@@ -1,0 +1,1 @@
+﻿dotnet ef --startup-project ../JailTalk.Web migrations add <Initial> -o Persistence/Migrations
