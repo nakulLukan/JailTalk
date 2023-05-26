@@ -8,4 +8,5 @@ namespace JailTalk.Application.Contracts.Data;
 
 public interface IAppDbContext
 {
+
 }

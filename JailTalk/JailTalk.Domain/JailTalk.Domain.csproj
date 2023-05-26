@@ -7,11 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\JailTalk.Shared\JailTalk.Shared.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="7.0.5" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Identity\" />
+    <ProjectReference Include="..\JailTalk.Shared\JailTalk.Shared.csproj" />
   </ItemGroup>
 
 </Project>

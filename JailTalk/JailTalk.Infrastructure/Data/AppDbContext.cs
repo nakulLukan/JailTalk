@@ -1,11 +1,12 @@
 ﻿using JailTalk.Application.Contracts.Data;
+using JailTalk.Domain.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace JailTalk.Infrastructure.Data;
 
-public class AppDbContext : IdentityDbContext, IAppDbContext
+public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
 {
     public AppDbContext(DbContextOptions options) : base(options)
     {
@@ -22,4 +23,6 @@ public class AppDbContext : IdentityDbContext, IAppDbContext
             )
         );
     }
+
+    public int MyProperty { get; set; }
 }
