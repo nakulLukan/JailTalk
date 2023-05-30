@@ -1,12 +1,16 @@
 ﻿@using JailTalk.Application.Dto.Identity;
+@using JailTalk.Domain.Identity;
 @using JailTalk.Web.Shared;
 @using Microsoft.AspNetCore.Components.Forms;
-@layout LoginLayout
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<AppUser> SignInManager;
+
+@layout IdentityLayout
 @page "/login"
 
 <Microsoft.AspNetCore.Components.Forms.EditForm Model="model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
-    <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center" >
+    <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
         <MudPaper Class="pa-16" Elevation="4">
             <MudGrid>
                 <MudItem sm="12">
@@ -26,8 +30,9 @@
 @code {
     SignInDto model = new();
 
-    private void OnValidSubmit(EditContext context)
+    private async Task OnValidSubmit(EditContext context)
     {
+        var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, false, true);
         StateHasChanged();
     }
 }

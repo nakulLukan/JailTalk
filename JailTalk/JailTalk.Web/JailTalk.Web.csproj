@@ -21,4 +21,12 @@
     <ProjectReference Include="..\JailTalk.Shared\JailTalk.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EditorConfigFiles Remove="D:\Workspace\CSharp\JailTalk\JailTalk\JailTalk.Web\.editorconfig" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="D:\Workspace\CSharp\JailTalk\JailTalk\JailTalk.Web\.editorconfig" />
+  </ItemGroup>
+
 </Project>

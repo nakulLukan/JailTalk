@@ -1,4 +1,5 @@
 ﻿using JailTalk.Application;
+using JailTalk.Domain.Identity;
 using JailTalk.Infrastructure;
 using JailTalk.Infrastructure.Data;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -18,7 +19,7 @@ public static class ServiceRegistry
 
     private static void RegisterIdentity(IServiceCollection services)
     {
-        services.AddIdentity<IdentityUser, IdentityRole>(options =>
+        services.AddIdentity<AppUser, IdentityRole>(options =>
         {
             options.SignIn.RequireConfirmedEmail = false;
         })
