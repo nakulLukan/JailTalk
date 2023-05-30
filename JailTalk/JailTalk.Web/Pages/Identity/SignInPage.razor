@@ -1,9 +1,12 @@
 ﻿@using JailTalk.Application.Dto.Identity;
+﻿@using JailTalk.Application.Contracts.Data;
 @using JailTalk.Domain.Identity;
+@using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Shared;
 @using Microsoft.AspNetCore.Components.Forms;
 @using Microsoft.AspNetCore.Identity;
-@inject SignInManager<AppUser> SignInManager;
+
+@inject IAppMediator AppMediator
 
 @layout IdentityLayout
 @page "/login"
@@ -22,6 +25,9 @@
                 <MudItem sm="12">
                     <MudTextField Label="Password" @bind-Value="@model.Password" For="@(()=> model.Password)" InputType="InputType.Password"></MudTextField>
                 </MudItem>
+                <MudItem sm="4">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Login</MudButton>
+                </MudItem>
             </MudGrid>
         </MudPaper>
     </MudStack>
@@ -32,7 +38,6 @@
 
     private async Task OnValidSubmit(EditContext context)
     {
-        var result = await SignInManager.PasswordSignInAsync(model.Username, model.Password, false, true);
         StateHasChanged();
     }
 }

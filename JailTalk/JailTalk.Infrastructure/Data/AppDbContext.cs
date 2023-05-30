@@ -25,4 +25,6 @@ public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
             )
         );
     }
+
+    public int MyProperty { get; set; }
 }
