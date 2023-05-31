@@ -16,6 +16,6 @@ public static class ServiceRegistry
             .UseNpgsql(connectionString)
             .UseSnakeCaseNamingConvention()
             .LogTo(Serilog.Log.Logger.Information));
-        services.AddTransient<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
+        services.AddScoped<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
     }
 }

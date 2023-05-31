@@ -1,5 +1,6 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Domain.Identity;
+using JailTalk.Domain.Lookup;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -13,8 +14,6 @@ public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
         ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
     }
 
-    public DbSet<AppUser> AspNetUsers { get; set; }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -26,5 +25,5 @@ public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
         );
     }
 
-    public int MyProperty { get; set; }
+    public DbSet<LookupMaster> LookupMasters { get; set; }
 }

@@ -1,3 +1,4 @@
+using JailTalk.Application.Contracts.Data;
 using JailTalk.Infrastructure.Data;
 using JailTalk.Web;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +11,13 @@ builder.Services.AddMudServices();
 builder.Services.RegisterService(builder.Configuration);
 
 var app = builder.Build();
-//var dbContext = app.Services.GetService<AppDbContext>();
-//await dbContext.Database.MigrateAsync();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
 if (!app.Environment.IsDevelopment())
 {
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.

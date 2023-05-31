@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace JailTalk.Infrastructure.Data.Migrations
+namespace JailTalk.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -49,6 +49,21 @@ namespace JailTalk.Infrastructure.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("pk_asp_net_users", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "lookup_masters",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    code = table.Column<string>(type: "character varying(15)", maxLength: 15, nullable: false),
+                    name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    is_active = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_lookup_masters", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -212,6 +227,9 @@ namespace JailTalk.Infrastructure.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "lookup_masters");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

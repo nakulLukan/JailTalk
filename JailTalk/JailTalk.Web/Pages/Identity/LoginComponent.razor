@@ -1,0 +1,50 @@
+﻿@using JailTalk.Application.Dto.Identity;
+@using JailTalk.Application.Requests.Identity;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using JailTalk.Web.Impl.Events;
+@using Microsoft.AspNetCore.Components.Forms
+@inject IAppMediator AppMediator;
+
+<Microsoft.AspNetCore.Components.Forms.EditForm Model="model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
+        <MudPaper Class="pa-16" Elevation="4">
+            <MudGrid>
+                <MudItem sm="12">
+                    <MudText Typo="Typo.h4">Sign-In</MudText>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudTextField Label="Username" @bind-Value="@model.Username" For="@(()=> model.Username)"></MudTextField>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudTextField Label="Password" @bind-Value="@model.Password" For="@(()=> model.Password)" InputType="InputType.Password"></MudTextField>
+                </MudItem>
+                <MudItem sm="4">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Login</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudStack>
+</Microsoft.AspNetCore.Components.Forms.EditForm>
+@code {
+    SignInDto model = new();
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        await AppMediator.Send(new ValidateUserCommand()
+        {
+            Username = model.Username,
+            Password = model.Password
+        })
+        .OnSuccess(data =>
+        {
+
+        })
+        .OnError(error =>
+        {
+            
+        });
+        StateHasChanged();
+    }
+}

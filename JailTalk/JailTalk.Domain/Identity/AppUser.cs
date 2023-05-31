@@ -4,5 +4,4 @@ namespace JailTalk.Domain.Identity;
 
 public class AppUser : IdentityUser
 {
-
 }
