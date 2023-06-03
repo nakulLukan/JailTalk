@@ -8,6 +8,7 @@ public class LookupDetailEFConfig : IEntityTypeConfiguration<LookupDetail>
 {
     public void Configure(EntityTypeBuilder<LookupDetail> builder)
     {
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x => x.InternalName).IsRequired().HasMaxLength(20);
         builder.Property(x => x.Value).IsRequired().HasMaxLength(100);
         builder.Property(x => x.Order).IsRequired(false);

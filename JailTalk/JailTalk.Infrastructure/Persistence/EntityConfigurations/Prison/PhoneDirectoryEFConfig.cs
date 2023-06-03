@@ -8,6 +8,7 @@ public class PhoneDirectoryEFConfig : IEntityTypeConfiguration<PhoneDirectory>
 {
     public void Configure(EntityTypeBuilder<PhoneDirectory> builder)
     {
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x=>x.PhoneNumber).IsRequired(true).HasMaxLength(15);
         builder.Property(x=>x.CountryCode).IsRequired(true).HasMaxLength(5);
         builder.Property(x=>x.LastBlockedOn).IsRequired(false);

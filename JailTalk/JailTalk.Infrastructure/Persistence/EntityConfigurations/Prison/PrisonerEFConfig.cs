@@ -8,6 +8,7 @@ public class PrisonerEFConfig : IEntityTypeConfiguration<Prisoner>
 {
     public void Configure(EntityTypeBuilder<Prisoner> builder)
     {
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x => x.Pid).IsRequired(true).HasMaxLength(100);
         builder.HasIndex(x => x.Pid);
 

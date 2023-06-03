@@ -8,6 +8,7 @@ public class PhoneBalanceHistoryEFConfig : IEntityTypeConfiguration<PhoneBalance
 {
     public void Configure(EntityTypeBuilder<PhoneBalanceHistory> builder)
     {
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x=>x.CallRequestId).IsRequired(false);
         builder.Property(x=>x.RechargedByUserId).IsRequired(false);
         builder.HasOne(x => x.Prisoner)

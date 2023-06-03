@@ -8,6 +8,7 @@ public class AddressBookEFConfig : IEntityTypeConfiguration<AddressBook>
 {
     public void Configure(EntityTypeBuilder<AddressBook> builder)
     {
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.Property(x => x.HouseName).IsRequired(false).HasMaxLength(50);
         builder.Property(x => x.Street).IsRequired(false).HasMaxLength(50);
         builder.Property(x => x.City).IsRequired(false).HasMaxLength(30);

@@ -19,11 +19,19 @@ public class ValidateUserCommandHandler : IRequestHandler<ValidateUserCommand, A
 
     public async Task<AppUser> Handle(ValidateUserCommand request, CancellationToken cancellationToken)
     {
-        var result = await _authenticationService.SignInUser(request.Username, request.Password);
-        if (!result.Succeeded)
+        try
         {
-            throw new AppException("Username or Password does not match");
+            var result = await _authenticationService.SignInUser(request.Username, request.Password);
+            if (!result.Succeeded)
+            {
+                throw new AppException("Username or Password does not match");
+            }
         }
+        catch(Exception ex)
+        {
+
+        }
+        
 
         return null;
     }

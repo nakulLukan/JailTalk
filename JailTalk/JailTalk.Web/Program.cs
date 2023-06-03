@@ -1,17 +1,22 @@
-using JailTalk.Application.Contracts.Data;
 using JailTalk.Infrastructure.Data;
 using JailTalk.Web;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddConfiguration(new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+#if RELEASE
+                .AddJsonFile($"appsettings.release.json", optional: true)
+#endif
+                .Build());
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
 builder.Services.RegisterService(builder.Configuration);
 
 var app = builder.Build();
-
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();

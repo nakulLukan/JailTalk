@@ -8,6 +8,7 @@ public class CallHistoryEFConfig : IEntityTypeConfiguration<CallHistory>
 {
     public void Configure(EntityTypeBuilder<CallHistory> builder)
     {
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.HasOne(x => x.PhoneDirectory)
             .WithMany(x => x.CallHistory)
             .HasForeignKey(x => x.PhoneDirectoryId);

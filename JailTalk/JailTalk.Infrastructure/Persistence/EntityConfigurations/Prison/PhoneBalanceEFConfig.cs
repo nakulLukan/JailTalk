@@ -8,6 +8,7 @@ public class PhoneBalanceEFConfig : IEntityTypeConfiguration<PhoneBalance>
 {
     public void Configure(EntityTypeBuilder<PhoneBalance> builder)
     {
+        builder.Property(x => x.Id).ValueGeneratedOnAdd();
         builder.HasOne(x => x.Prisoner)
             .WithOne(x=>x.PhoneBalance)
             .HasForeignKey<PhoneBalance>(x => x.PrisonerId);
