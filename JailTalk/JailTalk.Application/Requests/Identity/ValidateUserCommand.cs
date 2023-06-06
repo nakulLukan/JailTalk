@@ -1,15 +1,15 @@
 ﻿using JailTalk.Application.Contracts.UserManagement;
 using JailTalk.Application.Dto.Identity;
-using JailTalk.Domain.Identity;
+using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
 using MediatR;
 namespace JailTalk.Application.Requests.Identity;
 
-public class ValidateUserCommand : SignInDto, IRequest<AppUser>
+public class ValidateUserCommand : SignInDto, IRequest<UserSignInResultDto>
 {
 }
 
-public class ValidateUserCommandHandler : IRequestHandler<ValidateUserCommand, AppUser>
+public class ValidateUserCommandHandler : IRequestHandler<ValidateUserCommand, UserSignInResultDto>
 {
     readonly IAuthenticationService _authenticationService;
     public ValidateUserCommandHandler(IAuthenticationService authenticationService)
@@ -17,22 +17,14 @@ public class ValidateUserCommandHandler : IRequestHandler<ValidateUserCommand, A
         _authenticationService = authenticationService;
     }
 
-    public async Task<AppUser> Handle(ValidateUserCommand request, CancellationToken cancellationToken)
+    public async Task<UserSignInResultDto> Handle(ValidateUserCommand request, CancellationToken cancellationToken)
     {
-        try
+        var result = await _authenticationService.SignInUser(request.Email, request.Password);
+        if (!result.Succeeded)
         {
-            var result = await _authenticationService.SignInUser(request.Username, request.Password);
-            if (!result.Succeeded)
-            {
-                throw new AppException("Username or Password does not match");
-            }
+            throw new AppException("Username or Password does not match");
         }
-        catch(Exception ex)
-        {
 
-        }
-        
-
-        return null;
+        return result;
     }
 }

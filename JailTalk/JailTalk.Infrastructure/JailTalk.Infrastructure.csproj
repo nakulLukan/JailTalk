@@ -27,8 +27,4 @@
     <ProjectReference Include="..\JailTalk.Shared\JailTalk.Shared.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Data\Seeder\" />
-  </ItemGroup>
-
 </Project>

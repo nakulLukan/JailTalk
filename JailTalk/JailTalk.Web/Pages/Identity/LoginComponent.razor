@@ -1,12 +1,15 @@
 ﻿@using JailTalk.Application.Dto.Identity;
 @using JailTalk.Application.Requests.Identity;
+@using JailTalk.Shared.Models.Identity;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
 @using JailTalk.Web.Impl.Events;
+@using JailTalk.Web.Impl.UserManagement;
 @using Microsoft.AspNetCore.Components.Forms
 @inject IAppMediator AppMediator;
+@inject NavigationManager NavigationManager;
 
-<Microsoft.AspNetCore.Components.Forms.EditForm Model="model" OnValidSubmit="OnValidSubmit">
+<EditForm Model="model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
     <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
         <MudPaper Class="pa-16" Elevation="4">
@@ -15,7 +18,7 @@
                     <MudText Typo="Typo.h4">Sign-In</MudText>
                 </MudItem>
                 <MudItem sm="12">
-                    <MudTextField Label="Username" @bind-Value="@model.Username" For="@(()=> model.Username)"></MudTextField>
+                    <MudTextField Label="Username" @bind-Value="@model.Email" For="@(()=> model.Email)"></MudTextField>
                 </MudItem>
                 <MudItem sm="12">
                     <MudTextField Label="Password" @bind-Value="@model.Password" For="@(()=> model.Password)" InputType="InputType.Password"></MudTextField>
@@ -26,24 +29,25 @@
             </MudGrid>
         </MudPaper>
     </MudStack>
-</Microsoft.AspNetCore.Components.Forms.EditForm>
+</EditForm>
 @code {
     SignInDto model = new();
 
     private async Task OnValidSubmit(EditContext context)
     {
         await AppMediator.Send(new ValidateUserCommand()
-        {
-            Username = model.Username,
-            Password = model.Password
-        })
+            {
+                Email = model.Email,
+                Password = model.Password
+            })
         .OnSuccess(data =>
         {
-
+            Guid key = Guid.NewGuid();
+            AuthenticationService.Logins[key] = new LoginInfo { UserName = data.UserName, Password = model.Password };
+            NavigationManager.NavigateTo($"/login?key={key}", true);
         })
         .OnError(error =>
         {
-            
         });
         StateHasChanged();
     }

@@ -9,8 +9,6 @@ using JailTalk.Web.Impl.UserManagement;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.DependencyInjection;
-using MediatR;
 
 namespace JailTalk.Web;
 
@@ -27,7 +25,7 @@ public static class ServiceRegistry
     private static void RegisterWebServices(IServiceCollection services)
     {
         services.AddTransient<IAuthenticationService, AuthenticationService>();
-        services.AddMediatR((c)=>
+        services.AddMediatR((c) =>
         {
             c.RegisterServicesFromAssembly(typeof(Application.ServiceRegistry).Assembly);
         });

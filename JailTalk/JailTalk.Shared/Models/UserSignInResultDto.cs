@@ -31,4 +31,9 @@ public class UserSignInResultDto
     /// </summary>
     /// <value>True if the user attempting to sign-in requires two factor authentication, otherwise false.</value>
     public bool RequiresTwoFactor { get; set; }
+
+    /// <summary>
+    /// Username of the authenticated user
+    /// </summary>
+    public string UserName { get; set; }
 }

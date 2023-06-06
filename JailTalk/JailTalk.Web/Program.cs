@@ -1,10 +1,12 @@
 using JailTalk.Infrastructure.Data;
+using JailTalk.Infrastructure.Data.Seeder;
 using JailTalk.Web;
+using JailTalk.Web.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
-using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Configuration.AddConfiguration(new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
 #if RELEASE
@@ -21,6 +23,8 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await dbContext.Database.MigrateAsync();
+    await dbContext.SeedRoles();
+    await dbContext.SeedDefaultUsers(builder.Configuration);
 }
 
 if (!app.Environment.IsDevelopment())
@@ -36,9 +40,8 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseMiddleware<AuthenticationMiddleware>();
 app.MapControllers();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
-
 app.Run();
