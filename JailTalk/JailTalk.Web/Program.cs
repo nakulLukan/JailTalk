@@ -8,6 +8,7 @@ using MudBlazor.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddConfiguration(new ConfigurationBuilder()
+                .AddEnvironmentVariables()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
 #if RELEASE
                 .AddJsonFile($"appsettings.release.json", optional: true)
