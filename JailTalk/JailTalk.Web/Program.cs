@@ -8,11 +8,8 @@ using MudBlazor.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddConfiguration(new ConfigurationBuilder()
-                .AddEnvironmentVariables()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-#if RELEASE
-                .AddJsonFile($"appsettings.release.json", optional: true)
-#endif
+                .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
                 .Build());
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -22,14 +19,13 @@ builder.Services.RegisterService(builder.Configuration);
 var app = builder.Build();
 try
 {
-
-using (var scope = app.Services.CreateScope())
-{
-    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    await dbContext.Database.MigrateAsync();
-    await dbContext.SeedRoles();
-    await dbContext.SeedDefaultUsers(builder.Configuration);
-}
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await dbContext.Database.MigrateAsync();
+        await dbContext.SeedRoles();
+        await dbContext.SeedDefaultUsers(builder.Configuration);
+    }
 }
 catch
 {
