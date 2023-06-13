@@ -49,6 +49,7 @@
         })
         .OnError(error =>
         {
+            ToastService.Error(error.Message);
         });
         StateHasChanged();
     }

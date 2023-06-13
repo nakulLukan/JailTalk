@@ -1,10 +1,12 @@
 ﻿using JailTalk.Application;
+using JailTalk.Application.Contracts.Presentation;
 using JailTalk.Application.Contracts.UserManagement;
 using JailTalk.Domain.Identity;
 using JailTalk.Infrastructure;
 using JailTalk.Infrastructure.Data;
 using JailTalk.Web.Contracts.Events;
 using JailTalk.Web.Impl.Events;
+using JailTalk.Web.Impl.Presentation;
 using JailTalk.Web.Impl.UserManagement;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
@@ -24,6 +26,7 @@ public static class ServiceRegistry
 
     private static void RegisterWebServices(IServiceCollection services)
     {
+        services.AddTransient<IToastService, ToastService>();
         services.AddTransient<IAuthenticationService, AuthenticationService>();
         services.AddMediatR((c) =>
         {

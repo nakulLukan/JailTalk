@@ -4,13 +4,19 @@ using JailTalk.Web;
 using JailTalk.Web.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
-
+Log.Logger = new LoggerConfiguration()
+        .WriteTo.File($"{Directory.GetCurrentDirectory()}/logs/log-.txt", rollingInterval: RollingInterval.Day)
+        .CreateLogger();
 builder.Configuration.AddConfiguration(new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
                 .Build());
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
