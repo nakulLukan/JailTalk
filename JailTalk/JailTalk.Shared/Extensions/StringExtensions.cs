@@ -2,7 +2,7 @@
 
 public static class StringExtensions
 {
-    public static string Normalize(this string value)
+    public static string Normalized(this string value)
     {
         if (value == null) return null;
         return value.ToUpperInvariant();

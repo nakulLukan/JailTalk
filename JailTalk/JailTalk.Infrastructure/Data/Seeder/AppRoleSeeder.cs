@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using JailTalk.Shared.Extensions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,7 +20,7 @@ public static class AppRoleSeeder
             await roleStore.CreateAsync(new IdentityRole
             {
                 Name = role,
-                NormalizedName = role.Normalize()
+                NormalizedName = role.Normalized()
             });
         }
     }

@@ -1,4 +1,5 @@
 ﻿using JailTalk.Domain.Identity;
+using JailTalk.Shared.Extensions;
 using JailTalk.Shared.Models.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -20,15 +21,17 @@ public static class AppUserSeeder
             AppUser newUser = new AppUser()
             {
                 UserName = user.UserName,
-                NormalizedUserName = user.UserName.Normalize(),
-                Email = user.Email.Normalize(),
+                NormalizedUserName = user.UserName.Normalized(),
+                Email = user.Email,
+                NormalizedEmail = user.Email.Normalized(),
+                LockoutEnabled = true,
             };
 
             var password = new PasswordHasher<AppUser>();
             var hashed = password.HashPassword(newUser, user.Password);
             newUser.PasswordHash = hashed;
             var result = await userStore.CreateAsync(newUser);
-            await userStore.AddToRoleAsync(newUser, user.Role.Normalize());
+            await userStore.AddToRoleAsync(newUser, user.Role.Normalized());
         }
     }
 }
