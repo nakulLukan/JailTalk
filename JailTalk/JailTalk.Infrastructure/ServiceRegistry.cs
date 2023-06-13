@@ -11,6 +11,9 @@ public static class ServiceRegistry
     public static void RegisterInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("Default");
+        Console.WriteLine(connectionString);
+        Console.WriteLine(configuration["ConnectionStrings:Default"]);
+
         services.AddDbContext<AppDbContext>(options =>
             options
             .UseNpgsql(connectionString)
