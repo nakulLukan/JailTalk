@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JailTalk.Domain", "JailTalk
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JailTalk.Shared", "JailTalk.Shared\JailTalk.Shared.csproj", "{C7366666-0086-4D00-9BE3-772DAFEF3763}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JailTalk.Api", "JailTalk.Api\JailTalk.Api.csproj", "{5DF1EC86-F83F-49D0-96E4-64FEC30FDCF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JailTalk.Api", "JailTalk.Api\JailTalk.Api.csproj", "{5DF1EC86-F83F-49D0-96E4-64FEC30FDCF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

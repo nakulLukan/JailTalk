@@ -1,0 +1,19 @@
+﻿<MudCard Square="true" Elevation="1" Outlined=true @onclick="@asdasd" Class="cursor-pointer grey lighten-4">
+    <MudCardContent>
+        <MudPaper Elevation="0" Width="100px" Height="100px"
+            Square=true
+                  Class="d-flex align-center justify-center shades transparent">
+            <MudText Align="Align.Center">@Name</MudText>
+        </MudPaper>
+    </MudCardContent>
+</MudCard>
+@code {
+
+    [Parameter]
+    public string Name { get; set; }
+
+    public void asdasd()
+    {
+        Console.WriteLine("Test");
+    }
+}
