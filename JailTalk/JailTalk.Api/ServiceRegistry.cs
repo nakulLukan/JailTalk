@@ -45,5 +45,7 @@ public static class ServiceRegistry
         {
             c.RegisterServicesFromAssembly(typeof(Application.ServiceRegistry).Assembly);
         });
+
+        services.AddProblemDetails();
     }
 }

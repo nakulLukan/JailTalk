@@ -1,4 +1,7 @@
-﻿<MudCard Square="true" Elevation="1" Outlined=true @onclick="@asdasd" Class="cursor-pointer grey lighten-4">
+﻿@using JailTalk.Shared.Utilities;
+@inject NavigationManager NavigationManager
+
+<MudCard Square="true" Elevation="1" Outlined=true @onclick="@NavigateToRoute" Class="cursor-pointer grey lighten-4">
     <MudCardContent>
         <MudPaper Elevation="0" Width="100px" Height="100px"
             Square=true
@@ -12,8 +15,16 @@
     [Parameter]
     public string Name { get; set; }
 
-    public void asdasd()
+    [Parameter]
+    public string Route { get; set; }
+
+    public void NavigateToRoute()
     {
-        Console.WriteLine("Test");
+        if (string.IsNullOrEmpty(Route))
+        {
+            throw new AppException("Route cannot be empty");
+        }
+
+        NavigationManager.NavigateTo(Route);
     }
 }

@@ -16,6 +16,7 @@ public interface IAppDbContext
     public DbSet<PhoneBalanceHistory> PhoneBalanceHistory { get; set; }
     public DbSet<PhoneDirectory> PhoneDirectory { get; set; }
     public DbSet<Prisoner> Prisoners { get; set; }
+    public DbSet<Device> Devices { get; set; }
 
     Task<int> SaveAsync(CancellationToken cancellationToken);
 }
