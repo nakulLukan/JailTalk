@@ -1,0 +1,45 @@
+﻿@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Prison;
+@using MediatR;
+@using System.Linq.Expressions;
+@inject IMediator Mediator;
+
+<MudSelect Label="Prison" AnchorOrigin="Origin.BottomCenter" ValueChanged="ValueChanged" For="For">
+    <MudSelectItem T="int?" Value="default(int?)">Select</MudSelectItem>
+    @foreach (var prison in prisons)
+    {
+        <MudSelectItem T="int?" Value="prison.Id">@prison.Name</MudSelectItem>
+    }
+</MudSelect>
+@code {
+    List<JailNameDto> prisons = new();
+
+    private int? _value;
+    [Parameter]
+    public int? Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            _value = value;
+            ValueChanged.InvokeAsync(value);
+        }
+    }
+    [Parameter]
+    public EventCallback<int?> ValueChanged { get; set; }
+
+    [Parameter]
+    [Category("Validation")]
+    public Expression<Func<int?>> For { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            prisons = await Mediator.Send(new GetJailNamesRequest());
+        }
+
+    }
+
+}

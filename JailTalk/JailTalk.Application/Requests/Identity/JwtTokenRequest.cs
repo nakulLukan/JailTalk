@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using JailTalk.Application.Contracts.Data;
-using JailTalk.Domain.Prison;
 using JailTalk.Shared;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
@@ -39,7 +38,7 @@ public class JwtTokenRequestHandler : IRequestHandler<JwtTokenRequest, ResponseD
         return new ResponseDto<string>(jwt);
     }
 
-    private async Task<Device> ValidateDevice(JwtTokenRequest request, CancellationToken cancellationToken)
+    private async Task<Domain.Prison.Device> ValidateDevice(JwtTokenRequest request, CancellationToken cancellationToken)
     {
         var device = await _dbContext.Devices.AsTracking()
                     .Where(x => x.MacAddress == request.MacAddress && x.IsActive)
@@ -73,7 +72,7 @@ public class JwtTokenRequestHandler : IRequestHandler<JwtTokenRequest, ResponseD
         return device;
     }
 
-    private string CreateToken(Device device)
+    private string CreateToken(Domain.Prison.Device device)
     {
         IdentityModelEventSource.ShowPII = false;
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -105,6 +104,6 @@ public class JwtTokenRequestValidator : AbstractValidator<JwtTokenRequest>
     public JwtTokenRequestValidator()
     {
         RuleFor(x => x.MacAddress).NotEmpty()
-            .Matches("^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$");
+            .Matches(RegularExpressionPattern.MacAddress);
     }
 }

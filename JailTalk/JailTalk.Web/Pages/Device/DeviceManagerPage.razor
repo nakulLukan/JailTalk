@@ -1,0 +1,66 @@
+﻿@page "/device-manager"
+@using JailTalk.Application.Dto.Device;
+@using JailTalk.Application.Requests.Device;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using JailTalk.Web.Impl.Events;
+@using MediatR;
+@inject IMediator Mediator;
+
+<MudTable Items="@Elements"
+          Dense="false" Hover="true" Bordered="true"
+@bind-SelectedItem="selectedItem1" FixedHeader="true" Loading="_loading">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Device Manager</MudText>
+        <MudSpacer />
+        <MudStack Row="true" AlignItems="AlignItems.End">
+            <MudLink Href="/device-manager/new">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary">Register Device</MudButton>
+            </MudLink>
+            <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </MudStack>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>S/L</MudTh>
+        <MudTh>Device Code</MudTh>
+        <MudTh>Prison</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Device Secret</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="S/L">@context.Serial</MudTd>
+        <MudTd DataLabel="Device Code">@context.Code</MudTd>
+        <MudTd DataLabel="Prison">@context.Prison</MudTd>
+        <MudTd DataLabel="Status"> @(context.IsActive ? "Enabled" : "Disabled")</MudTd>
+        <MudTd DataLabel="Device Secret">@context.DeviceSecret</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private bool _loading = true;
+    private string searchString1 = "";
+    private DeviceListDto selectedItem1 = null;
+    private HashSet<DeviceListDto> selectedItems = new HashSet<DeviceListDto>();
+
+    private List<DeviceListDto> Elements = new List<DeviceListDto>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Elements = (await Mediator.Send(new GetAllDevicesRequest())).Data;
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private bool FilterFunc1(DeviceListDto element) => FilterFunc(element, searchString1);
+
+    private bool FilterFunc(DeviceListDto element, string searchString)
+    {
+        return false;
+    }
+}

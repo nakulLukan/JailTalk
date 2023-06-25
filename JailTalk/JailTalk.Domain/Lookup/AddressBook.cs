@@ -7,6 +7,7 @@ public class AddressBook
     public string City { get; set; }
     public int? StateId { get; set; }
     public int? CountryId { get; set; }
+    public string PinCode { get; set; }
 
     public LookupDetail State { get; set; }
     public LookupDetail Country { get; set; }

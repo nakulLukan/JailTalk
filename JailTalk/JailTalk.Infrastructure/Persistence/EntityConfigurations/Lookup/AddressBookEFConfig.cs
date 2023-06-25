@@ -14,6 +14,7 @@ public class AddressBookEFConfig : IEntityTypeConfiguration<AddressBook>
         builder.Property(x => x.City).IsRequired(false).HasMaxLength(30);
         builder.Property(x => x.StateId).IsRequired(false);
         builder.Property(x => x.CountryId).IsRequired(false);
+        builder.Property(x => x.PinCode).IsRequired(true).HasMaxLength(10);
 
         builder.HasOne(x => x.State)
             .WithMany()

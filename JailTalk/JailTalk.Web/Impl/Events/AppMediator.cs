@@ -10,10 +10,12 @@ namespace JailTalk.Web.Impl.Events;
 public class AppMediator : IAppMediator
 {
     private readonly IMediator mediator;
+    private readonly ILogger<AppMediator> logger;
 
-    public AppMediator(IMediator mediator)
+    public AppMediator(IMediator mediator, ILogger<AppMediator> logger)
     {
         this.mediator = mediator;
+        this.logger = logger;
     }
 
     public async Task<ResponseDto<TData>> Send<TData>(IRequest<ResponseDto<TData>> request)
@@ -32,6 +34,8 @@ public class AppMediator : IAppMediator
         }
         catch (Exception ex)
         {
+            logger.LogError("{0} mediator request failed.", request.GetType().Name);
+            logger.LogError("Exception: {message}\nStackTrace: {stackTrace}", ex.Message, ex.StackTrace);
             return new ResponseDto<TData>(new ErrorDto("Oops, something went wrong."));
         }
     }

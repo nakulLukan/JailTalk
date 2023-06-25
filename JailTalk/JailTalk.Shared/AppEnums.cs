@@ -17,3 +17,19 @@ public enum CallEndReason : short
     CallEnded = 1,
 
 }
+
+public enum States : int
+{
+    Kerala = 1
+}
+
+public enum Country : int
+{
+    India = 1
+}
+
+public enum LookupMasters : int
+{
+    State = 1,
+    Country = 2
+}

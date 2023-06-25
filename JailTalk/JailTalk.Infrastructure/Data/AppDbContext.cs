@@ -5,7 +5,7 @@ using JailTalk.Domain.Prison;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-
+using JailTalk.Infrastructure.Data.Seeder;
 namespace JailTalk.Infrastructure.Data;
 
 public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
@@ -24,6 +24,8 @@ public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
                 i.GetGenericTypeDefinition() == typeof(IEntityTypeConfiguration<>)
             )
         );
+
+        modelBuilder.SeedData();
     }
 
     public Task<int> SaveAsync(CancellationToken cancellationToken)

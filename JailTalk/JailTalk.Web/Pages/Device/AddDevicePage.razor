@@ -1,0 +1,78 @@
+﻿@page "/device-manager/new"
+@using JailTalk.Application.Dto.Device;
+@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Device;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using Microsoft.AspNetCore.Components.Forms
+@inject IAppMediator AppMediator;
+@inject NavigationManager NavigationManager;
+
+<EditForm Model="model" OnValidSubmit="@OnValidSubmit">
+    <DataAnnotationsValidator />
+    <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
+        <MudPaper Class="pa-16" Elevation="4">
+            <MudGrid>
+                <MudItem sm="12">
+                    <h3>Register New Device</h3>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudTextField Label="Device Code" @bind-Value="@model.Code" For="@(()=> model.Code)"></MudTextField>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudTextField Label="MAC Address" Mask="@macAddressMask" @bind-Value="@model.MacAddress" For="@(()=> model.MacAddress)"></MudTextField>
+                </MudItem>
+                <MudItem sm="12">
+                    <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.PrisonId" For="@(()=> model.PrisonId)" />
+                </MudItem>
+                <MudItem sm="12">
+                    <MudTextField Mask="@secretMask" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudSwitch @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
+                </MudItem>
+                <MudItem sm="4">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                    <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
+    </MudStack>
+</EditForm>
+@code {
+    NewDeviceDto model = new();
+
+    PatternMask secretMask = new PatternMask("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
+        {
+            MaskChars = new[] { new MaskChar('X', @"[0-9a-fA-F]") },
+            Placeholder = '_',
+            CleanDelimiters = true,
+        };
+
+    PatternMask macAddressMask = new PatternMask("XX-XX-XX-XX-XX-XX")
+        {
+            MaskChars = new[] { new MaskChar('X', @"[0-9a-fA-F]") },
+            Placeholder = '_',
+            CleanDelimiters = true,
+        };
+    private async Task OnValidSubmit(EditContext context)
+    {
+        await AppMediator.Send(new RegisterDeviceCommand
+            {
+                Code = model.Code.Trim(),
+                DeviceSecret = model.DeviceSecret,
+                IsActive = model.IsActive,
+                MacAddress = model.MacAddress,
+                PrisonId = model.PrisonId
+            })
+        .OnSuccess(data =>
+        {
+            ToastService.Success("Device Registered Successfully.");
+            NavigationManager.NavigateTo("device-manager");
+        })
+        .OnError(err =>
+        {
+            ToastService.Error(err.Message);
+        });
+    }
+}
