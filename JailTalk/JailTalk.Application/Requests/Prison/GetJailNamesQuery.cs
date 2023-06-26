@@ -5,20 +5,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JailTalk.Application.Requests.Prison;
 
-public class GetJailNamesRequest : IRequest<List<JailNameDto>>
+public class GetJailNamesQuery : IRequest<List<JailNameDto>>
 {
 }
 
-public class GetJailNamesRequestHandler : IRequestHandler<GetJailNamesRequest, List<JailNameDto>>
+public class GetJailNamesQueryHandler : IRequestHandler<GetJailNamesQuery, List<JailNameDto>>
 {
     readonly IAppDbContext _dbContext;
 
-    public GetJailNamesRequestHandler(IAppDbContext dbContext)
+    public GetJailNamesQueryHandler(IAppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<List<JailNameDto>> Handle(GetJailNamesRequest request, CancellationToken cancellationToken)
+    public async Task<List<JailNameDto>> Handle(GetJailNamesQuery request, CancellationToken cancellationToken)
     {
         var jails = await _dbContext.Jails.OrderBy(x => x.Code).Select(x => new JailNameDto
         {

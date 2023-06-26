@@ -1,0 +1,57 @@
+﻿@page "/prisoners"
+@using JailTalk.Application.Dto.Device;
+@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Device;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using JailTalk.Web.Impl.Events;
+@using MediatR;
+@inject IMediator Mediator;
+
+<MudTable Items="@Prisoners"
+          Dense="true" Hover="true" Bordered="true"
+          FixedHeader="true" Loading="_loading">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Prisoners</MudText>
+        <MudSpacer />
+        <MudStack Row="true" AlignItems="AlignItems.End">
+            <MudLink Href="/prisoners/new">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary">Add Prisoner</MudButton>
+            </MudLink>
+        </MudStack>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>S/L</MudTh>
+        <MudTh>Full Name</MudTh>
+        <MudTh>PID</MudTh>
+        <MudTh>Prison Code</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="S/L">@context.Serial</MudTd>
+        <MudTd DataLabel="Full Name">@context.FullName</MudTd>
+        <MudTd DataLabel="PID">@context.Pid</MudTd>
+        <MudTd DataLabel="Prison Code">@context.PrisonCode</MudTd>
+    </RowTemplate>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private bool _loading = true;
+    private string searchString1 = "";
+    private PrisonerListDto selectedItem1 = null;
+
+    private List<PrisonerListDto> Prisoners = new List<PrisonerListDto>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Prisoners = (await Mediator.Send(new GetPrisonersQuery()));
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+}

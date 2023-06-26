@@ -37,7 +37,7 @@
     {
         if (firstRender)
         {
-            prisons = await Mediator.Send(new GetJailNamesRequest());
+            prisons = await Mediator.Send(new GetJailNamesQuery());
         }
 
     }

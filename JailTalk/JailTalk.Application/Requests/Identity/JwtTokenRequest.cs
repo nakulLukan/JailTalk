@@ -82,6 +82,7 @@ public class JwtTokenRequestHandler : IRequestHandler<JwtTokenRequest, ResponseD
         {
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Sub, device.Id.ToString()),
+            new(JwtRegisteredClaimNames.Name, device.Code),
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor
