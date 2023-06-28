@@ -1,0 +1,12 @@
+﻿<div class="@marginTopClassName"></div>
+@code {
+    [Parameter]
+    public int Spacing { get; set; }
+
+    string marginTopClassName = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        marginTopClassName = $"mt-{Spacing}";
+    }
+}

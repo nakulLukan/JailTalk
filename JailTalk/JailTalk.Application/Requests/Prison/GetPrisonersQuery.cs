@@ -30,6 +30,7 @@ public class GetPrisonersQueryHandler : IRequestHandler<GetPrisonersQuery, List<
                 FullName = x.FullName,
                 Pid = x.Pid,
                 PrisonCode = x.Jail.Code,
+                Id = x.Id
             })
             .ToListAsync(cancellationToken);
 

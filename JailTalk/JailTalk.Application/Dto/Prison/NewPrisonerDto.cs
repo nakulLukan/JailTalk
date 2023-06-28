@@ -1,4 +1,4 @@
-﻿using JailTalk.Application.Requests.Lookup;
+﻿using JailTalk.Application.Dto.Lookup;
 using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Prison;

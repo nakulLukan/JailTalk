@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace JailTalk.Application.Requests.Lookup;
+namespace JailTalk.Application.Dto.Lookup;
 
 public class NewAddressDto
 {

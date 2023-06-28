@@ -1,0 +1,51 @@
+﻿@using JailTalk.Application.Dto.Prison;
+@using MediatR;
+@inject IMediator Mediator;
+
+
+<MudTable Items="@contacts" Dense="true" Hover="true" Bordered="true" Striped="true" Class="">
+    <ToolBarContent >
+        <MudText Typo="Typo.h6">Contacts</MudText>
+        <MudSpacer />
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary">Add Contact</MudButton>
+    </ToolBarContent>
+    <HeaderContent>
+        <MudTh>S/L</MudTh>
+        <MudTh>Contact Number</MudTh>
+        <MudTh>Relationship</MudTh>
+        <MudTh>Address</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Action</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="S/L">@context.Serial</MudTd>
+        <MudTd DataLabel="Contact Number">@context.ContactNumber</MudTd>
+        <MudTd DataLabel="Relationship">@context.Relationship</MudTd>
+        <MudTd DataLabel="Address">@context.RelativeAddress</MudTd>
+        <MudTd DataLabel="Status">@context.Status</MudTd>
+        <MudTd DataLabel="Action">
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert">
+                <MudMenuItem>Edit</MudMenuItem>
+                <MudMenuItem>Block Number</MudMenuItem>
+                <MudMenuItem>Disable Number</MudMenuItem>
+            </MudMenu>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Typo="Typo.caption" ><b>No Records Found !!!</b></MudText>
+    </NoRecordsContent>
+</MudTable>
+@code {
+    [Parameter]
+    public string PrisonerId { get; set; }
+    List<PrisonerContactDetailListDto> contacts = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        contacts = await Mediator.Send(new PrisonerContactDetailsQuery
+            {
+                PrisonerId = Guid.Parse(PrisonerId)
+            });
+    }
+}

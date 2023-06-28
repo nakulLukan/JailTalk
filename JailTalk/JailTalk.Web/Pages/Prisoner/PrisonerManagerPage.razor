@@ -8,10 +8,13 @@
 @using JailTalk.Web.Impl.Events;
 @using MediatR;
 @inject IMediator Mediator;
+@inject NavigationManager NavigationManager;
 
 <MudTable Items="@Prisoners"
           Dense="true" Hover="true" Bordered="true"
-          FixedHeader="true" Loading="_loading">
+          FixedHeader="true" Loading="_loading" SelectOnRowClick="true" 
+          OnRowClick="OnRowClick" T="PrisonerListDto"
+          RowClass="cursor-pointer" >
     <ToolBarContent>
         <MudText Typo="Typo.h6">Prisoners</MudText>
         <MudSpacer />
@@ -41,7 +44,6 @@
 @code {
     private bool _loading = true;
     private string searchString1 = "";
-    private PrisonerListDto selectedItem1 = null;
 
     private List<PrisonerListDto> Prisoners = new List<PrisonerListDto>();
 
@@ -53,5 +55,10 @@
             _loading = false;
             StateHasChanged();
         }
+    }
+
+    private void OnRowClick(TableRowClickEventArgs<PrisonerListDto> tableRowClickEventArgs)
+    {
+        NavigationManager.NavigateTo($"prisoners/{tableRowClickEventArgs.Item.Id}");
     }
 }
