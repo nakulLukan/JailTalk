@@ -32,8 +32,4 @@
     <None Include="D:\Workspace\CSharp\JailTalk\JailTalk\JailTalk.Application\.editorconfig" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Requests\Lookup\" />
-  </ItemGroup>
-
 </Project>

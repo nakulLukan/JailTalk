@@ -211,6 +211,60 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                             LookupMasterId = 2,
                             Order = 1,
                             Value = "India"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            InternalName = "father",
+                            IsActive = true,
+                            LookupMasterId = 3,
+                            Order = 1,
+                            Value = "Father"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            InternalName = "mother",
+                            IsActive = true,
+                            LookupMasterId = 3,
+                            Order = 2,
+                            Value = "Mother"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            InternalName = "brother",
+                            IsActive = true,
+                            LookupMasterId = 3,
+                            Order = 3,
+                            Value = "Brother"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            InternalName = "sister",
+                            IsActive = true,
+                            LookupMasterId = 3,
+                            Order = 4,
+                            Value = "Sister"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            InternalName = "lawyer",
+                            IsActive = true,
+                            LookupMasterId = 3,
+                            Order = 5,
+                            Value = "Lawyer"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            InternalName = "other",
+                            IsActive = true,
+                            LookupMasterId = 3,
+                            Order = 6,
+                            Value = "Others"
                         });
                 });
 
@@ -248,16 +302,23 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         new
                         {
                             Id = 1,
-                            InternalName = "state",
+                            InternalName = "State",
                             IsActive = true,
                             Name = "States"
                         },
                         new
                         {
                             Id = 2,
-                            InternalName = "country",
+                            InternalName = "Country",
                             IsActive = true,
                             Name = "Countries"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            InternalName = "Relationship",
+                            IsActive = true,
+                            Name = "Relationship"
                         });
                 });
 
@@ -278,7 +339,7 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("call_termination_reason");
 
-                    b.Property<DateTimeOffset>("EndedOn")
+                    b.Property<DateTimeOffset?>("EndedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("ended_on");
 
@@ -404,9 +465,9 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         {
                             Id = 1,
                             Code = "MLP-PN-SJ",
-                            CreatedOn = new DateTimeOffset(new DateTime(2023, 6, 25, 12, 12, 30, 624, DateTimeKind.Unspecified).AddTicks(1341), new TimeSpan(0, 0, 0, 0, 0)),
+                            CreatedOn = new DateTimeOffset(new DateTime(2023, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Name = "Ponnani Sub Jail",
-                            UpdatedOn = new DateTimeOffset(new DateTime(2023, 6, 25, 12, 12, 30, 624, DateTimeKind.Unspecified).AddTicks(1347), new TimeSpan(0, 0, 0, 0, 0))
+                            UpdatedOn = new DateTimeOffset(new DateTime(2023, 7, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0))
                         });
                 });
 
@@ -598,6 +659,24 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(150)")
                         .HasColumnName("full_name");
 
+                    b.Property<int>("Gender")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasDefaultValue(1)
+                        .HasColumnName("gender");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<bool>("IsBlocked")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_blocked");
+
                     b.Property<int>("JailId")
                         .HasColumnType("integer")
                         .HasColumnName("jail_id");
@@ -639,6 +718,54 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ix_prisoners_pid");
 
                     b.ToTable("prisoners", (string)null);
+                });
+
+            modelBuilder.Entity("JailTalk.Domain.System.ApplicationSetting", b =>
+                {
+                    b.Property<int>("Id")
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("Value")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("value");
+
+                    b.HasKey("Id")
+                        .HasName("pk_application_settings");
+
+                    b.ToTable("application_settings", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Max number of contacts to show to a prisoner",
+                            Value = "3"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Max number of minutes a male prisoner can make a call.",
+                            Value = "15"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Max number of minutes a female prisoner can make a call.",
+                            Value = "20"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Max number of minutes a LGBTQ+ prisoner can make a call.",
+                            Value = "15"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

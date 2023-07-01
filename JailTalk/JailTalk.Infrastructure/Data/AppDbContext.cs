@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 using JailTalk.Infrastructure.Data.Seeder;
+using JailTalk.Domain.System;
+
 namespace JailTalk.Infrastructure.Data;
 
 public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
@@ -43,4 +45,5 @@ public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
     public DbSet<PhoneDirectory> PhoneDirectory { get;set; }
     public DbSet<Prisoner> Prisoners { get;set; }
     public DbSet<Device> Devices { get; set; }
+    public DbSet<ApplicationSetting> ApplicationSettings { get; set; }
 }

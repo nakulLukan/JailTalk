@@ -1,7 +1,9 @@
 using JailTalk.Api;
+using JailTalk.Api.Filters;
 using JailTalk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,7 +23,6 @@ builder.Logging.AddConsole();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.RegisterService(builder.Configuration);
 
 var app = builder.Build();
@@ -36,7 +37,19 @@ app.UseExceptionHandler();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Jail Talk Device API V1");
+
+        // Configure the Swagger UI to require authorization
+        c.DocumentTitle = "Jail Talk Device";
+        c.DocExpansion(DocExpansion.None);
+        c.DefaultModelExpandDepth(0);
+        c.EnableDeepLinking();
+        c.EnableFilter();
+        c.DisplayRequestDuration();
+        c.EnableValidator();
+    });
 }
 
 app.UseHttpsRedirection();

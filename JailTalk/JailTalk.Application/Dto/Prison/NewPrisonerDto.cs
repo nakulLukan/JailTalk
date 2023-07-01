@@ -1,4 +1,5 @@
 ﻿using JailTalk.Application.Dto.Lookup;
+using JailTalk.Shared;
 using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Prison;
@@ -17,6 +18,9 @@ public class NewPrisonerDto
     public string FirstName { get; set; }
     [MaxLength(50)]
     public string MiddleName { get; set; }
+
+    [Required]
+    public Gender Gender { get; set; }
 
     [Required]
     [MaxLength(50)]

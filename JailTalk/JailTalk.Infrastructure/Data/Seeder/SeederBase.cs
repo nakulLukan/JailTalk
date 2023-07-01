@@ -8,5 +8,6 @@ public static class SeederBase
     {
         LookupSeeder.SeedData(modelBuilder);
         PrisonSeeder.SeedData(modelBuilder);
+        ApplicationSettingsSeeder.SeedData(modelBuilder);
     }
 }

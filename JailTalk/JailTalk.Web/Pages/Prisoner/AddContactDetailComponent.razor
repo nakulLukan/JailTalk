@@ -1,0 +1,83 @@
+﻿@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Shared;
+@using JailTalk.Shared.Models;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using Microsoft.AspNetCore.Components.Forms;
+@inject IAppMediator AppMediator;
+
+<Microsoft.AspNetCore.Components.Forms.EditForm Model="model" OnValidSubmit="OnSubmit">
+    <Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator />
+    <MudPaper Elevation="0">
+        <MudGrid>
+            <MudItem sm="12">
+                <MudText Typo="Typo.h5">Enter Contact Details</MudText>
+            </MudItem>
+            <MudItem sm="3">
+                <MudNumericField Adornment="Adornment.Start" AdornmentText="+" 
+                Label="Code" @bind-Value="@model.CountryCode" For="@(()=> model.CountryCode)" Variant="Variant.Text"></MudNumericField>
+            </MudItem>
+            <MudItem sm="9">
+                <MudTextField Label="Phone Number" @bind-Value="@model.PhoneNumber" For="@(()=> model.PhoneNumber)"></MudTextField>
+            </MudItem>
+            <MudItem sm="6">
+                <JailTalk.Web.Components.Lookup.LookupSelectComponent Label="Relationship" For="@(()=> model.RelationshipId)"
+                @bind-Value="@model.RelationshipId" LookupMaster="@LookupMasters.Relationship.ToString()" />
+            </MudItem>
+            <MudItem sm="4">
+                <MudCheckBox T="bool" Label="Enabled?" @bind-Checked="model.IsEnabled"></MudCheckBox>
+            </MudItem>
+
+            <MudItem sm="12">
+                <MudTextField Label="House/Flat Name" @bind-Value="@model.RelativeAddress.HouseName" For="@(()=> model.RelativeAddress.HouseName)"></MudTextField>
+            </MudItem>
+            <MudItem sm="4">
+                <MudTextField Label="Street" @bind-Value="@model.RelativeAddress.Street" For="@(()=> model.RelativeAddress.Street)"></MudTextField>
+            </MudItem>
+            <MudItem sm="4">
+                <MudTextField Label="City" @bind-Value="@model.RelativeAddress.City" For="@(()=> model.RelativeAddress.City)"></MudTextField>
+            </MudItem>
+            <MudItem sm="4">
+                <MudTextField Label="Pincode" @bind-Value="@model.RelativeAddress.PinCode" For="@(()=> model.RelativeAddress.PinCode)"
+                              Mask="@(new PatternMask("000 000"))"></MudTextField>
+            </MudItem>
+            <MudItem sm="12">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
+            </MudItem>
+        </MudGrid>
+    </MudPaper>
+</Microsoft.AspNetCore.Components.Forms.EditForm>
+@code {
+    [Parameter]
+    public string PrisonerId { get; set; }
+
+    [Parameter]
+    public EventCallback<long> OnSubmitSuccess { get; set; }
+    [Parameter]
+    public EventCallback<ErrorDto> OnSubmitFailed { get; set; }
+
+    AddContactDetailsDto model = new();
+
+    private async Task OnSubmit(EditContext context)
+    {
+        await AppMediator.Send(new AddContactDetailsCommand
+            {
+                CountryCode = "+" + model.CountryCode.Trim(),
+                PhoneNumber = model.PhoneNumber.Trim(),
+                IsEnabled = model.IsEnabled,
+                PrisonerId = Guid.Parse(PrisonerId),
+                RelationshipId = model.RelationshipId,
+                RelativeAddress = model.RelativeAddress
+            })
+        .OnSuccess(async data =>
+        {
+            await InvokeAsync(() => OnSubmitSuccess.InvokeAsync(data));
+        })
+        .OnError(async err =>
+        {
+            await InvokeAsync(() => OnSubmitFailed.InvokeAsync(err));
+        });
+    }
+}

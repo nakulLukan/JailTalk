@@ -1,4 +1,5 @@
 ﻿using JailTalk.Domain.Prison;
+using JailTalk.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,6 +18,10 @@ public class PrisonerEFConfig : IEntityTypeConfiguration<Prisoner>
         builder.Property(x => x.LastName).IsRequired(false).HasMaxLength(50);
         builder.Property(x => x.FullName).IsRequired(true).HasMaxLength(150);
         builder.Property(x => x.AddressId).IsRequired(false);
+        builder.Property(x => x.Gender).IsRequired().HasDefaultValue(Gender.Male);
+        builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
+        builder.Property(x => x.IsBlocked).IsRequired().HasDefaultValue(false);
+
         builder.HasOne(x => x.Address)
             .WithMany()
             .HasForeignKey(x => x.AddressId);

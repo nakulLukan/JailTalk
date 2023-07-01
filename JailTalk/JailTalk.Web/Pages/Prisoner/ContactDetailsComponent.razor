@@ -1,13 +1,14 @@
 ﻿@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Shared.Models;
 @using MediatR;
 @inject IMediator Mediator;
 
-
-<MudTable Items="@contacts" Dense="true" Hover="true" Bordered="true" Striped="true" Class="">
-    <ToolBarContent >
+<MudTable Items="@contacts" Dense="true" Hover="true" Bordered="true" Striped="true">
+    <ToolBarContent>
         <MudText Typo="Typo.h6">Contacts</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary">Add Contact</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="(x => _isOpen = !_isOpen)">Add Contact</MudButton>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>S/L</MudTh>
@@ -32,13 +33,27 @@
         </MudTd>
     </RowTemplate>
     <NoRecordsContent>
-        <MudText Typo="Typo.caption" ><b>No Records Found !!!</b></MudText>
+        <MudText Typo="Typo.caption"><b>No Records Found !!!</b></MudText>
     </NoRecordsContent>
 </MudTable>
+
+<MudDialog @bind-IsVisible="_isOpen" Options="options">
+    <DialogContent>
+        <AddContactDetailComponent PrisonerId="@PrisonerId" OnSubmitSuccess="OnAddContactSuccess" />
+    </DialogContent>
+</MudDialog>
 @code {
     [Parameter]
     public string PrisonerId { get; set; }
     List<PrisonerContactDetailListDto> contacts = new();
+
+    bool _isOpen = false;
+
+    DialogOptions options = new DialogOptions
+        {
+            CloseButton = true,
+            DisableBackdropClick = true
+        };
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -47,5 +62,17 @@
             {
                 PrisonerId = Guid.Parse(PrisonerId)
             });
+        StateHasChanged();
+    }
+
+    private void OnAddContactSuccess(long id)
+    {
+        ToastService.Success("Contact details added successfully");
+        _isOpen = false;
+    }
+
+    private void OnAddContactFailed(ErrorDto err)
+    {
+        ToastService.Error(err.Message);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using JailTalk.Domain.Lookup;
+using JailTalk.Shared;
 
 namespace JailTalk.Domain.Prison;
 public class Prisoner : DomainBase
@@ -11,6 +12,9 @@ public class Prisoner : DomainBase
     public string FullName { get; set; }
     public long? AddressId { get; set; }
     public int JailId { get; set; }
+    public bool IsBlocked { get; set; }
+    public bool IsActive { get; set; }
+    public Gender Gender { get; set; }
 
     public AddressBook Address { get; set; }
     public Jail Jail { get; set; }

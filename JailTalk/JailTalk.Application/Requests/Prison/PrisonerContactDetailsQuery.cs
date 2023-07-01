@@ -1,8 +1,10 @@
 ﻿using JailTalk.Application.Contracts.Data;
+using JailTalk.Application.Dto.Prison;
+using JailTalk.Application.Extensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace JailTalk.Application.Dto.Prison;
+namespace JailTalk.Application.Requests.Prison;
 
 public class PrisonerContactDetailsQuery : IRequest<List<PrisonerContactDetailListDto>>
 {
@@ -21,6 +23,8 @@ public class PrisonerContactDetailsQueryHandler : IRequestHandler<PrisonerContac
     public async Task<List<PrisonerContactDetailListDto>> Handle(PrisonerContactDetailsQuery request, CancellationToken cancellationToken)
     {
         var contactDetails = await _dbContext.PhoneDirectory
+            .Include(x=>x.RelativeAddress)
+            .Include(x=>x.RelativeType)
             .Where(x => x.PrisonerId == request.PrisonerId)
             .ToListAsync(cancellationToken);
         int index = 1;
@@ -34,7 +38,9 @@ public class PrisonerContactDetailsQueryHandler : IRequestHandler<PrisonerContac
                     x.CountryCode,
                     x.PhoneNumber
                 }),
-                Status = ConvertToStatus(x.IsActive, x.IsBlocked)
+                Status = ConvertToStatus(x.IsActive, x.IsBlocked),
+                Relationship = x.RelativeType.Value,
+                RelativeAddress = x.RelativeAddress.AddressAsText()
             }).ToList();
     }
 

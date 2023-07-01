@@ -1,0 +1,54 @@
+﻿@using JailTalk.Application.Dto.Lookup;
+@using System.Linq.Expressions;
+@using JailTalk.Application.Requests.Lookup;
+@using MediatR;
+@inject IMediator Mediator;
+
+<MudSelect Label="@Label" AnchorOrigin="Origin.BottomCenter" ValueChanged="ValueChanged" For="For">
+    <MudSelectItem T="int?" Value="default(int?)">Select</MudSelectItem>
+    @foreach (var lookupValue in lookupDetails)
+    {
+        <MudSelectItem T="int?" Value="lookupValue.Id">@lookupValue.Value</MudSelectItem>
+    }
+</MudSelect>
+@code {
+    List<LookupSelectDto> lookupDetails = new();
+
+    [Parameter]
+    public string Label { get; set; }
+
+    [Parameter]
+    public string LookupMaster { get; set; }
+
+    private int? _value;
+    [Parameter]
+    public int? Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            _value = value;
+            ValueChanged.InvokeAsync(value);
+        }
+    }
+    [Parameter]
+    public EventCallback<int?> ValueChanged { get; set; }
+
+    [Parameter]
+    [Category("Validation")]
+    public Expression<Func<int?>> For { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            lookupDetails = await Mediator.Send(new LookupSelectQuery()
+            {
+                    LookupMasterInternalName = LookupMaster
+            });
+        }
+
+    }
+
+}

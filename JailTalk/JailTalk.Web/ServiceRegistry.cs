@@ -28,6 +28,7 @@ public static class ServiceRegistry
 
     private static void RegisterWebServices(IServiceCollection services)
     {
+        services.AddMemoryCache();
         services.AddTransient<IToastService, ToastService>();
         services.AddTransient<IAuthenticationService, AuthenticationService>();
         services.AddMediatR((c) =>
@@ -46,5 +47,6 @@ public static class ServiceRegistry
             .AddEntityFrameworkStores<AppDbContext>();
         services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
         services.AddScoped<IAppRequestContext, AppRequestContext>();
+        services.AddScoped<IDeviceRequestContext>(prv => null);
     }
 }

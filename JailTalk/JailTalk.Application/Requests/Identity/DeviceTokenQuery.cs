@@ -14,13 +14,13 @@ using System.Text;
 
 namespace JailTalk.Application.Requests.Identity;
 
-public class JwtTokenRequest : IRequest<ResponseDto<string>>
+public class DeviceTokenQuery : IRequest<ResponseDto<string>>
 {
     public string MacAddress { get; set; }
     public Guid DeviceSecretIdentifier { get; set; }
 }
 
-public class JwtTokenRequestHandler : IRequestHandler<JwtTokenRequest, ResponseDto<string>>
+public class JwtTokenRequestHandler : IRequestHandler<DeviceTokenQuery, ResponseDto<string>>
 {
     readonly IConfiguration _configuration;
     readonly IAppDbContext _dbContext;
@@ -31,14 +31,14 @@ public class JwtTokenRequestHandler : IRequestHandler<JwtTokenRequest, ResponseD
         _dbContext = dbContext;
     }
 
-    public async Task<ResponseDto<string>> Handle(JwtTokenRequest request, CancellationToken cancellationToken)
+    public async Task<ResponseDto<string>> Handle(DeviceTokenQuery request, CancellationToken cancellationToken)
     {
         var device = await ValidateDevice(request, cancellationToken);
         string jwt = CreateToken(device);
         return new ResponseDto<string>(jwt);
     }
 
-    private async Task<Domain.Prison.Device> ValidateDevice(JwtTokenRequest request, CancellationToken cancellationToken)
+    private async Task<Domain.Prison.Device> ValidateDevice(DeviceTokenQuery request, CancellationToken cancellationToken)
     {
         var device = await _dbContext.Devices.AsTracking()
                     .Where(x => x.MacAddress == request.MacAddress && x.IsActive)
@@ -83,6 +83,7 @@ public class JwtTokenRequestHandler : IRequestHandler<JwtTokenRequest, ResponseD
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new(JwtRegisteredClaimNames.Sub, device.Id.ToString()),
             new(JwtRegisteredClaimNames.Name, device.Code),
+            new(AppClaims.PrisonId, device.JailId.ToString()),
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor
@@ -100,7 +101,7 @@ public class JwtTokenRequestHandler : IRequestHandler<JwtTokenRequest, ResponseD
     }
 }
 
-public class JwtTokenRequestValidator : AbstractValidator<JwtTokenRequest>
+public class JwtTokenRequestValidator : AbstractValidator<DeviceTokenQuery>
 {
     public JwtTokenRequestValidator()
     {

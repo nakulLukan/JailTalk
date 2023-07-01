@@ -1,6 +1,7 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Dto.Prison;
 using JailTalk.Domain.Prison;
+using JailTalk.Shared;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
 using MediatR;
@@ -45,7 +46,8 @@ public class RegisterPrisonerCommandHandler : IRequestHandler<RegisterPrisonerCo
             CreatedOn = AppDateTime.UtcNow,
             UpdatedOn = AppDateTime.UtcNow,
             CreatedBy = string.Empty,
-            UpdatedBy = string.Empty
+            UpdatedBy = string.Empty,
+            Gender = (Gender)request.Gender
         };
 
         _dbContext.Prisoners.Add(prisoner);

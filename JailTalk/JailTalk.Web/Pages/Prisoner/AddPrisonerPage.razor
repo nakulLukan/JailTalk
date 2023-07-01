@@ -3,6 +3,7 @@
 @using JailTalk.Application.Requests.Prison;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
+@using JailTalk.Shared;
 @using Microsoft.AspNetCore.Components.Forms;
 @inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
@@ -27,6 +28,16 @@
                 <MudItem sm="4">
                     <MudTextField Label="Last Name" @bind-Value="@model.LastName" For="@(()=> model.LastName)"></MudTextField>
                 </MudItem>
+
+                <MudItem sm="12">
+                    <MudText>Gender</MudText>
+                    <MudRadioGroup @bind-SelectedOption="@model.Gender" For="@(() => model.Gender)" Name="Gender">
+                        <MudRadio Option="@(Gender.Male)" Color="Color.Primary">Male</MudRadio>
+                        <MudRadio Option="@(Gender.Female)" Color="Color.Secondary">Female</MudRadio>
+                        <MudRadio Option="@(Gender.Others)" Color="Color.Tertiary">Others</MudRadio>
+                    </MudRadioGroup>
+                </MudItem>
+
                 <MudItem sm="12">
                     <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.JailId" For="@(()=> model.JailId)" />
                 </MudItem>
@@ -64,7 +75,8 @@
                 LastName = model.LastName,
                 MiddleName = model.MiddleName ?? string.Empty,
                 JailId = model.JailId.Value,
-                Address = model.Address
+                Address = model.Address,
+                Gender = model.Gender
             })
         .OnSuccess(data =>
         {

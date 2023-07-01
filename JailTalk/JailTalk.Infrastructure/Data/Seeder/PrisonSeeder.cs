@@ -1,5 +1,4 @@
 ﻿using JailTalk.Domain.Prison;
-using JailTalk.Shared.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace JailTalk.Infrastructure.Data.Seeder;
@@ -15,9 +14,9 @@ public static class PrisonSeeder
             Name = "Ponnani Sub Jail",
             Code = "MLP-PN-SJ",
             CreatedBy = null,
-            CreatedOn = AppDateTime.UtcNow,
+            CreatedOn = new DateTimeOffset(2023, 7, 1, 0, 0, 0, TimeSpan.Zero),
             UpdatedBy = null,
-            UpdatedOn = AppDateTime.UtcNow,
+            UpdatedOn = new DateTimeOffset(2023, 7, 1, 0, 0, 0, TimeSpan.Zero),
             AddressId = null
         });
 

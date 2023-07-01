@@ -1,6 +1,6 @@
-﻿using JailTalk.Domain.Identity;
-using JailTalk.Domain.Lookup;
+﻿using JailTalk.Domain.Lookup;
 using JailTalk.Domain.Prison;
+using JailTalk.Domain.System;
 using Microsoft.EntityFrameworkCore;
 
 namespace JailTalk.Application.Contracts.Data;
@@ -17,6 +17,7 @@ public interface IAppDbContext
     public DbSet<PhoneDirectory> PhoneDirectory { get; set; }
     public DbSet<Prisoner> Prisoners { get; set; }
     public DbSet<Device> Devices { get; set; }
+    public DbSet<ApplicationSetting> ApplicationSettings { get; set; }
 
     Task<int> SaveAsync(CancellationToken cancellationToken);
 }

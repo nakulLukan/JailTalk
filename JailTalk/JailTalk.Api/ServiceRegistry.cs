@@ -1,9 +1,13 @@
-﻿using JailTalk.Api.Impl.UserManagement;
+﻿using JailTalk.Api.Filters;
+using JailTalk.Api.Impl.Http;
+using JailTalk.Api.Impl.UserManagement;
 using JailTalk.Application;
+using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Contracts.UserManagement;
 using JailTalk.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace JailTalk.Api;
@@ -19,7 +23,39 @@ public static class ServiceRegistry
 
     private static void RegisterWebServices(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddHttpContextAccessor();
+        services.AddMemoryCache();
         services.AddTransient<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IDeviceRequestContext, DeviceRequestContext>();
+        services.AddScoped<IAppRequestContext>(prv => null);
+        services.AddSwaggerGen(config =>
+        {
+            config.SwaggerDoc("v1", new OpenApiInfo { Title = "Jail Talk Device Api", Version = "v1" });
+            config.OperationFilter<SwaggerHeaderFilter>();
+            config.OperationFilter<SwaggerBearerTokenFilter>();
+            config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            config.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    new string[] { }
+                }
+            });
+        });
         services.AddAuthentication(auth =>
         {
             auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

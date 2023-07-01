@@ -31,5 +31,21 @@ public enum Country : int
 public enum LookupMasters : int
 {
     State = 1,
-    Country = 2
+    Country = 2,
+    Relationship = 3,
+}
+
+public enum Gender : int
+{
+    Male = 1,
+    Female = 2,
+    Others = 3,
+}
+
+public enum ApplicationSettings : int
+{
+    MaxAllowedActiveContacts = 1,
+    MaxAllowedCallDurationMale = 2,
+    MaxAllowedCallDurationFemale = 3,
+    MaxAllowedCallDurationOthers = 4,
 }

@@ -10,10 +10,10 @@ public class IdentityController : AppBaseController
     {
     }
 
-    [HttpGet("validate")]
+    [HttpGet("devices/validate")]
     public async Task<IActionResult> ValidateDevice([FromQuery] string macAddress, [FromQuery] Guid deviceSecret)
     {
-        var data = await Mediator.Send(new JwtTokenRequest()
+        var data = await Mediator.Send(new DeviceTokenQuery()
         {
             MacAddress = macAddress,
             DeviceSecretIdentifier = deviceSecret

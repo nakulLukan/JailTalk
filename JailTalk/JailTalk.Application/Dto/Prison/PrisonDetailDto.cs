@@ -12,6 +12,7 @@ public class PrisonerDetailDto
     public string MiddleName { get; set; }
     public string LastName { get; set; }
     public string FullName { get; set; }
+    public string Gender { get; set; }
     public string AddressAsText { get; set; }
     public AddressDetailDto Address { get; set; } = new AddressDetailDto();
 }
