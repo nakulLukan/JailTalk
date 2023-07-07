@@ -1,5 +1,4 @@
 using JailTalk.Api;
-using JailTalk.Api.Filters;
 using JailTalk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -33,24 +32,6 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseExceptionHandler();
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Jail Talk Device API V1");
-
-        // Configure the Swagger UI to require authorization
-        c.DocumentTitle = "Jail Talk Device";
-        c.DocExpansion(DocExpansion.None);
-        c.DefaultModelExpandDepth(0);
-        c.EnableDeepLinking();
-        c.EnableFilter();
-        c.DisplayRequestDuration();
-        c.EnableValidator();
-    });
-}
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
@@ -58,4 +39,18 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Jail Talk Device API V1");
+
+    // Configure the Swagger UI to require authorization
+    c.DocumentTitle = "Jail Talk Device";
+    c.DocExpansion(DocExpansion.None);
+    c.DefaultModelExpandDepth(0);
+    c.EnableDeepLinking();
+    c.EnableFilter();
+    c.DisplayRequestDuration();
+    c.EnableValidator();
+});
 app.Run();
