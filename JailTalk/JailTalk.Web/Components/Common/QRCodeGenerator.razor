@@ -1,0 +1,28 @@
+﻿@using Net.Codecrete.QrCodeGenerator;
+@using System.Web;
+@using System.Text;
+<style>
+    svg{
+        height: 100%;
+        width: 100%;
+        max-height: 200px;
+    }
+</style>
+<MudPaper>
+    @((MarkupString)SvgString)
+</MudPaper>
+@code {
+
+    [Parameter]
+    public string SecretMessage { get; set; }
+
+    public string SvgString { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        SecretMessage = SecretMessage ?? string.Empty;
+        var qr = QrCode.EncodeText(SecretMessage, QrCode.Ecc.Medium);
+        string svg = qr.ToSvgString(1);
+        SvgString = svg;
+    }
+}

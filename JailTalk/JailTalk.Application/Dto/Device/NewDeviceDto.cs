@@ -17,7 +17,7 @@ public class NewDeviceDto
     [MaxLength(50)]
     public string MacAddress { get; set; }
 
-    public string DeviceSecret { get; set; }
+    public string DeviceSecret { get; set; } = string.Empty;
 
     public bool IsActive { get; set; } = true;
 }

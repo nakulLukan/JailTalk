@@ -26,7 +26,16 @@
                     <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.PrisonId" For="@(()=> model.PrisonId)" />
                 </MudItem>
                 <MudItem sm="12">
-                    <MudTextField Mask="@secretMask" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
+                    <div class="d-flex flex-grow-1 gap-4">
+                        <MudTextField Class="flex-grow-1" Mask="@secretMask" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
+                        <MudButton Class="flex-none" OnClick="OnGenerateDeviceSecret">Generate</MudButton>
+                        <MudButton Class="flex-none" Disabled="@(!model.DeviceSecret.Any())" Variant="Variant.Filled" Color="Color.Surface" 
+                            OnClick="@ToggleQRCodeWindow">@QRCodePopupButtonName()</MudButton>
+                        <MudPopover Open="@_isOpen" Fixed="false" Class="flex-none px-4 pt-4" AnchorOrigin="Origin.CenterRight"
+                            TransformOrigin="Origin.CenterLeft" >
+                            <JailTalk.Web.Components.Common.QRCodeGenerator SecretMessage="@model.DeviceSecret" />
+                        </MudPopover>
+                    </div>
                 </MudItem>
                 <MudItem sm="12">
                     <MudSwitch @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
@@ -41,6 +50,7 @@
 </EditForm>
 @code {
     NewDeviceDto model = new();
+    bool _isOpen = false;
 
     PatternMask secretMask = new PatternMask("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
         {
@@ -55,6 +65,7 @@
             Placeholder = '_',
             CleanDelimiters = true,
         };
+
     private async Task OnValidSubmit(EditContext context)
     {
         await AppMediator.Send(new RegisterDeviceCommand
@@ -74,5 +85,20 @@
         {
             ToastService.Error(err.Message);
         });
+    }
+
+    private void OnGenerateDeviceSecret()
+    {
+        model.DeviceSecret = Guid.NewGuid().ToString();
+    }
+
+    private void ToggleQRCodeWindow()
+    {
+        _isOpen = !_isOpen;
+    }
+
+    private string QRCodePopupButtonName()
+    {
+        return _isOpen ? "Close" : "Show QR Code";
     }
 }
