@@ -22,6 +22,46 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("JailTalk.Domain.Identity.AppFaceEncoding", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<double[]>("Encoding")
+                        .IsRequired()
+                        .HasColumnType("double precision[]")
+                        .HasColumnName("encoding");
+
+                    b.Property<string>("EncodingName")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("encoding_name");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("last_modified_by");
+
+                    b.Property<DateTimeOffset?>("LastModifiedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_modified_on");
+
+                    b.HasKey("Id")
+                        .HasName("pk_app_face_encodings");
+
+                    b.ToTable("app_face_encodings", (string)null);
+                });
+
             modelBuilder.Entity("JailTalk.Domain.Identity.AppUser", b =>
                 {
                     b.Property<string>("Id")
@@ -720,6 +760,44 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                     b.ToTable("prisoners", (string)null);
                 });
 
+            modelBuilder.Entity("JailTalk.Domain.Prison.PrisonerFaceEncodingMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FaceEncodingId")
+                        .HasColumnType("integer")
+                        .HasColumnName("face_encoding_id");
+
+                    b.Property<int>("ImageId")
+                        .HasColumnType("integer")
+                        .HasColumnName("image_id");
+
+                    b.Property<Guid>("PrisonerId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("prisoner_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_prisoner_face_encoding_mappings");
+
+                    b.HasIndex("FaceEncodingId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_prisoner_face_encoding_mappings_face_encoding_id");
+
+                    b.HasIndex("ImageId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_prisoner_face_encoding_mappings_image_id");
+
+                    b.HasIndex("PrisonerId")
+                        .HasDatabaseName("ix_prisoner_face_encoding_mappings_prisoner_id");
+
+                    b.ToTable("prisoner_face_encoding_mappings", (string)null);
+                });
+
             modelBuilder.Entity("JailTalk.Domain.System.ApplicationSetting", b =>
                 {
                     b.Property<int>("Id")
@@ -766,6 +844,42 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                             Description = "Max number of minutes a LGBTQ+ prisoner can make a call.",
                             Value = "15"
                         });
+                });
+
+            modelBuilder.Entity("JailTalk.Domain.System.Attachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("Data")
+                        .HasColumnType("bytea")
+                        .HasColumnName("data");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("file_name");
+
+                    b.Property<bool>("IsBlob")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_blob");
+
+                    b.Property<string>("Path")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("path");
+
+                    b.HasKey("Id")
+                        .HasName("pk_attachments");
+
+                    b.ToTable("attachments", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -1075,6 +1189,36 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                     b.Navigation("Jail");
                 });
 
+            modelBuilder.Entity("JailTalk.Domain.Prison.PrisonerFaceEncodingMapping", b =>
+                {
+                    b.HasOne("JailTalk.Domain.Identity.AppFaceEncoding", "FaceEncoding")
+                        .WithOne()
+                        .HasForeignKey("JailTalk.Domain.Prison.PrisonerFaceEncodingMapping", "FaceEncodingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_prisoner_face_encoding_mappings_app_face_encodings_face_enc");
+
+                    b.HasOne("JailTalk.Domain.System.Attachment", "Attachment")
+                        .WithOne()
+                        .HasForeignKey("JailTalk.Domain.Prison.PrisonerFaceEncodingMapping", "ImageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_prisoner_face_encoding_mappings_attachments_attachment_id");
+
+                    b.HasOne("JailTalk.Domain.Prison.Prisoner", "Prisoner")
+                        .WithMany("FaceEncodings")
+                        .HasForeignKey("PrisonerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_prisoner_face_encoding_mappings_prisoners_prisoner_id");
+
+                    b.Navigation("Attachment");
+
+                    b.Navigation("FaceEncoding");
+
+                    b.Navigation("Prisoner");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1144,6 +1288,8 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JailTalk.Domain.Prison.Prisoner", b =>
                 {
+                    b.Navigation("FaceEncodings");
+
                     b.Navigation("PhoneBalance");
 
                     b.Navigation("PhoneDirectory");

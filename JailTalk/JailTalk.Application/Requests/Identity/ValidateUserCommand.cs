@@ -22,6 +22,11 @@ public class ValidateUserCommandHandler : IRequestHandler<ValidateUserCommand, U
         var result = await _authenticationService.SignInUser(request.Email, request.Password);
         if (!result.Succeeded)
         {
+            if (result.IsLockedOut)
+            {
+                throw new AppException("This account is locked. Please try again after sometime.");
+            }
+
             throw new AppException("Username or Password does not match");
         }
 

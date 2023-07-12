@@ -10,7 +10,7 @@ public static class NumberExtension
     {
         if (value.HasValue)
         {
-            return value.Value.ToString("C", System.Globalization.CultureInfo.CurrentCulture);
+            return value.Value.ToString("C", System.Globalization.CultureInfo.CurrentUICulture);
         }
 
         return String.Empty;

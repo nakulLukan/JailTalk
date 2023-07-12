@@ -58,21 +58,28 @@
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        contacts = await Mediator.Send(new PrisonerContactDetailsQuery
-            {
-                PrisonerId = Guid.Parse(PrisonerId)
-            });
+        await UpdateContacts();
         StateHasChanged();
     }
 
-    private void OnAddContactSuccess(long id)
+    private async Task OnAddContactSuccess(long id)
     {
         ToastService.Success("Contact details added successfully");
         _isOpen = false;
+        await UpdateContacts();
+        StateHasChanged();
     }
 
     private void OnAddContactFailed(ErrorDto err)
     {
         ToastService.Error(err.Message);
+    }
+
+    private async Task UpdateContacts()
+    {
+        contacts = await Mediator.Send(new PrisonerContactDetailsQuery
+        {
+            PrisonerId = Guid.Parse(PrisonerId)
+        });
     }
 }

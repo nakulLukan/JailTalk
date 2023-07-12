@@ -1,4 +1,5 @@
-﻿using JailTalk.Domain.Lookup;
+﻿using JailTalk.Domain.Identity;
+using JailTalk.Domain.Lookup;
 using JailTalk.Domain.Prison;
 using JailTalk.Domain.System;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,11 @@ public interface IAppDbContext
     public DbSet<Prisoner> Prisoners { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<ApplicationSetting> ApplicationSettings { get; set; }
+    public DbSet<Attachment> Attachments { get; set; }
+    public DbSet<PrisonerFaceEncodingMapping> PrisonerFaceEncodingMappings { get; set; }
+    public DbSet<AppFaceEncoding> AppFaceEncodings { get; set; }
+
+    public void ClearChanges();
 
     Task<int> SaveAsync(CancellationToken cancellationToken);
 }

@@ -1,4 +1,5 @@
-﻿using JailTalk.Application.Contracts.UserManagement;
+﻿using JailTalk.Application.Contracts.Data;
+using JailTalk.Application.Contracts.UserManagement;
 using JailTalk.Domain.Identity;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Models.Identity;
@@ -12,18 +13,20 @@ public class AuthenticationService : IAuthenticationService
     public static IDictionary<Guid, LoginInfo> Logins { get; private set; }
         = new ConcurrentDictionary<Guid, LoginInfo>();
 
-    readonly SignInManager<AppUser> _signInManager;
-    readonly UserManager<AppUser> _userInManager;
+    readonly IServiceScopeFactory _serviceScopeFactory;
+    readonly IAppDbContext _appDbContext;
 
-    public AuthenticationService(SignInManager<AppUser> signInManager, UserManager<AppUser> userInManager)
+    public AuthenticationService(IServiceScopeFactory serviceScopeFactory)
     {
-        _signInManager = signInManager;
-        _userInManager = userInManager;
+        _serviceScopeFactory = serviceScopeFactory;
     }
 
     public async Task<UserSignInResultDto> SignInUser(string email, string password)
     {
-        var user = await _userInManager.FindByEmailAsync(email);
+        using var scope =_serviceScopeFactory.CreateScope();
+        var userInManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        var signInManager = scope.ServiceProvider.GetRequiredService<SignInManager<AppUser>>();
+        var user = await userInManager.FindByEmailAsync(email);
         if (user == null)
         {
             return new UserSignInResultDto()
@@ -31,7 +34,7 @@ public class AuthenticationService : IAuthenticationService
                 Succeeded = false
             };
         }
-        var result = await _signInManager.CheckPasswordSignInAsync(user, password, true);
+        var result = await signInManager.CheckPasswordSignInAsync(user, password, true);
         return new UserSignInResultDto
         {
             IsLockedOut = result.IsLockedOut,

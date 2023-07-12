@@ -20,4 +20,5 @@ public class Prisoner : DomainBase
     public Jail Jail { get; set; }
     public PhoneBalance PhoneBalance { get; set; }
     public List<PhoneDirectory> PhoneDirectory { get; set; }
+    public List<PrisonerFaceEncodingMapping> FaceEncodings { get; set; }
 }

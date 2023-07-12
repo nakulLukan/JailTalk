@@ -2,11 +2,11 @@
 using JailTalk.Domain.Identity;
 using JailTalk.Domain.Lookup;
 using JailTalk.Domain.Prison;
+using JailTalk.Domain.System;
+using JailTalk.Infrastructure.Data.Seeder;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using JailTalk.Infrastructure.Data.Seeder;
-using JailTalk.Domain.System;
 
 namespace JailTalk.Infrastructure.Data;
 
@@ -35,15 +35,23 @@ public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
         return SaveChangesAsync(cancellationToken);
     }
 
+    public void ClearChanges()
+    {
+        this.ChangeTracker.Clear();
+    }
+
     public DbSet<LookupMaster> LookupMasters { get; set; }
-    public DbSet<LookupDetail> LookupDetails { get;set; }
-    public DbSet<AddressBook> AddressBook { get;set; }
-    public DbSet<CallHistory> CallHistory { get;set; }
-    public DbSet<Jail> Jails { get;set; }
-    public DbSet<PhoneBalance> PhoneBalances { get;set; }
-    public DbSet<PhoneBalanceHistory> PhoneBalanceHistory { get;set; }
-    public DbSet<PhoneDirectory> PhoneDirectory { get;set; }
-    public DbSet<Prisoner> Prisoners { get;set; }
+    public DbSet<LookupDetail> LookupDetails { get; set; }
+    public DbSet<AddressBook> AddressBook { get; set; }
+    public DbSet<CallHistory> CallHistory { get; set; }
+    public DbSet<Jail> Jails { get; set; }
+    public DbSet<PhoneBalance> PhoneBalances { get; set; }
+    public DbSet<PhoneBalanceHistory> PhoneBalanceHistory { get; set; }
+    public DbSet<PhoneDirectory> PhoneDirectory { get; set; }
+    public DbSet<Prisoner> Prisoners { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<ApplicationSetting> ApplicationSettings { get; set; }
+    public DbSet<Attachment> Attachments { get; set; }
+    public DbSet<PrisonerFaceEncodingMapping> PrisonerFaceEncodingMappings { get; set; }
+    public DbSet<AppFaceEncoding> AppFaceEncodings { get; set; }
 }

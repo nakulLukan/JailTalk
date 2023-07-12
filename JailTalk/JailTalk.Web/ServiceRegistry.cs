@@ -5,6 +5,7 @@ using JailTalk.Application.Contracts.UserManagement;
 using JailTalk.Domain.Identity;
 using JailTalk.Infrastructure;
 using JailTalk.Infrastructure.Data;
+using JailTalk.Shared.Utilities;
 using JailTalk.Web.Contracts.Events;
 using JailTalk.Web.Impl.Events;
 using JailTalk.Web.Impl.Http;
@@ -13,6 +14,8 @@ using JailTalk.Web.Impl.UserManagement;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 namespace JailTalk.Web;
 
@@ -36,6 +39,17 @@ public static class ServiceRegistry
             c.RegisterServicesFromAssembly(typeof(Application.ServiceRegistry).Assembly);
         });
         services.AddTransient<IAppMediator, AppMediator>();
+        services.Configure<RequestLocalizationOptions>(options =>
+        {
+            var supportedCultures = new[]
+            {
+            new CultureInfo("en-IN") // Set the desired culture, e.g., "en-IN" (English - India)
+        };
+
+            options.DefaultRequestCulture = new RequestCulture(supportedCultures[0]);
+            options.SupportedCultures = supportedCultures;
+            options.SupportedUICultures = supportedCultures;
+        });
     }
 
     private static void RegisterIdentity(IServiceCollection services)
