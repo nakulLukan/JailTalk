@@ -25,3 +25,8 @@ public static class HttpHeader
 {
     public const string SessionToken = "SessionToken";
 }
+
+public static class CommonExceptionMessages
+{
+    public const string UserNotFound = "Unknown user";
+}

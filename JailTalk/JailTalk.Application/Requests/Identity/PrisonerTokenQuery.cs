@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using JailTalk.Application.Contracts.AI;
 using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Shared;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -18,6 +20,7 @@ namespace JailTalk.Application.Requests.Identity;
 
 public class PrisonerTokenQuery : IRequest<ResponseDto<string>>
 {
+    public byte[] FaceImageData { get; set; }
     public string Pid { get; set; }
 }
 
@@ -27,15 +30,17 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
     readonly IAppDbContext _dbContext;
     readonly IDeviceRequestContext _requestContext;
     readonly ILogger<PrisonerTokenQueryHandler> _logger;
+    readonly IAppFaceRecognition _faceRecognition;
 
-    record PrisonerDto(Guid Id, bool IsBlocked, bool IsActive, string FullName, int PrisonId);
+    record PrisonerDto(Guid Id, bool IsBlocked, bool IsActive, string FullName, int PrisonId, List<double[]> FaceEncodings);
 
-    public PrisonerTokenQueryHandler(IConfiguration configuration, IAppDbContext dbContext, IDeviceRequestContext requestContext, ILogger<PrisonerTokenQueryHandler> logger)
+    public PrisonerTokenQueryHandler(IConfiguration configuration, IAppDbContext dbContext, IDeviceRequestContext requestContext, ILogger<PrisonerTokenQueryHandler> logger, IAppFaceRecognition faceRecognition)
     {
         _configuration = configuration;
         _dbContext = dbContext;
         _requestContext = requestContext;
         _logger = logger;
+        _faceRecognition = faceRecognition;
     }
 
     public async Task<ResponseDto<string>> Handle(PrisonerTokenQuery request, CancellationToken cancellationToken)
@@ -47,23 +52,48 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
                 x.IsBlocked,
                 x.IsActive,
                 x.FullName,
-                x.JailId))
+                x.JailId,
+                x.FaceEncodings.Select(y => y.FaceEncoding.Encoding).ToList()))
             .FirstOrDefaultAsync(cancellationToken);
+        if(prisoner is null)
+        {
+            throw new AppApiException(HttpStatusCode.Unauthorized, "PID does not exists.");
+        }
         if (prisoner.IsBlocked)
         {
             _logger.LogError("The prisoner is blocked.");
-            throw new AppApiException(System.Net.HttpStatusCode.Forbidden, "Inactive record");
+            throw new AppApiException(HttpStatusCode.Forbidden, "Inactive record");
         }
 
         var prisonerId = _requestContext.GetJailId();
         if (prisonerId != prisoner.PrisonId)
         {
             _logger.LogError("Device trying to access prisoner in another jail.");
-            throw new AppApiException(System.Net.HttpStatusCode.Forbidden, "Unauthorized access");
+            throw new AppApiException(HttpStatusCode.Forbidden, "Unauthorized access");
         }
+
+        AuthenticateByFaceId(request, prisoner);
 
         var token = CreateToken(prisoner);
         return new ResponseDto<string>(token);
+    }
+
+    private void AuthenticateByFaceId(PrisonerTokenQuery request, PrisonerDto prisoner)
+    {
+        var unknownEncoding = _faceRecognition.GetFaceEncodings(request.FaceImageData);
+        var hasMatch = false;
+        foreach (var existingEncoding in prisoner.FaceEncodings)
+        {
+            if (_faceRecognition.IsFaceMatching(existingEncoding, unknownEncoding))
+            {
+                hasMatch = true;
+            }
+        }
+
+        if (!hasMatch)
+        {
+            throw new AppApiException(HttpStatusCode.Unauthorized, "Face Id does not match");
+        }
     }
 
     private string CreateToken(PrisonerDto device)

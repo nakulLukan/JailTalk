@@ -5,6 +5,7 @@ using JailTalk.Shared.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace JailTalk.Application.Requests.Prison;
 
@@ -38,19 +39,19 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
 
         if (callHistory == null)
         {
-            throw new AppApiException(System.Net.HttpStatusCode.NotFound, "Invalid call history record");
+            throw new AppApiException(HttpStatusCode.NotFound, "Invalid call history record");
         }
 
         if (prisonerId != callHistory.PhoneDirectory.PrisonerId)
         {
             _logger.LogError("Record does not belong to prisoner {prisoner}", prisonerId);
-            throw new AppApiException(System.Net.HttpStatusCode.BadRequest, "Invalid call history record");
+            throw new AppApiException(HttpStatusCode.BadRequest, "Invalid call history record");
         }
 
         if (callHistory.EndedOn.HasValue)
         {
             _logger.LogError("Call already terminated on {terminatedOn}", callHistory.EndedOn.Value);
-            throw new AppApiException(System.Net.HttpStatusCode.BadRequest, "Call Already Terminated");
+            throw new AppApiException(HttpStatusCode.BadRequest, "Call Already Terminated");
         }
 
         var phoneBalance = await _appDbContext.PhoneBalances.AsTracking()

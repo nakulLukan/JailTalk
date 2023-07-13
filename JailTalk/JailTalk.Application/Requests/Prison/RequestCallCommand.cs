@@ -5,6 +5,7 @@ using JailTalk.Shared.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Net;
 
 namespace JailTalk.Application.Requests.Prison;
 
@@ -43,12 +44,12 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
         if (contact is null)
         {
             _logger.LogError("Contact '{ct}' is associated to prisoner {prisoner}", request.ContactId, prisonerId);
-            throw new AppApiException(System.Net.HttpStatusCode.BadRequest, "Invalid Contact Requested");
+            throw new AppApiException(HttpStatusCode.BadRequest, "Invalid Contact Requested");
         }
         else if (contact.IsBlocked || !contact.IsActive)
         {
             _logger.LogError("Contact '{ct}' active status: {active}, is blocked: {blocked}", request.ContactId, contact.IsActive, contact.IsBlocked);
-            throw new AppApiException(System.Net.HttpStatusCode.BadRequest, "Invalid Contact Requested");
+            throw new AppApiException(HttpStatusCode.BadRequest, "Invalid Contact Requested");
         }
 
         var phoneBalanceEntity = await _dbContext.PhoneBalances

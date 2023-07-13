@@ -9,6 +9,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -46,12 +47,12 @@ public class JwtTokenRequestHandler : IRequestHandler<DeviceTokenQuery, Response
 
         if (device is null)
         {
-            throw new AppApiException(System.Net.HttpStatusCode.Forbidden, "Unable to recognize device");
+            throw new AppApiException(HttpStatusCode.Forbidden, "Unable to recognize device");
         }
 
         if (device.FailedLoginAttempts > 3 && AppDateTime.UtcNow < device.LockoutEnd.Value)
         {
-            throw new AppApiException(System.Net.HttpStatusCode.Forbidden, "Too many login attempts. Please try again later.");
+            throw new AppApiException(HttpStatusCode.Forbidden, "Too many login attempts. Please try again later.");
         }
 
         if (device.DeviceSecretIdentifier != request.DeviceSecretIdentifier)
@@ -63,7 +64,7 @@ public class JwtTokenRequestHandler : IRequestHandler<DeviceTokenQuery, Response
             device.FailedLoginAttempts = device.FailedLoginAttempts + 1;
 
             await _dbContext.SaveAsync(cancellationToken);
-            throw new AppApiException(System.Net.HttpStatusCode.Forbidden, "Secret key is invalid");
+            throw new AppApiException(HttpStatusCode.Forbidden, "Secret key is invalid");
         }
 
         device.FailedLoginAttempts = 0;

@@ -2,5 +2,6 @@
 
 public interface IAppFaceRecognition
 {
-    bool FaceMatching(byte[] image);
+    double[] GetFaceEncodings(byte[] image);
+    bool IsFaceMatching(double[] knownEncoding, double[] unknownEncoding);
 }

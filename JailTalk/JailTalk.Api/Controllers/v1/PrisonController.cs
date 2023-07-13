@@ -17,12 +17,24 @@ public class PrisonController : AppBaseController
     {
     }
 
+    [RequestSizeLimit(5_242_880)]
     [HttpPost("prisoners/validate")]
     [ProducesResponseType(typeof(ResponseDto<string>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> AuthenticatePrisoner([FromBody] PrisonerTokenQuery prisonerTokenQuery)
+    public async Task<IActionResult> AuthenticatePrisoner(IFormFile faceImageBinary, [FromForm]
+        string pid)
     {
-        var data = await Mediator.Send(prisonerTokenQuery);
-        return Ok(data);
+        // Save the file to the specified path
+        using (var memStream = new MemoryStream())
+        {
+            await faceImageBinary.CopyToAsync(memStream);
+
+            var data = await Mediator.Send(new PrisonerTokenQuery
+            {
+                Pid = pid,
+                FaceImageData = memStream.ToArray()
+            });
+            return Ok(data);
+        }
     }
 
     [HttpGet("prisoners/contacts/all")]
