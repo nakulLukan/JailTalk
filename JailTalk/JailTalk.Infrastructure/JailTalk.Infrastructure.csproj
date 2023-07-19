@@ -14,6 +14,7 @@
     <Content Remove="C:\Users\nakul.a\.nuget\packages\facerecognitiondotnet\1.3.0.7\build\..\runtimes\win-AnyCPU\native\DlibDotNetNativeDnnGenderClassification.dll" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Rekognition" Version="3.7.200" />
     <PackageReference Include="EFCore.NamingConventions" Version="7.0.2" />
     <PackageReference Include="FaceRecognitionDotNet" Version="1.3.0.7" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />

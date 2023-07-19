@@ -47,12 +47,11 @@ public class LinkAttachmentToPrisonerCommandHandler : IRequestHandler<LinkAttach
                 .Select(x => x.Data)
                 .FirstAsync(cancellationToken);
 
-            var faceEncoding = _faceRecognition.GetFaceEncodings(imageByteArray);
             PrisonerFaceEncodingMapping entity = new()
             {
                 FaceEncoding = new Domain.Identity.AppFaceEncoding
                 {
-                    Encoding = faceEncoding,
+                    Encoding = new double[0],
                     IsActive = true,
                     LastModifiedBy = userId,
                     LastModifiedOn = AppDateTime.UtcNow,

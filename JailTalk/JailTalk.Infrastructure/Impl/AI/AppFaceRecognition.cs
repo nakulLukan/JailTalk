@@ -41,4 +41,9 @@ public class AppFaceRecognition : IAppFaceRecognition
             return encodings.First().GetRawEncoding();
         }
     }
+
+    public Task<bool> IsFaceMatching(byte[] knownImage, byte[] unknownImage)
+    {
+        throw new NotImplementedException();
+    }
 }

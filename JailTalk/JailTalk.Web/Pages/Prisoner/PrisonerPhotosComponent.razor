@@ -77,7 +77,7 @@
         await AppMediator.Send(new LinkAttachmentToPrisonerCommand()
             {
                 AttachmentIds = uploadedAttachmentIds,
-                PrisonerId = Guid.Parse(PrisonerId)
+                PrisonerId = Guid.Parse(PrisonerId),
             })
         .OnSuccess(async data =>
         {

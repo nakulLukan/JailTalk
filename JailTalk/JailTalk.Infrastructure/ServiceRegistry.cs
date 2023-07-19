@@ -24,6 +24,6 @@ public static class ServiceRegistry
         services.AddTransient<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
         services.AddTransient<IAppImageEditor, AppImageEditor>();
-        services.AddTransient<IAppFaceRecognition, AppFaceRecognition>();
+        services.AddTransient<IAppFaceRecognition, AwsFaceRecognition>();
     }
 }

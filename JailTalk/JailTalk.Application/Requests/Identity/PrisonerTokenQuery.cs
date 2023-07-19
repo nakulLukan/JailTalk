@@ -32,7 +32,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
     readonly ILogger<PrisonerTokenQueryHandler> _logger;
     readonly IAppFaceRecognition _faceRecognition;
 
-    record PrisonerDto(Guid Id, bool IsBlocked, bool IsActive, string FullName, int PrisonId, List<double[]> FaceEncodings);
+    record PrisonerDto(Guid Id, bool IsBlocked, bool IsActive, string FullName, int PrisonId, List<double[]> FaceEncodings, List<byte[]> FaceImages);
 
     public PrisonerTokenQueryHandler(IConfiguration configuration, IAppDbContext dbContext, IDeviceRequestContext requestContext, ILogger<PrisonerTokenQueryHandler> logger, IAppFaceRecognition faceRecognition)
     {
@@ -53,9 +53,10 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
                 x.IsActive,
                 x.FullName,
                 x.JailId,
-                x.FaceEncodings.Select(y => y.FaceEncoding.Encoding).ToList()))
+                x.FaceEncodings.Select(y => y.FaceEncoding.Encoding).ToList(),
+                x.FaceEncodings.Select(y => y.Attachment.Data).ToList()))
             .FirstOrDefaultAsync(cancellationToken);
-        if(prisoner is null)
+        if (prisoner is null)
         {
             throw new AppApiException(HttpStatusCode.Unauthorized, "PID does not exists.");
         }
@@ -78,18 +79,17 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
         return new ResponseDto<string>(token);
     }
 
-    private void AuthenticateByFaceId(PrisonerTokenQuery request, PrisonerDto prisoner)
+    private async void AuthenticateByFaceId(PrisonerTokenQuery request, PrisonerDto prisoner)
     {
-        var unknownEncoding = _faceRecognition.GetFaceEncodings(request.FaceImageData);
         var hasMatch = false;
-        foreach (var existingEncoding in prisoner.FaceEncodings)
+        List<Task<bool>> results = new();
+        foreach (var existingFace in prisoner.FaceImages)
         {
-            if (_faceRecognition.IsFaceMatching(existingEncoding, unknownEncoding))
-            {
-                hasMatch = true;
-            }
+            results.Add(_faceRecognition.IsFaceMatching(existingFace, request.FaceImageData));
         }
 
+        await Task.WhenAll(results);
+        hasMatch = results.All(x => x.Result);
         if (!hasMatch)
         {
             throw new AppApiException(HttpStatusCode.Unauthorized, "Face Id does not match");
