@@ -73,7 +73,10 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
             throw new AppApiException(HttpStatusCode.Forbidden, "Unauthorized access");
         }
 
-        AuthenticateByFaceId(request, prisoner);
+        if (bool.Parse(_configuration[AppSettingKeys.JwtValidateFaceImage]))
+        {
+            AuthenticateByFaceId(request, prisoner);
+        }
 
         var token = CreateToken(prisoner);
         return new ResponseDto<string>(token);

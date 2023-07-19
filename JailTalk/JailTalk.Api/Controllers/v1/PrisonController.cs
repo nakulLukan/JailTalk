@@ -17,16 +17,27 @@ public class PrisonController : AppBaseController
     {
     }
 
+    /// <summary>
+    /// Authenticates the prisoner. 
+    /// If face validation is enabled then system checks if the given image is matching 
+    /// images of prisoner stored in the system.
+    /// </summary>
+    /// <param name="faceImageBinary">Base 64 string</param>
+    /// <param name="pid">Pid of the prisoner</param>
+    /// <returns></returns>
     [RequestSizeLimit(5_242_880)]
     [HttpPost("prisoners/validate")]
     [ProducesResponseType(typeof(ResponseDto<string>), (int)HttpStatusCode.OK)]
-    public async Task<IActionResult> AuthenticatePrisoner(IFormFile faceImageBinary, [FromForm]
+    public async Task<IActionResult> AuthenticatePrisoner(IFormFile? faceImageBinary, [FromForm]
         string pid)
     {
         // Save the file to the specified path
         using (var memStream = new MemoryStream())
         {
-            await faceImageBinary.CopyToAsync(memStream);
+            if (faceImageBinary is not null)
+            {
+                await faceImageBinary.CopyToAsync(memStream);
+            }
 
             var data = await Mediator.Send(new PrisonerTokenQuery
             {
@@ -37,6 +48,10 @@ public class PrisonController : AppBaseController
         }
     }
 
+    /// <summary>
+    /// Get all enabled contacts associated to the prisoner
+    /// </summary>
+    /// <returns></returns>
     [HttpGet("prisoners/contacts/all")]
     [ProducesResponseType(typeof(List<ShowContactsDto>), (int)HttpStatusCode.OK)]
     [SessionAuthFilter]
@@ -46,6 +61,11 @@ public class PrisonController : AppBaseController
         return Ok(data);
     }
 
+    /// <summary>
+    /// Requests for a phone call
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPost("prisoners/contacts/begin-call")]
     [ProducesResponseType(typeof(RequestCallResultDto), (int)HttpStatusCode.OK)]
     [SessionAuthFilter]
@@ -55,6 +75,11 @@ public class PrisonController : AppBaseController
         return Ok(data);
     }
 
+    /// <summary>
+    /// Notifies the system that a phone call has been completed.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
     [HttpPut("prisoners/contacts/end-call")]
     [ProducesResponseType(typeof(EndCallResultDto), (int)HttpStatusCode.OK)]
     [SessionAuthFilter]

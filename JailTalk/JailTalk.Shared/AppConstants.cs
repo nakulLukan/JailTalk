@@ -6,6 +6,7 @@ public static class AppSettingKeys
     public const string JwtSettingsIssuer = "JwtSettings:Issuer";
     public const string JwtSettingsAudience = "JwtSettings:Audience";
     public const string JwtSettingsSessionVerificationKey = "JwtSettings:SessionVerificationKey";
+    public const string JwtValidateFaceImage = "JwtSettings:ValidateFaceImage";
 }
 
 public static class RegularExpressionPattern
