@@ -396,6 +396,7 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
-
-*/appsettings.Development.json
-*/appsettings.Production.json
+/JailTalk/JailTalk.Api/appsettings.Development.json
+/JailTalk/JailTalk.Api/appsettings.Production.json
+/JailTalk/JailTalk.Web/appsettings.Development.json
+/JailTalk/JailTalk.Web/appsettings.Production.json
