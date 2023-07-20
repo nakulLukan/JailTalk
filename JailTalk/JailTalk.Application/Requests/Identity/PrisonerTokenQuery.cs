@@ -75,15 +75,16 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
 
         if (bool.Parse(_configuration[AppSettingKeys.JwtValidateFaceImage]))
         {
-            AuthenticateByFaceId(request, prisoner);
+            await AuthenticateByFaceId(request, prisoner);
         }
 
         var token = CreateToken(prisoner);
         return new ResponseDto<string>(token);
     }
 
-    private async void AuthenticateByFaceId(PrisonerTokenQuery request, PrisonerDto prisoner)
+    private async Task AuthenticateByFaceId(PrisonerTokenQuery request, PrisonerDto prisoner)
     {
+        _logger.LogInformation("About to match face details of prisoner #{pid}", request.Pid);
         var hasMatch = false;
         List<Task<bool>> results = new();
         foreach (var existingFace in prisoner.FaceImages)
@@ -92,6 +93,8 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
         }
 
         await Task.WhenAll(results);
+        _logger.LogInformation("Face match results completed");
+
         hasMatch = results.All(x => x.Result);
         if (!hasMatch)
         {
