@@ -23,7 +23,7 @@ public class AwsFaceRecognition : IAppFaceRecognition
         string secretKey = configuration["Aws:Rekognition:SecretKey"];
         string region = configuration["Aws:Rekognition:Region"];
         bool useBasicCredentialAuthentication = bool.Parse(configuration["Aws:Rekognition:UseBasicCredentialAuthentication"]);
-        logger.LogInformation("[{bac}] [{region}] [{acc}] [{sec}]", useBasicCredentialAuthentication, region, accessKey, secretKey);
+        logger.LogError("[{bac}] [{region}] [{acc}] [{sec}]", useBasicCredentialAuthentication, region, accessKey, secretKey);
         if (useBasicCredentialAuthentication)
         {
             var credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey);
