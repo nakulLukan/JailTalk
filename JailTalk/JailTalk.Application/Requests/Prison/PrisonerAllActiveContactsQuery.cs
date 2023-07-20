@@ -28,6 +28,8 @@ public class PrisonerAllActiveContactsQueryHandler : IRequestHandler<PrisonerAll
             .Where(x => x.PrisonerId == prisonerId
                 && x.IsActive
                 && !x.IsBlocked)
+            .OrderBy(x => x.IsActive)
+                .ThenBy(x => x.RelativeType.Value)
             .Select(x => new ShowContactsDto
             {
                 Id = x.Id,
@@ -35,7 +37,6 @@ public class PrisonerAllActiveContactsQueryHandler : IRequestHandler<PrisonerAll
                 CountryCode = x.CountryCode,
                 PhoneNumber = x.PhoneNumber,
             })
-            .OrderBy(x => x.ContactRelationName)
             .ToListAsync(cancellationToken);
         return contacts;
     }

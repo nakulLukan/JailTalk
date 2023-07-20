@@ -1,12 +1,18 @@
 ﻿@using JailTalk.Application.Dto.System;
 @using Microsoft.AspNetCore.Components.Forms;
 <div class="d-flex flex-grow-1 gap-3">
-    <MudStack>
-        <MudFileUpload T="IReadOnlyList<IBrowserFile>" OnFilesChanged="OnInputFileChanged" AppendMultipleFiles Hidden="false" Class="flex-1" InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20" InputStyle="opacity:0"
+    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
+        <MudFileUpload T="IReadOnlyList<IBrowserFile>" OnFilesChanged="OnInputFileChanged" AppendMultipleFiles Hidden="false"
+                       Class="flex-shrink-1 " InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20"
+                       InputStyle="opacity:0"
         @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass" MaximumFileCount="3">
             <ButtonTemplate>
-                <MudPaper Height="300px" Outlined="true" Class="@DragClass">
-                    <MudText Typo="Typo.subtitle1">Drag and drop files here or click</MudText>
+                <MudPaper Height="300px" Width="200px" Outlined="true" Class="@DragClass">
+                    @if (files.Count == 0)
+                    {
+                        <MudText Typo="Typo.subtitle1" Align="Align.Center"
+                                 Class="align-self-center">Drag and drop files here or click</MudText>
+                    }
                     @foreach (var file in files)
                     {
                         <MudChip Color="Color.Dark" Text="@file.Name" />
@@ -20,24 +26,35 @@
         </MudToolBar>
     </MudStack>
     <MudDivider Vertical="true" DividerType="DividerType.Middle" FlexItem="true" />
-    <MudPaper Class="d-flex justify-start flex-grow-1 gap-3" Elevation="0">
+    <MudPaper Class="d-flex justify-start flex-grow-1 gap-3 flex-wrap align-content-start" Elevation="0">
         @foreach (var imageDto in Attachments)
         {
-            <div>
+            <MudBadge Overlap="true" Bordered="true" Color="Color.Error" Icon="@Icons.Material.Filled.Close"
+                      BadgeClass="cursor-pointer" OnClick="@(()=> OnPhotoDeletedClicked(imageDto.Id))">
                 <div class="d-flex flex-column gap-1 justify-center align-content-center">
                     <MudImage Src="@imageDto.Base64ImageSrc" ObjectPosition="ObjectPosition.Center"
-                              ObjectFit="ObjectFit.Cover" Width="84" Height="84" Alt="@imageDto.FileName" Fluid="true"></MudImage>
-                    <MudText Typo="Typo.caption">@imageDto.FileName</MudText>
+                              ObjectFit="ObjectFit.Cover" Height="84" Width="84" Alt="@imageDto.FileName"></MudImage>
+                    <MudText Typo="Typo.caption" Align="Align.Center">@imageDto.FileName</MudText>
                 </div>
-            </div>
+            </MudBadge>
         }
     </MudPaper>
 </div>
+
+<MudMessageBox @ref="_imageDeleteConfirmation" Title="Warning" CancelText="Cancel">
+    <MessageContent>
+        Are you sure you want to delete this image?
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" Size="Size.Small">Delete!</MudButton>
+    </YesButton>
+</MudMessageBox>
 @code {
 
-    private static string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10";
+    private static string DefaultDragClass = "relative rounded-lg border-2 border-dashed pa-4 mt-4 mud-width-full mud-height-full z-10 d-flex flex-wrap justify-start align-content-start";
     private string DragClass = DefaultDragClass;
     private List<IBrowserFile> files = new List<IBrowserFile>();
+    private MudMessageBox _imageDeleteConfirmation;
 
     [Parameter]
     public List<ImageViewDto> Attachments { get; set; }
@@ -47,6 +64,12 @@
 
     [Parameter]
     public EventCallback<List<ImageUploadDto>> OnUpload { get; set; }
+
+    [Parameter]
+    public EventCallback<int> OnPhotoDeleted { get; set; }
+
+    [Parameter]
+    public int? MaximumImageCount { get; set; }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -68,9 +91,16 @@
 
     private void Upload()
     {
+        var projectedImageCount = files.Count + Attachments.Count;
         if (files.Any(x => x.Size > MaxImageSize))
         {
             ToastService.Error($"Choose file size less than '{MaxImageSize}' bytes.");
+            return;
+        }
+
+        if (MaximumImageCount.HasValue && projectedImageCount > MaximumImageCount.Value)
+        {
+            ToastService.Error($"Cannot upload more than '{MaximumImageCount}' images.");
             return;
         }
 
@@ -93,5 +123,15 @@
     private void ClearDragClass()
     {
         DragClass = DefaultDragClass;
+    }
+
+    private async Task OnPhotoDeletedClicked(int imageId)
+    {
+        bool? result = await _imageDeleteConfirmation.Show();
+
+        if (result.HasValue && result.Value)
+        {
+            await OnPhotoDeleted.InvokeAsync(imageId);
+        }
     }
 }
