@@ -13,8 +13,8 @@ public class AwsFaceRecognition : IAppFaceRecognition
 
     public AwsFaceRecognition(IConfiguration configuration, ILogger<AwsFaceRecognition> logger)
     {
-        client = InitialiseAwsClient(configuration);
         this.logger = logger;
+        client = InitialiseAwsClient(configuration);
     }
 
     AmazonRekognitionClient InitialiseAwsClient(IConfiguration configuration)
@@ -23,6 +23,7 @@ public class AwsFaceRecognition : IAppFaceRecognition
         string secretKey = configuration["Aws:Rekognition:SecretKey"];
         string region = configuration["Aws:Rekognition:Region"];
         bool useBasicCredentialAuthentication = bool.Parse(configuration["Aws:Rekognition:UseBasicCredentialAuthentication"]);
+        logger.LogInformation("[{bac}] [{region}] [{acc}] [{sec}]", useBasicCredentialAuthentication, region, accessKey, secretKey);
         if (useBasicCredentialAuthentication)
         {
             var credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey);
