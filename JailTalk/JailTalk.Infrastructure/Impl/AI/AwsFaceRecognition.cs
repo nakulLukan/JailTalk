@@ -13,12 +13,25 @@ public class AwsFaceRecognition : IAppFaceRecognition
 
     public AwsFaceRecognition(IConfiguration configuration, ILogger<AwsFaceRecognition> logger)
     {
+        client = InitialiseAwsClient(configuration);
+        this.logger = logger;
+    }
+
+    AmazonRekognitionClient InitialiseAwsClient(IConfiguration configuration)
+    {
         string accessKey = configuration["Aws:Rekognition:AccessKey"];
         string secretKey = configuration["Aws:Rekognition:SecretKey"];
         string region = configuration["Aws:Rekognition:Region"];
-        var credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey);
-        client = new AmazonRekognitionClient(credentials, Amazon.RegionEndpoint.GetBySystemName(region));
-        this.logger = logger;
+        bool useBasicCredentialAuthentication = bool.Parse(configuration["Aws:Rekognition:UseBasicCredentialAuthentication"]);
+        if (useBasicCredentialAuthentication)
+        {
+            var credentials = new Amazon.Runtime.BasicAWSCredentials(accessKey, secretKey);
+            return new AmazonRekognitionClient(credentials, Amazon.RegionEndpoint.GetBySystemName(region));
+        }
+        else
+        {
+            return new AmazonRekognitionClient(Amazon.RegionEndpoint.GetBySystemName(region));
+        }
     }
 
     public double[] GetFaceEncodings(byte[] image)
