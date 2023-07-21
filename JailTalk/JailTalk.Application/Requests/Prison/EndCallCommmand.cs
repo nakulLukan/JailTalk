@@ -39,19 +39,19 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
 
         if (callHistory == null)
         {
-            throw new AppApiException(HttpStatusCode.NotFound, "Invalid call history record");
+            throw new AppApiException(HttpStatusCode.NotFound, "EC-0001", "Invalid call history record");
         }
 
         if (prisonerId != callHistory.PhoneDirectory.PrisonerId)
         {
             _logger.LogError("Record does not belong to prisoner {prisoner}", prisonerId);
-            throw new AppApiException(HttpStatusCode.BadRequest, "Invalid call history record");
+            throw new AppApiException(HttpStatusCode.BadRequest, "EC-0002", "This phone call history is not associated to this prisoner.");
         }
 
         if (callHistory.EndedOn.HasValue)
         {
             _logger.LogError("Call already terminated on {terminatedOn}", callHistory.EndedOn.Value);
-            throw new AppApiException(HttpStatusCode.BadRequest, "Call Already Terminated");
+            throw new AppApiException(HttpStatusCode.BadRequest, "EC-0003", "Call Already Terminated");
         }
 
         var phoneBalance = await _appDbContext.PhoneBalances.AsTracking()

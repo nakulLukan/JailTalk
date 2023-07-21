@@ -1,5 +1,4 @@
-﻿using JailTalk.Application.Contracts.AI;
-using JailTalk.Application.Contracts.Data;
+﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Domain.Prison;
 using JailTalk.Shared;
@@ -19,13 +18,11 @@ public class LinkAttachmentToPrisonerCommand : IRequest<ResponseDto<bool>>
 public class LinkAttachmentToPrisonerCommandHandler : IRequestHandler<LinkAttachmentToPrisonerCommand, ResponseDto<bool>>
 {
     readonly IAppDbContext _dbContext;
-    readonly IAppFaceRecognition _faceRecognition;
     readonly IAppRequestContext _requestContext;
 
-    public LinkAttachmentToPrisonerCommandHandler(IAppDbContext dbContext, IAppFaceRecognition faceRecognition, IAppRequestContext requestContext)
+    public LinkAttachmentToPrisonerCommandHandler(IAppDbContext dbContext, IAppRequestContext requestContext)
     {
         _dbContext = dbContext;
-        _faceRecognition = faceRecognition;
         _requestContext = requestContext;
     }
 

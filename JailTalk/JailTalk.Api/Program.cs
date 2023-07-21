@@ -1,5 +1,6 @@
 using JailTalk.Api;
 using JailTalk.Infrastructure.Data;
+using JailTalk.Infrastructure.Impl.Middlewares;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -32,8 +33,7 @@ using (var scope = app.Services.CreateScope())
     await dbContext.Database.MigrateAsync();
 }
 
-app.UseExceptionHandler();
-
+app.UseMiddleware<AppApiGlobalExceptionHandlerMiddleware>();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

@@ -47,12 +47,12 @@ public class JwtTokenRequestHandler : IRequestHandler<DeviceTokenQuery, Response
 
         if (device is null)
         {
-            throw new AppApiException(HttpStatusCode.Forbidden, "Unable to recognize device");
+            throw new AppApiException(HttpStatusCode.Forbidden, "DT-0001", "Unable to recognize device");
         }
 
         if (device.FailedLoginAttempts > 3 && AppDateTime.UtcNow < device.LockoutEnd.Value)
         {
-            throw new AppApiException(HttpStatusCode.Forbidden, "Too many login attempts. Please try again later.");
+            throw new AppApiException(HttpStatusCode.Forbidden, "DT-0002", "Too many login attempts. Please try again later.");
         }
 
         if (device.DeviceSecretIdentifier != request.DeviceSecretIdentifier)
@@ -64,7 +64,7 @@ public class JwtTokenRequestHandler : IRequestHandler<DeviceTokenQuery, Response
             device.FailedLoginAttempts = device.FailedLoginAttempts + 1;
 
             await _dbContext.SaveAsync(cancellationToken);
-            throw new AppApiException(HttpStatusCode.Forbidden, "Secret key is invalid");
+            throw new AppApiException(HttpStatusCode.Forbidden, "DT-0003", "Secret key is invalid");
         }
 
         device.FailedLoginAttempts = 0;

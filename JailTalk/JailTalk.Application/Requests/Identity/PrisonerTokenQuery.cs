@@ -58,19 +58,19 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
             .FirstOrDefaultAsync(cancellationToken);
         if (prisoner is null)
         {
-            throw new AppApiException(HttpStatusCode.Unauthorized, "PID does not exists.");
+            throw new AppApiException(HttpStatusCode.Unauthorized, "PT-0001", "PID does not exists.");
         }
         if (prisoner.IsBlocked)
         {
             _logger.LogError("The prisoner is blocked.");
-            throw new AppApiException(HttpStatusCode.Forbidden, "Inactive record");
+            throw new AppApiException(HttpStatusCode.Forbidden, "PT-0002", "Inactive record");
         }
 
         var prisonerId = _requestContext.GetJailId();
         if (prisonerId != prisoner.PrisonId)
         {
             _logger.LogError("Device trying to access prisoner in another jail.");
-            throw new AppApiException(HttpStatusCode.Forbidden, "Unauthorized access");
+            throw new AppApiException(HttpStatusCode.Forbidden, "PT-0003", "Unauthorized access");
         }
 
         if (bool.Parse(_configuration[AppSettingKeys.JwtValidateFaceImage]))
@@ -98,7 +98,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
         hasMatch = results.All(x => x.Result);
         if (!hasMatch)
         {
-            throw new AppApiException(HttpStatusCode.Unauthorized, "Face Id does not match");
+            throw new AppApiException(HttpStatusCode.Unauthorized, "PT-0004", "Face Id does not match");
         }
     }
 

@@ -44,12 +44,12 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
         if (contact is null)
         {
             _logger.LogError("Contact '{ct}' is associated to prisoner {prisoner}", request.ContactId, prisonerId);
-            throw new AppApiException(HttpStatusCode.BadRequest, "Invalid Contact Requested");
+            throw new AppApiException(HttpStatusCode.BadRequest, "RC-0001", "Invalid Contact Requested");
         }
         else if (contact.IsBlocked || !contact.IsActive)
         {
             _logger.LogError("Contact '{ct}' active status: {active}, is blocked: {blocked}", request.ContactId, contact.IsActive, contact.IsBlocked);
-            throw new AppApiException(HttpStatusCode.BadRequest, "Invalid Contact Requested");
+            throw new AppApiException(HttpStatusCode.BadRequest, "RC-0002", "Invalid Contact Requested");
         }
 
         var phoneBalanceEntity = await _dbContext.PhoneBalances
