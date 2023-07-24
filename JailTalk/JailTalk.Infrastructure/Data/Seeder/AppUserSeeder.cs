@@ -15,7 +15,7 @@ public static class AppUserSeeder
         var users = configuration.GetRequiredSection("Identity:DefaultUsers").Get<List<DefaultUserDto>>();
 
         var existingUsers = await dbContext.Users.Select(x => x.UserName).ToListAsync();
-        var userStore = new UserStore<AppUser>(dbContext);
+        var userStore = new UserStore<AppUser, AppRole, AppDbContext>(dbContext);
         foreach (var user in users.Where(x => !existingUsers.Contains(x.UserName)))
         {
             AppUser newUser = new AppUser()

@@ -49,4 +49,10 @@
     <None Include="D:\Workspace\CSharp\JailTalk\JailTalk\JailTalk.Web\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

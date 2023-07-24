@@ -41,6 +41,11 @@ public class AuthenticationMiddleware
                 return;
             }
         }
+        else if (context.Request.Path == "/sign-out")
+        {
+            await signInMgr.SignOutAsync();
+            context.Response.Redirect("/");
+        }
         else
         {
             await _next.Invoke(context);

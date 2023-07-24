@@ -13,6 +13,7 @@ Log.Logger = new LoggerConfiguration()
         .CreateLogger();
 builder.Configuration.AddConfiguration(new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appconfig.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
                 .Build());
 builder.Logging.ClearProviders();

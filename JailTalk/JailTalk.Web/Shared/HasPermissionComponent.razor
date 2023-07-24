@@ -1,0 +1,21 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization;
+@inject AuthenticationStateProvider AuthenticationStateProvider;
+@inject NavigationManager NavigationManager;
+@code {
+    [EditorRequired]
+    [Parameter]
+    public string Roles { get; set; } = "none";
+
+    protected override void OnInitialized()
+    {
+        if (Roles == "none")
+        {
+            return;
+        }
+        var user = AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User;
+        if (!Roles.Split(',').All(role => user.IsInRole(role.Trim())))
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

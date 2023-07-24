@@ -5,7 +5,6 @@ using JailTalk.Application.Contracts.UserManagement;
 using JailTalk.Domain.Identity;
 using JailTalk.Infrastructure;
 using JailTalk.Infrastructure.Data;
-using JailTalk.Shared.Utilities;
 using JailTalk.Web.Contracts.Events;
 using JailTalk.Web.Impl.Events;
 using JailTalk.Web.Impl.Http;
@@ -13,7 +12,6 @@ using JailTalk.Web.Impl.Presentation;
 using JailTalk.Web.Impl.UserManagement;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
 
@@ -54,7 +52,7 @@ public static class ServiceRegistry
 
     private static void RegisterIdentity(IServiceCollection services)
     {
-        services.AddIdentity<AppUser, IdentityRole>(options =>
+        services.AddIdentity<AppUser, AppRole>(options =>
         {
             options.SignIn.RequireConfirmedEmail = false;
         })

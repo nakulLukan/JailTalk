@@ -1,0 +1,46 @@
+﻿@page "/identity-management/roles"
+@using JailTalk.Application.Dto.Identity;
+@using JailTalk.Application.Requests.Identity;
+@using MediatR;
+@using Microsoft.AspNetCore.Authorization;
+@using Microsoft.AspNetCore.Components.Authorization;
+@inject IMediator Mediator;
+
+<HasPermissionComponent Roles="none" />
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+
+    <MudTable Items="@Elements"
+              Dense="false" Hover="true" Bordered="true"
+              FixedHeader="true" Loading="_loading" Context="item">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Roles</MudText>
+        </ToolBarContent>
+        <HeaderContent>
+            <MudTh>S/L</MudTh>
+            <MudTh>Role Name</MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>Action</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="S/L">@item.Serial</MudTd>
+            <MudTd DataLabel="Role Name">@item.RoleName</MudTd>
+            <MudTd DataLabel="Description">@item.RoleDescription</MudTd>
+            <MudTd DataLabel="Action"></MudTd>
+        </RowTemplate>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudContainer>
+@code {
+    public List<RolesListDto> Elements { get; set; }
+    public bool _loading { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        Elements = (await Mediator.Send(new RolesListQuery())).Data;
+        StateHasChanged();
+    }
+}

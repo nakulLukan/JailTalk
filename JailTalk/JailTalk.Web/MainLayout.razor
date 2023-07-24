@@ -9,6 +9,8 @@
     <MudAppBar>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         <MudLink Href="/" Typo="Typo.h6" Underline="Underline.None" Color="Color.Inherit">Jail Talk </MudLink>
+        <MudSpacer />
+        <MudLink Href="/sign-out" Typo="Typo.subtitle1" Underline="Underline.None" Color="Color.Inherit" >Log out </MudLink>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
         <MudDrawerHeader>
@@ -17,17 +19,15 @@
         <JailTalk.Web.Shared.AppNavMenu />
     </MudDrawer>
     <MudMainContent>
-        <MudContainer MaxWidth="MaxWidth.Medium">
-            <ErrorBoundary>
-                <ChildContent>
-                    <div class="mt-6"></div>
-                    @Body
-                </ChildContent>
-                <ErrorContent>
-                    <p class="errorUI">Oops, something went wrong</p>
-                </ErrorContent>
-            </ErrorBoundary>
-        </MudContainer>
+        <ErrorBoundary>
+            <ChildContent>
+                <div class="mt-6"></div>
+                @Body
+            </ChildContent>
+            <ErrorContent>
+                <p class="errorUI">Oops, something went wrong</p>
+            </ErrorContent>
+        </ErrorBoundary>
     </MudMainContent>
 </MudLayout>
 @code {

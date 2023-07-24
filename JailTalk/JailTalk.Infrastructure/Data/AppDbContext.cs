@@ -10,7 +10,7 @@ using System.Reflection;
 
 namespace JailTalk.Infrastructure.Data;
 
-public class AppDbContext : IdentityDbContext<AppUser>, IAppDbContext
+public class AppDbContext : IdentityDbContext<AppUser, AppRole, string>, IAppDbContext
 {
     public AppDbContext(DbContextOptions options) : base(options)
     {
