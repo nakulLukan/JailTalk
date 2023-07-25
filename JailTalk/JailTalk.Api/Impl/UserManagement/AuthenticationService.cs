@@ -15,4 +15,9 @@ public class AuthenticationService : IAuthenticationService
     {
         throw new NotImplementedException();
     }
+
+    public Task SignOut()
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using JailTalk.Application.Contracts.Data;
+using JailTalk.Application.Contracts.Http;
 using JailTalk.Domain.Identity;
 using JailTalk.Domain.Lookup;
 using JailTalk.Domain.Prison;

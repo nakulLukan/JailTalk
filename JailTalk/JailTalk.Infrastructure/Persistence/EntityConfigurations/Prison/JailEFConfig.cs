@@ -1,4 +1,5 @@
-﻿using JailTalk.Domain.Prison;
+﻿using JailTalk.Domain.Identity;
+using JailTalk.Domain.Prison;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -15,5 +16,9 @@ public class JailEFConfig : IEntityTypeConfiguration<Jail>
         builder.HasOne(x => x.Address)
             .WithMany()
             .HasForeignKey(x => x.AddressId);
+
+        builder.HasMany<AppUser>()
+            .WithOne(x => x.Prison)
+            .HasForeignKey(x => x.PrisonId);
     }
 }

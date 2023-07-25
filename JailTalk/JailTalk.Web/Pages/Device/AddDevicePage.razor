@@ -8,46 +8,49 @@
 @inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
 
-<EditForm Model="model" OnValidSubmit="@OnValidSubmit">
-    <DataAnnotationsValidator />
-    <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
-        <MudPaper Class="pa-16" Elevation="4">
-            <MudGrid>
-                <MudItem sm="12">
-                    <h3>Register New Device</h3>
-                </MudItem>
-                <MudItem sm="12">
-                    <MudTextField Label="Device Code" @bind-Value="@model.Code" For="@(()=> model.Code)"></MudTextField>
-                </MudItem>
-                <MudItem sm="12">
-                    <MudTextField Label="MAC Address" Mask="@macAddressMask" @bind-Value="@model.MacAddress" For="@(()=> model.MacAddress)"></MudTextField>
-                </MudItem>
-                <MudItem sm="12">
-                    <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.PrisonId" For="@(()=> model.PrisonId)" />
-                </MudItem>
-                <MudItem sm="12">
-                    <div class="d-flex flex-grow-1 gap-4">
-                        <MudTextField Class="flex-grow-1" Mask="@secretMask" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
-                        <MudButton Class="flex-none" OnClick="OnGenerateDeviceSecret">Generate</MudButton>
-                        <MudButton Class="flex-none" Disabled="@(!model.DeviceSecret.Any())" Variant="Variant.Filled" Color="Color.Surface" 
-                            OnClick="@ToggleQRCodeWindow">@QRCodePopupButtonName()</MudButton>
-                        <MudPopover Open="@_isOpen" Fixed="false" Class="flex-none px-4 pt-4" AnchorOrigin="Origin.CenterRight"
-                            TransformOrigin="Origin.CenterLeft" >
-                            <JailTalk.Web.Components.Common.QRCodeGenerator SecretMessage="@model.DeviceSecret" />
-                        </MudPopover>
-                    </div>
-                </MudItem>
-                <MudItem sm="12">
-                    <MudSwitch @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
-                </MudItem>
-                <MudItem sm="4">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
-                    <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
-    </MudStack>
-</EditForm>
+<MudContainer MaxWidth="MaxWidth.Medium">
+
+    <EditForm Model="model" OnValidSubmit="@OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
+            <MudPaper Class="pa-16" Elevation="4">
+                <MudGrid>
+                    <MudItem sm="12">
+                        <h3>Register New Device</h3>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudTextField Label="Device Code" @bind-Value="@model.Code" For="@(()=> model.Code)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudTextField Label="MAC Address" Mask="@macAddressMask" @bind-Value="@model.MacAddress" For="@(()=> model.MacAddress)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.PrisonId" For="@(()=> model.PrisonId)" />
+                    </MudItem>
+                    <MudItem sm="12">
+                        <div class="d-flex flex-grow-1 gap-4">
+                            <MudTextField Class="flex-grow-1" Mask="@secretMask" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
+                            <MudButton Class="flex-none" OnClick="OnGenerateDeviceSecret">Generate</MudButton>
+                            <MudButton Class="flex-none" Disabled="@(!model.DeviceSecret.Any())" Variant="Variant.Filled" Color="Color.Surface"
+                                       OnClick="@ToggleQRCodeWindow">@QRCodePopupButtonName()</MudButton>
+                            <MudPopover Open="@_isOpen" Fixed="false" Class="flex-none px-4 pt-4" AnchorOrigin="Origin.CenterRight"
+                                        TransformOrigin="Origin.CenterLeft">
+                                <JailTalk.Web.Components.Common.QRCodeGenerator SecretMessage="@model.DeviceSecret" />
+                            </MudPopover>
+                        </div>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudSwitch @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
+                    </MudItem>
+                    <MudItem sm="4">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                        <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudStack>
+    </EditForm>
+</MudContainer>
 @code {
     NewDeviceDto model = new();
     bool _isOpen = false;

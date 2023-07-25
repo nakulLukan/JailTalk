@@ -8,61 +8,63 @@
 @inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
 
-<EditForm Model="model" OnValidSubmit="@OnValidSubmit">
-    <DataAnnotationsValidator />
-    <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
-        <MudPaper Class="pa-16" Elevation="4">
-            <MudGrid>
-                <MudItem sm="12">
-                    <h3>Add new Prisoner</h3>
-                </MudItem>
-                <MudItem sm="12">
-                    <MudTextField Label="PID" @bind-Value="@model.Pid" For="@(()=> model.Pid)"></MudTextField>
-                </MudItem>
-                <MudItem sm="4">
-                    <MudTextField Label="First Name" @bind-Value="@model.FirstName" For="@(()=> model.FirstName)"></MudTextField>
-                </MudItem>
-                <MudItem sm="4">
-                    <MudTextField Label="Middle Name" @bind-Value="@model.MiddleName" For="@(()=> model.MiddleName)"></MudTextField>
-                </MudItem>
-                <MudItem sm="4">
-                    <MudTextField Label="Last Name" @bind-Value="@model.LastName" For="@(()=> model.LastName)"></MudTextField>
-                </MudItem>
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <EditForm Model="model" OnValidSubmit="@OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
+            <MudPaper Class="pa-16" Elevation="4">
+                <MudGrid>
+                    <MudItem sm="12">
+                        <h3>Add new Prisoner</h3>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudTextField Label="PID" @bind-Value="@model.Pid" For="@(()=> model.Pid)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="4">
+                        <MudTextField Label="First Name" @bind-Value="@model.FirstName" For="@(()=> model.FirstName)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="4">
+                        <MudTextField Label="Middle Name" @bind-Value="@model.MiddleName" For="@(()=> model.MiddleName)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="4">
+                        <MudTextField Label="Last Name" @bind-Value="@model.LastName" For="@(()=> model.LastName)"></MudTextField>
+                    </MudItem>
 
-                <MudItem sm="12">
-                    <MudText>Gender</MudText>
-                    <MudRadioGroup @bind-SelectedOption="@model.Gender" For="@(() => model.Gender)" Name="Gender">
-                        <MudRadio Option="@(Gender.Male)" Color="Color.Primary">Male</MudRadio>
-                        <MudRadio Option="@(Gender.Female)" Color="Color.Secondary">Female</MudRadio>
-                        <MudRadio Option="@(Gender.Others)" Color="Color.Tertiary">Others</MudRadio>
-                    </MudRadioGroup>
-                </MudItem>
+                    <MudItem sm="12">
+                        <MudText>Gender</MudText>
+                        <MudRadioGroup @bind-SelectedOption="@model.Gender" For="@(() => model.Gender)" Name="Gender">
+                            <MudRadio Option="@(Gender.Male)" Color="Color.Primary">Male</MudRadio>
+                            <MudRadio Option="@(Gender.Female)" Color="Color.Secondary">Female</MudRadio>
+                            <MudRadio Option="@(Gender.Others)" Color="Color.Tertiary">Others</MudRadio>
+                        </MudRadioGroup>
+                    </MudItem>
 
-                <MudItem sm="12">
-                    <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.JailId" For="@(()=> model.JailId)" />
-                </MudItem>
-                <MudDivider DividerType="DividerType.Middle" />
-                <MudItem sm="12">
-                    <MudTextField Label="House/Flat Name" @bind-Value="@model.Address.HouseName" For="@(()=> model.Address.HouseName)"></MudTextField>
-                </MudItem>
-                <MudItem sm="4">
-                    <MudTextField Label="Street" @bind-Value="@model.Address.Street" For="@(()=> model.Address.Street)"></MudTextField>
-                </MudItem>
-                <MudItem sm="4">
-                    <MudTextField Label="City" @bind-Value="@model.Address.City" For="@(()=> model.Address.City)"></MudTextField>
-                </MudItem>
-                <MudItem sm="4">
-                    <MudTextField Label="Pincode" @bind-Value="@model.Address.PinCode" For="@(()=> model.Address.PinCode)"
-                                  Mask="@(new PatternMask("000 000"))"></MudTextField>
-                </MudItem>
-                <MudItem sm="4">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
-                    <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
-                </MudItem>
-            </MudGrid>
-        </MudPaper>
-    </MudStack>
-</EditForm>
+                    <MudItem sm="12">
+                        <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.JailId" For="@(()=> model.JailId)" />
+                    </MudItem>
+                    <MudDivider DividerType="DividerType.Middle" />
+                    <MudItem sm="12">
+                        <MudTextField Label="House/Flat Name" @bind-Value="@model.Address.HouseName" For="@(()=> model.Address.HouseName)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="4">
+                        <MudTextField Label="Street" @bind-Value="@model.Address.Street" For="@(()=> model.Address.Street)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="4">
+                        <MudTextField Label="City" @bind-Value="@model.Address.City" For="@(()=> model.Address.City)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="4">
+                        <MudTextField Label="Pincode" @bind-Value="@model.Address.PinCode" For="@(()=> model.Address.PinCode)"
+                                      Mask="@(new PatternMask("000 000"))"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="4">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                        <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudStack>
+    </EditForm>
+</MudContainer>
 @code {
     NewPrisonerDto model = new();
 

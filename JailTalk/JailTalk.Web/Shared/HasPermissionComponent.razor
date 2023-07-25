@@ -13,9 +13,9 @@
             return;
         }
         var user = AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User;
-        if (!Roles.Split(',').All(role => user.IsInRole(role.Trim())))
+        if (!Roles.Split(',').Any(role => user.IsInRole(role.Trim())))
         {
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/unauthorized");
         }
     }
 }

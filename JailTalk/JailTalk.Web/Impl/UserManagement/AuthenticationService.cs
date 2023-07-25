@@ -1,7 +1,7 @@
-﻿using JailTalk.Application.Contracts.Data;
-using JailTalk.Application.Contracts.UserManagement;
+﻿using JailTalk.Application.Contracts.UserManagement;
 using JailTalk.Application.Dto.Identity;
 using JailTalk.Domain.Identity;
+using JailTalk.Shared;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Models.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -17,7 +17,6 @@ public class AuthenticationService : IAuthenticationService
         = new ConcurrentDictionary<Guid, LoginInfo>();
 
     readonly IServiceScopeFactory _serviceScopeFactory;
-    readonly IAppDbContext _appDbContext;
 
     public AuthenticationService(IServiceScopeFactory serviceScopeFactory)
     {
@@ -45,6 +44,10 @@ public class AuthenticationService : IAuthenticationService
             var userRoles = await userInManager.GetRolesAsync(user);
             var roleClaim = new Claim(ClaimTypes.Role, userRoles.First());
             await signInManager.UserManager.AddClaimAsync(user, roleClaim);
+
+            // Add associated prison claim. This can be used restrict data belonging to that prison.
+            var associatedPrisonClaim = new Claim(AppClaims.PrisonId, user.PrisonId?.ToString() ?? 0.ToString());
+            await signInManager.UserManager.AddClaimAsync(user, associatedPrisonClaim);
         }
         return new UserSignInResultDto
         {
