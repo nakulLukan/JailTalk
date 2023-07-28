@@ -2,8 +2,10 @@
 using JailTalk.Application.Dto.Identity;
 using JailTalk.Domain.Identity;
 using JailTalk.Shared;
+using JailTalk.Shared.Extensions;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Models.Identity;
+using JailTalk.Shared.Utilities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Concurrent;
@@ -76,5 +78,56 @@ public class AuthenticationService : IAuthenticationService
         using var scope = _serviceScopeFactory.CreateScope();
         var signInManager = scope.ServiceProvider.GetRequiredService<SignInManager<AppUser>>();
         await signInManager.SignOutAsync();
+    }
+
+    public async Task<string> AddUser(AddUserAccountDto accountDetails)
+    {
+        using var scope = _serviceScopeFactory.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        AppUser newUser = new AppUser()
+        {
+            UserName = accountDetails.Username,
+            NormalizedUserName = accountDetails.Username.Normalized(),
+            Email = accountDetails.Email,
+            NormalizedEmail = accountDetails.Email.Normalized(),
+            LockoutEnabled = true,
+            PrisonId = accountDetails.PrisonId,
+            FullName = accountDetails.FullName,
+        };
+
+        var password = new PasswordHasher<AppUser>();
+        var hashed = password.HashPassword(newUser, accountDetails.Password);
+        newUser.PasswordHash = hashed;
+        var result = await userManager.CreateAsync(newUser);
+
+        if (!string.IsNullOrEmpty(accountDetails.RoleName))
+        {
+            await userManager.AddToRoleAsync(newUser, accountDetails.RoleName.Normalized());
+        }
+
+        return newUser.Id;
+    }
+
+    public async Task<bool> LockUserAccount(string userId, bool lockAccount)
+    {
+        using var scope = _serviceScopeFactory.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null)
+        {
+            throw new AppException(CommonExceptionMessages.UserNotFound);
+        }
+
+        if (lockAccount)
+        {
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTimeOffset.MaxValue;
+        }
+        else
+        {
+            user.LockoutEnd = null;
+        }
+        await userManager.UpdateAsync(user);
+        return true;
     }
 }

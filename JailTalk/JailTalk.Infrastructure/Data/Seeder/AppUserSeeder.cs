@@ -10,12 +10,13 @@ namespace JailTalk.Infrastructure.Data.Seeder;
 
 public static class AppUserSeeder
 {
-    public static async Task SeedDefaultUsers(this AppDbContext dbContext, IConfiguration configuration)
+    public static async Task SeedDefaultUsers(this AppDbContext dbContext,
+                                              IConfiguration configuration,
+                                              UserManager<AppUser> userManager)
     {
         var users = configuration.GetRequiredSection("Identity:DefaultUsers").Get<List<DefaultUserDto>>();
 
         var existingUsers = await dbContext.Users.Select(x => x.UserName).ToListAsync();
-        var userStore = new UserStore<AppUser, AppRole, AppDbContext>(dbContext);
         foreach (var user in users.Where(x => !existingUsers.Contains(x.UserName)))
         {
             AppUser newUser = new AppUser()
@@ -30,8 +31,8 @@ public static class AppUserSeeder
             var password = new PasswordHasher<AppUser>();
             var hashed = password.HashPassword(newUser, user.Password);
             newUser.PasswordHash = hashed;
-            var result = await userStore.CreateAsync(newUser);
-            await userStore.AddToRoleAsync(newUser, user.Role.Normalized());
+            var result = await userManager.CreateAsync(newUser);
+            await userManager.AddToRoleAsync(newUser, user.Role.Normalized());
         }
     }
 }

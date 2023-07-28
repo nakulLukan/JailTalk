@@ -1,6 +1,5 @@
 ﻿using JailTalk.Api.Filters;
 using JailTalk.Api.Impl.Http;
-using JailTalk.Api.Impl.UserManagement;
 using JailTalk.Application;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Contracts.UserManagement;
@@ -25,7 +24,7 @@ public static class ServiceRegistry
     {
         services.AddHttpContextAccessor();
         services.AddMemoryCache();
-        services.AddTransient<IAuthenticationService, AuthenticationService>();
+        services.AddScoped<IAuthenticationService>(prv => null);
         services.AddScoped<IDeviceRequestContext, DeviceRequestContext>();
         services.AddScoped<IAppRequestContext>(prv => null);
         services.AddSwaggerGen(config =>

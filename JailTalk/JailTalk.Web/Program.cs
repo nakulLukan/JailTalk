@@ -1,7 +1,9 @@
+using JailTalk.Domain.Identity;
 using JailTalk.Infrastructure.Data;
 using JailTalk.Infrastructure.Data.Seeder;
 using JailTalk.Web;
 using JailTalk.Web.Middlewares;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 using Serilog;
@@ -30,7 +32,8 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await dbContext.Database.MigrateAsync();
     await dbContext.SeedRoles();
-    await dbContext.SeedDefaultUsers(builder.Configuration);
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+    await dbContext.SeedDefaultUsers(builder.Configuration, userManager);
 }
 if (!app.Environment.IsDevelopment())
 {

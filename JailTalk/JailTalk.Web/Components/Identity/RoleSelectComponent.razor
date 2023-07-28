@@ -1,0 +1,47 @@
+﻿@using JailTalk.Application.Dto.Identity;
+@using System.Linq.Expressions;
+@using JailTalk.Application.Requests.Identity;
+@using MediatR;
+@inject IMediator Mediator;
+
+<MudSelect Label="@LabelName" AnchorOrigin="Origin.BottomCenter" ValueChanged="ValueChanged" For="For">
+    <MudSelectItem T="string" Value="null">None</MudSelectItem>
+    @foreach (var role in roles)
+    {
+        <MudSelectItem T="string" Value="role.RoleName">@role.RoleName</MudSelectItem>
+    }
+</MudSelect>
+@code {
+    List<RolesListDto> roles = new();
+
+    [Parameter]
+    public string LabelName { get; set; } = "Role";
+
+    private string _value;
+    [Parameter]
+    public string Value
+    {
+        get => _value;
+        set
+        {
+            if (_value == value) return;
+            _value = value;
+            ValueChanged.InvokeAsync(value);
+        }
+    }
+    [Parameter]
+    public EventCallback<string> ValueChanged { get; set; }
+
+    [Parameter]
+    [Category("Validation")]
+    public Expression<Func<string>> For { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            roles = (await Mediator.Send(new RolesListQuery())).Data;
+        }
+    }
+
+}

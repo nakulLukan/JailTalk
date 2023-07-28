@@ -6,6 +6,11 @@ namespace JailTalk.Domain.Identity;
 public class AppUser : IdentityUser
 {
     /// <summary>
+    /// Full name of the user
+    /// </summary>
+    public string FullName { get; set; }
+
+    /// <summary>
     /// The prison to which this user is associated to administrate.
     /// If value is null then the user has access to all prisons in the system
     /// </summary>

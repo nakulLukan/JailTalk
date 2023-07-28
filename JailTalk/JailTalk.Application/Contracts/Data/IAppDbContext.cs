@@ -2,6 +2,7 @@
 using JailTalk.Domain.Lookup;
 using JailTalk.Domain.Prison;
 using JailTalk.Domain.System;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace JailTalk.Application.Contracts.Data;
@@ -24,6 +25,7 @@ public interface IAppDbContext
     public DbSet<AppFaceEncoding> AppFaceEncodings { get; set; }
     public DbSet<AppUser> Users { get; set; }
     public DbSet<AppRole> Roles { get; set; }
+    public DbSet<IdentityUserRole<string>> UserRoles { get; set; }
 
     public void ClearChanges();
 

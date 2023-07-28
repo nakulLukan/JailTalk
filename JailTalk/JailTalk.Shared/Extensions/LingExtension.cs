@@ -14,6 +14,11 @@ public static class LingExtension
     /// <returns></returns>
     public static IQueryable<T> WhereInPrison<T>(this IQueryable<T> query, Expression<Func<T, int?>> prisonIdFieldExpression, int prisonId)
     {
+        // If prison id is zero then no need to add any filter.
+        if (prisonId == 0)
+        {
+            return query;
+        }
         var parameter = prisonIdFieldExpression.Parameters[0];
         var nullCheck = Expression.Equal(Expression.Constant(prisonId), Expression.Constant(0));
         var equalityCheck = Expression.Equal(prisonIdFieldExpression.Body, Expression.Constant(prisonId, typeof(int?)));
