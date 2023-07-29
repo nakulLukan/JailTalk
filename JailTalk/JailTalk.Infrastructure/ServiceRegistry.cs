@@ -1,8 +1,10 @@
 ﻿using JailTalk.Application.Contracts.AI;
 using JailTalk.Application.Contracts.Data;
+using JailTalk.Application.Contracts.Email;
 using JailTalk.Application.Contracts.Graphics;
 using JailTalk.Infrastructure.Data;
 using JailTalk.Infrastructure.Impl.AI;
+using JailTalk.Infrastructure.Impl.Email;
 using JailTalk.Infrastructure.Impl.Graphics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,5 +27,6 @@ public static class ServiceRegistry
 
         services.AddTransient<IAppImageEditor, AppImageEditor>();
         services.AddTransient<IAppFaceRecognition, AwsFaceRecognition>();
+        services.AddTransient<IEmailService, EmailService>();
     }
 }

@@ -16,6 +16,7 @@
   <ItemGroup>
     <PackageReference Include="AWSSDK.Rekognition" Version="3.7.200" />
     <PackageReference Include="EFCore.NamingConventions" Version="7.0.2" />
+    <PackageReference Include="MailKit" Version="4.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="7.0.5" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
