@@ -20,19 +20,31 @@ public class ApplicationSettingsSeeder
             {
                 Id = ApplicationSettings.MaxAllowedCallDurationMale,
                 Value = 15.ToString(),
-                Description = "Max number of minutes a male prisoner can make a call."
+                Description = "Max number of minutes a male prisoner can make a call a day."
             },
             new()
             {
                 Id = ApplicationSettings.MaxAllowedCallDurationFemale,
                 Value = 20.ToString(),
-                Description = "Max number of minutes a female prisoner can make a call."
+                Description = "Max number of minutes a female prisoner can make a call a day."
             },
             new()
             {
                 Id = ApplicationSettings.MaxAllowedCallDurationOthers,
                 Value = 15.ToString(),
-                Description = "Max number of minutes a LGBTQ+ prisoner can make a call."
+                Description = "Max number of minutes a LGBTQ+ prisoner can make a call a day."
+            },
+            new()
+            {
+                Id = ApplicationSettings.CallPricePerMinute,
+                Value = (0.5).ToString(),
+                Description = "Amount charged for 1 minute call in rupees."
+            },
+            new()
+            {
+                Id = ApplicationSettings.MaxAllowedCallTimeInRupeesPerMonth,
+                Value = (450).ToString(),
+                Description = "Maximum allowed call time per month in rupees. The prisoner cannot make any call of the total talktime amount in a month crosses this value."
             }
         };
 

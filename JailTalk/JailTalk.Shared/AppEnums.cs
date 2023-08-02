@@ -48,4 +48,6 @@ public enum ApplicationSettings : int
     MaxAllowedCallDurationMale = 2,
     MaxAllowedCallDurationFemale = 3,
     MaxAllowedCallDurationOthers = 4,
+    CallPricePerMinute = 5,
+    MaxAllowedCallTimeInRupeesPerMonth = 6,
 }

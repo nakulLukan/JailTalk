@@ -1,8 +1,12 @@
 ﻿@using JailTalk.Application.Dto.Prison;
 @using JailTalk.Application.Requests.Prison;
+@using JailTalk.Shared.Helper;
 @using JailTalk.Shared.Models;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
 @using MediatR;
 @inject IMediator Mediator;
+@inject IAppMediator AppMediator;
 
 <MudTable Items="@contacts" Dense="true" Hover="true" Bordered="true" Striped="true">
     <ToolBarContent>
@@ -27,22 +31,22 @@
         <MudTd DataLabel="Action">
             <MudMenu Icon="@Icons.Material.Filled.MoreVert">
                 <MudMenuItem>Edit</MudMenuItem>
-                <MudMenuItem>Block Number</MudMenuItem>
-                <MudMenuItem>Disable Number</MudMenuItem>
-            </MudMenu>
-        </MudTd>
-    </RowTemplate>
-    <NoRecordsContent>
-        <MudText Typo="Typo.caption"><b>No Records Found !!!</b></MudText>
-    </NoRecordsContent>
-</MudTable>
+                <MudMenuItem OnClick="@(() => OnContactBlocked(context.Id, context.IsBlocked))">@(context.IsBlocked ? "Unblock Number" : "Block Number")</MudMenuItem>
+                    <MudMenuItem OnClick="@(() => OnContactDisabled(context.Id, context.IsActive))">@(context.IsActive ? "Disable Number" : "Enable Number")</MudMenuItem>
+                </MudMenu>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <MudText Typo="Typo.caption"><b>No Records Found !!!</b></MudText>
+        </NoRecordsContent>
+    </MudTable>
 
-<MudDialog @bind-IsVisible="_isOpen" Options="options">
-    <DialogContent>
-        <AddContactDetailComponent PrisonerId="@PrisonerId" OnSubmitSuccess="OnAddContactSuccess" />
-    </DialogContent>
-</MudDialog>
-@code {
+    <MudDialog @bind-IsVisible="_isOpen" Options="options">
+        <DialogContent>
+            <AddContactDetailComponent PrisonerId="@PrisonerId" OnSubmitSuccess="OnAddContactSuccess" OnSubmitFailed="OnAddContactFailed" />
+        </DialogContent>
+    </MudDialog>
+    @code {
     [Parameter]
     public string PrisonerId { get; set; }
     List<PrisonerContactDetailListDto> contacts = new();
@@ -78,8 +82,56 @@
     private async Task UpdateContacts()
     {
         contacts = await Mediator.Send(new PrisonerContactDetailsQuery
-        {
-            PrisonerId = Guid.Parse(PrisonerId)
-        });
+            {
+                PrisonerId = Guid.Parse(PrisonerId)
+            });
+    }
+
+    private async Task OnContactBlocked(long contactNumberId, bool isNumberBlocked)
+    {
+        await AppMediator.Send(new DisableOrBlockContactCommand()
+            {
+                ContactId = contactNumberId,
+                BlockContact = !isNumberBlocked,
+                DisableContact = null
+            })
+            .OnSuccess(data =>
+            {
+                string status = isNumberBlocked ? "unblocked" : "blocked";
+                ToastService.Success($"Contact {status} successfully.");
+                UpdateItemStatus(contactNumberId, !isNumberBlocked, nameof(PrisonerContactDetailListDto.IsBlocked));
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
+    }
+
+    private async Task OnContactDisabled(long contactNumberId, bool isContactActive)
+    {
+        await AppMediator.Send(new DisableOrBlockContactCommand()
+            {
+                ContactId = contactNumberId,
+                BlockContact = null,
+                DisableContact = isContactActive
+            })
+            .OnSuccess(data =>
+            {
+                string status = isContactActive ? "disabled" : "enabled";
+                ToastService.Success($"Contact {status} successfully.");
+                UpdateItemStatus(contactNumberId, !isContactActive, nameof(PrisonerContactDetailListDto.IsActive));
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
+    }
+
+    private void UpdateItemStatus(long contactId, bool value, string nameOfProperty)
+    {
+        var item = contacts.First(x => x.Id == contactId);
+        item.GetType().GetProperty(nameOfProperty).SetValue(item, value);
+        item.Status = PrisonerHelper.ConvertContactStateAsText(item.IsActive, item.IsBlocked);
+        InvokeAsync(StateHasChanged);
     }
 }

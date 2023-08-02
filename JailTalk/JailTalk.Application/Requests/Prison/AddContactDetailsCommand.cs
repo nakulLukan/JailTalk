@@ -16,11 +16,13 @@ public class AddContactDetailsCommandHandler : IRequestHandler<AddContactDetails
 {
     readonly IAppDbContext _dbContext;
     readonly IAppRequestContext _requestContext;
+    readonly IApplicationSettingsProvider _settingsProvider;
 
-    public AddContactDetailsCommandHandler(IAppDbContext dbContext, IAppRequestContext requestContext)
+    public AddContactDetailsCommandHandler(IAppDbContext dbContext, IAppRequestContext requestContext, IApplicationSettingsProvider settingsProvider)
     {
         _dbContext = dbContext;
         _requestContext = requestContext;
+        _settingsProvider = settingsProvider;
     }
 
     public async Task<ResponseDto<long>> Handle(AddContactDetailsCommand request, CancellationToken cancellationToken)
@@ -31,6 +33,18 @@ public class AddContactDetailsCommandHandler : IRequestHandler<AddContactDetails
             && x.PhoneNumber == request.PhoneNumber))
         {
             throw new AppException("Given contact number already exists");
+        }
+
+        var maxEnabledContactsPerPrisoner = await _settingsProvider.GetMaxContactNumbersInActiveState();
+        var currentNumberOfActiveContacts = await _dbContext.PhoneDirectory
+            .Where(x => x.PrisonerId == request.PrisonerId
+                && x.IsActive)
+            .CountAsync(cancellationToken);
+
+        if (request.IsEnabled && currentNumberOfActiveContacts >= maxEnabledContactsPerPrisoner)
+        {
+            var numberOfContactsToBeDisabled = currentNumberOfActiveContacts - maxEnabledContactsPerPrisoner + 1;
+            throw new AppException($"Only {maxEnabledContactsPerPrisoner} contacts are allowed to be active. Please disable atleast {numberOfContactsToBeDisabled} contacts.");
         }
 
         var userId = await _requestContext.GetUserId();

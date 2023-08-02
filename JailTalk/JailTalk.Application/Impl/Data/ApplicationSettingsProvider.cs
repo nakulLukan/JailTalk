@@ -34,6 +34,24 @@ public class ApplicationSettingsProvider : IApplicationSettingsProvider
         };
     }
 
+    /// <summary>
+    /// Amount in rupees charged per minute phone call.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<float> GetCallPriceChargedPerMinute()
+    {
+        return float.Parse(await GetApplicationSettingValue(ApplicationSettings.CallPricePerMinute));
+    }
+
+    /// <summary>
+    /// The number of allowed contacts a prisoner can choose to select from the device.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<int> GetMaxContactNumbersInActiveState()
+    {
+        return int.Parse(await GetApplicationSettingValue(ApplicationSettings.MaxAllowedActiveContacts));
+    }
+
     private async Task<string> GetApplicationSettingValue(ApplicationSettings applicationSetting)
     {
         if (_memoryCache.TryGetValue(applicationSetting, out string value))

@@ -7,5 +7,11 @@ public class PrisonerContactDetailListDto
     public string ContactNumber { get; set; }
     public string Relationship { get; set; }
     public string RelativeAddress { get; set; }
+
+    /// <summary>
+    /// Text representation of whether contact is blocked or active
+    /// </summary>
     public string Status { get; set; }
+    public bool IsBlocked { get; set; }
+    public bool IsActive { get; set; }
 }

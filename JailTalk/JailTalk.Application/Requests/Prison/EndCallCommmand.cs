@@ -1,6 +1,7 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Dto.Prison;
+using JailTalk.Shared.Extensions;
 using JailTalk.Shared.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,13 +20,15 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
     readonly IAppDbContext _appDbContext;
     readonly ILogger<EndCallCommmandHandler> _logger;
     readonly IDeviceRequestContext _requestContext;
+    readonly IApplicationSettingsProvider _settingsProvider;
 
 
-    public EndCallCommmandHandler(IAppDbContext appDbContext, IDeviceRequestContext requestContext, ILogger<EndCallCommmandHandler> logger)
+    public EndCallCommmandHandler(IAppDbContext appDbContext, IDeviceRequestContext requestContext, ILogger<EndCallCommmandHandler> logger, IApplicationSettingsProvider settingsProvider)
     {
         _appDbContext = appDbContext;
         _requestContext = requestContext;
         _logger = logger;
+        _settingsProvider = settingsProvider;
     }
 
     public async Task<EndCallResultDto> Handle(EndCallCommmand request, CancellationToken cancellationToken)
@@ -61,7 +64,8 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
         callHistory.EndedOn = AppDateTime.UtcNow;
         callHistory.CallTerminationReason = Shared.CallEndReason.CallEnded;
         var totalCallDuration = callHistory.EndedOn.Value - callHistory.CallStartedOn;
-        var callCost = (float)totalCallDuration.TotalMinutes;
+        var chargePerMinute = await _settingsProvider.GetCallPriceChargedPerMinute();
+        var callCost = (float)totalCallDuration.TotalMinutes * chargePerMinute;
 
         phoneBalance.Balance -= callCost;
         phoneBalance.LastUpdatedOn = AppDateTime.UtcNow;
@@ -77,11 +81,10 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
             RechargedByUserId = null,
         });
         await _appDbContext.SaveAsync(cancellationToken);
-
         return new EndCallResultDto
         {
             AvailableBalance = phoneBalance.Balance,
-            CallDuration = $"{totalCallDuration.Minutes} minutes {totalCallDuration.Seconds} seconds"
+            CallDuration = ((float?)totalCallDuration.TotalMinutes).ToHoursMinutesSeconds()
         };
     }
 }

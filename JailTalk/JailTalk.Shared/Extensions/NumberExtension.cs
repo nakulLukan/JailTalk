@@ -1,4 +1,6 @@
-﻿namespace JailTalk.Shared.Extensions;
+﻿using Humanizer;
+
+namespace JailTalk.Shared.Extensions;
 public static class NumberExtension
 {
     public static string ToCurrency(this float value)
@@ -31,11 +33,14 @@ public static class NumberExtension
         return String.Empty;
     }
 
-    public static string ToMinutes(this float? value)
+    public static string ToHoursMinutesSeconds(this float? value)
     {
         if (value.HasValue)
         {
-            return MathF.Round((value.Value / 60), 2) + " minutes";
+            return TimeSpan.FromMinutes(value.Value)
+                .Humanize(3,
+                maxUnit: Humanizer.Localisation.TimeUnit.Hour,
+                minUnit: Humanizer.Localisation.TimeUnit.Second);
         }
 
         return String.Empty;

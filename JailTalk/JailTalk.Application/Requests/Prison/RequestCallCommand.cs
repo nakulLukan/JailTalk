@@ -70,11 +70,19 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
         _dbContext.CallHistory.Add(callHistory);
         await _dbContext.SaveAsync(cancellationToken);
 
+        // Get amount charged for a phone call per minute.
+        var chargePerMinute = await _appSettingsProvider.GetCallPriceChargedPerMinute();
+
+        // Call duration per day varies for each gender.
         var maxAllowedTalkTimeInMinutes = await _appSettingsProvider.GetMaxAllowedCallDuration(phoneBalanceEntity.PrisonerGender);
+        
+        // Available talk time = Minimum of allowed talk time in seconds VS available balance amount converted to value per second.
         var response = new RequestCallResultDto
         {
             CallHistoryId = callHistory.Id,
-            AvailableTalkTime = Convert.ToInt32(Math.Ceiling(MathF.Min(maxAllowedTalkTimeInMinutes * 60, phoneBalanceEntity.Balance * 60))),
+            AvailableTalkTime = Convert.ToInt32(
+                Math.Ceiling(MathF.Min(maxAllowedTalkTimeInMinutes * 60, 
+                MathF.Ceiling((phoneBalanceEntity.Balance / chargePerMinute) * 60)))),
         };
 
         _logger.LogInformation("Call Allowed for prisoner: {prisoner}, Contact Id: {ct}, Duration: {dur}", prisonerId, request.ContactId, response.AvailableTalkTime / 60);

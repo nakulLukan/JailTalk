@@ -9,21 +9,27 @@
 <MudCard Elevation="0">
     <MudCard>
         <MudCardContent>
-            <MudText Typo="Typo.overline">Account Balance</MudText>
-            <MudStack Row="true" Justify="Justify.SpaceBetween">
-                <div>
-                    <MudText>@balanceInfo.AccountBalanceAmount.ToCurrency()</MudText>
-                    <MudText>@balanceInfo.TalkTimeLeft.ToMinutes()</MudText>
-                </div>
-                <div>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@ToggleOpen">Recharge Balance</MudButton>
-                    <MudPopover Open="@_isOpen" Fixed="true" Class="px-4 py-2 blue lighten-5" 
-                        AnchorOrigin="Origin.CenterLeft" TransformOrigin="Origin.CenterRight"
-                        Style="max-width: 250px">
+            <MudStack Row="true" Spacing="10">
+                <MudItem>
+                    <MudText Typo="Typo.overline">Account Balance</MudText>
+                    <MudText Typo="Typo.h6"><b>@balanceInfo.AccountBalanceAmount.ToCurrency()</b></MudText>
+                </MudItem>
+                <MudItem>
+                    <MudText Typo="Typo.overline">Talk Time Left</MudText>
+                    <MudText Typo="Typo.h6"><b> @balanceInfo.TalkTimeLeft</b></MudText>
+                </MudItem>
+                <MudSpacer />
+                <MudItem>
+
+                    <div>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@ToggleOpen">Recharge Balance</MudButton>
+                        <MudPopover Open="@_isOpen" Fixed="true" Class="px-4 py-2 blue lighten-5"
+                                    AnchorOrigin="Origin.CenterLeft" TransformOrigin="Origin.CenterRight"
+                                    Style="max-width: 250px">
                             <MudGrid Justify="Justify.FlexEnd">
                                 <MudItem xs="12">
-                                <MudNumericField Adornment="Adornment.Start" AdornmentAriaLabel="Curreny" AdornmentIcon="@Icons.Material.TwoTone.CurrencyRupee" @bind-Value="@rechargeAmount" Label="Enter Top-up Amount"
-                                        Min="1"/>
+                                    <MudNumericField Adornment="Adornment.Start" AdornmentAriaLabel="Curreny" AdornmentIcon="@Icons.Material.TwoTone.CurrencyRupee" @bind-Value="@rechargeAmount" Label="Enter Top-up Amount"
+                                                     Min="1" />
                                 </MudItem>
                                 <MudItem>
                                     <MudButton Class="ml-auto mr-n3 mb-1" Color="Color.Success" Variant="Variant.Filled"
@@ -33,8 +39,9 @@
                                     <MudButton OnClick="@ToggleOpen" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Cancel</MudButton>
                                 </MudItem>
                             </MudGrid>
-                    </MudPopover>
-                </div>
+                        </MudPopover>
+                    </div>
+                </MudItem>
             </MudStack>
         </MudCardContent>
     </MudCard>

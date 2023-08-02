@@ -1,6 +1,7 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Dto.Prison;
 using JailTalk.Application.Extensions;
+using JailTalk.Shared.Helper;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,12 +24,14 @@ public class PrisonerContactDetailsQueryHandler : IRequestHandler<PrisonerContac
     public async Task<List<PrisonerContactDetailListDto>> Handle(PrisonerContactDetailsQuery request, CancellationToken cancellationToken)
     {
         var contactDetails = await _dbContext.PhoneDirectory
-            .Include(x=>x.RelativeAddress)
-            .Include(x=>x.RelativeType)
+            .Include(x => x.RelativeAddress)
+            .Include(x => x.RelativeType)
             .Where(x => x.PrisonerId == request.PrisonerId)
             .ToListAsync(cancellationToken);
         int index = 1;
         return contactDetails
+            .OrderByDescending(x => x.IsActive)
+                .ThenBy(x => x.IsBlocked)
             .Select(x => new PrisonerContactDetailListDto
             {
                 Serial = index++,
@@ -38,20 +41,13 @@ public class PrisonerContactDetailsQueryHandler : IRequestHandler<PrisonerContac
                     x.CountryCode,
                     x.PhoneNumber
                 }),
-                Status = ConvertToStatus(x.IsActive, x.IsBlocked),
+                Status = PrisonerHelper.ConvertContactStateAsText(x.IsActive, x.IsBlocked),
                 Relationship = x.RelativeType.Value,
-                RelativeAddress = x.RelativeAddress.AddressAsText()
-            }).ToList();
-    }
-
-    private string ConvertToStatus(bool isActive, bool isBlocked)
-    {
-        return isActive switch
-        {
-            true when !isBlocked => "Enabled",
-            false when !isBlocked => "Disabled",
-            _ => "Blocked"
-        };
+                RelativeAddress = x.RelativeAddress.AddressAsText(),
+                IsActive = x.IsActive,
+                IsBlocked = x.IsBlocked
+            })
+            .ToList();
     }
 }
 
