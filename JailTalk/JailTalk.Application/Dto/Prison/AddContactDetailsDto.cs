@@ -1,5 +1,6 @@
 ﻿using JailTalk.Application.Dto.Lookup;
 using JailTalk.Shared;
+using JailTalk.Shared.Constants;
 using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Prison;
@@ -9,11 +10,11 @@ public class AddContactDetailsDto
 
     [Required]
     [MaxLength(5)]
-    [RegularExpression(RegularExpressionPattern.CountryCode)]
+    [RegularExpression(RegularExpressionPatternConstant.CountryCode)]
     public string CountryCode { get; set; }
 
     [MaxLength(15)]
-    [RegularExpression(RegularExpressionPattern.PhoneNumber)]
+    [RegularExpression(RegularExpressionPatternConstant.PhoneNumber)]
     [Required]
     public string PhoneNumber { get; set; }
 

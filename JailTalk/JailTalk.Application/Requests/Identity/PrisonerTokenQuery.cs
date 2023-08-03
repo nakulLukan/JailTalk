@@ -3,6 +3,7 @@ using JailTalk.Application.Contracts.AI;
 using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Shared;
+using JailTalk.Shared.Constants;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
 using MediatR;
@@ -73,7 +74,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
             throw new AppApiException(HttpStatusCode.Forbidden, "PT-0003", "Unauthorized access");
         }
 
-        if (bool.Parse(_configuration[AppSettingKeys.JwtValidateFaceImage]))
+        if (bool.Parse(_configuration[AppSettingKeysConstant.JwtValidateFaceImage]))
         {
             await AuthenticateByFaceId(request, prisoner);
         }
@@ -106,7 +107,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
     {
         IdentityModelEventSource.ShowPII = false;
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(_configuration[AppSettingKeys.JwtSettingsSessionVerificationKey]);
+        var key = Encoding.UTF8.GetBytes(_configuration[AppSettingKeysConstant.JwtSettingsSessionVerificationKey]);
 
         var claims = new List<Claim>
         {
@@ -119,8 +120,8 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddMinutes(60),
-            Issuer = _configuration[AppSettingKeys.JwtSettingsIssuer],
-            Audience = _configuration[AppSettingKeys.JwtSettingsAudience],
+            Issuer = _configuration[AppSettingKeysConstant.JwtSettingsIssuer],
+            Audience = _configuration[AppSettingKeysConstant.JwtSettingsAudience],
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256)
         };
 

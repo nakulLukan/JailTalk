@@ -1,4 +1,5 @@
 ﻿using JailTalk.Shared;
+using JailTalk.Shared.Constants;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
@@ -13,12 +14,12 @@ public class SessionAuthFilter : Attribute, IAuthorizationFilter
     {
         var _configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
         var _logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<SessionAuthFilter>>();
-        var securityKey = Encoding.UTF8.GetBytes(_configuration[AppSettingKeys.JwtSettingsSessionVerificationKey]);
+        var securityKey = Encoding.UTF8.GetBytes(_configuration[AppSettingKeysConstant.JwtSettingsSessionVerificationKey]);
         var tokenHandler = new JwtSecurityTokenHandler();
         var validationParameters = new TokenValidationParameters
         {
-            ValidIssuer = _configuration[AppSettingKeys.JwtSettingsIssuer],
-            ValidAudience = _configuration[AppSettingKeys.JwtSettingsAudience],
+            ValidIssuer = _configuration[AppSettingKeysConstant.JwtSettingsIssuer],
+            ValidAudience = _configuration[AppSettingKeysConstant.JwtSettingsAudience],
             IssuerSigningKey = new SymmetricSecurityKey(securityKey),
 
             ValidateIssuer = true,

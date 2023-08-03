@@ -9,5 +9,6 @@ public class ApplicationSettingEFConfig : IEntityTypeConfiguration<ApplicationSe
     {
         builder.Property(x => x.Value).HasMaxLength(100);
         builder.Property(x => x.Description).HasMaxLength(500);
+        builder.Property(x => x.RegexValidation).IsRequired(false).HasMaxLength(100);
     }
 }

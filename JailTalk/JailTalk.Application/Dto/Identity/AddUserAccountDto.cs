@@ -1,4 +1,4 @@
-﻿using JailTalk.Shared;
+﻿using JailTalk.Shared.Constants;
 using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Identity;
@@ -26,7 +26,7 @@ public class AddUserAccountDto
 
     [Required]
     [MaxLength(25)]
-    [RegularExpression(RegularExpressionPattern.RoleName)]
+    [RegularExpression(RegularExpressionPatternConstant.RoleName)]
     public string RoleName { get; set; }
 
     public int? PrisonId { get; set; }

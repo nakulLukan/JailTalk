@@ -1,4 +1,4 @@
-﻿using JailTalk.Shared;
+﻿using JailTalk.Shared.Constants;
 using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Device;
@@ -7,7 +7,7 @@ public class NewDeviceDto
 {
     [Required]
     [MaxLength(50)]
-    [RegularExpression(RegularExpressionPattern.DeviceCode)]
+    [RegularExpression(RegularExpressionPatternConstant.DeviceCode)]
     public string Code { get; set; }
 
     [Required]

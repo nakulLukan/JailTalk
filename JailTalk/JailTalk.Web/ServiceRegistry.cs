@@ -41,8 +41,8 @@ public static class ServiceRegistry
         {
             var supportedCultures = new[]
             {
-            new CultureInfo("en-IN") // Set the desired culture, e.g., "en-IN" (English - India)
-        };
+                new CultureInfo("en-IN")
+            };
 
             options.DefaultRequestCulture = new RequestCulture(supportedCultures[0]);
             options.SupportedCultures = supportedCultures;
