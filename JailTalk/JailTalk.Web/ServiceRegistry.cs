@@ -13,6 +13,8 @@ using JailTalk.Web.Impl.UserManagement;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Localization;
+using MudBlazor.Services;
+using Serilog;
 using System.Globalization;
 
 namespace JailTalk.Web;
@@ -29,6 +31,13 @@ public static class ServiceRegistry
 
     private static void RegisterWebServices(IServiceCollection services)
     {
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddSerilog(dispose: true);
+        });
+        services.AddRazorPages();
+        services.AddServerSideBlazor();
+        services.AddMudServices();
         services.AddMemoryCache();
         services.AddTransient<IToastService, ToastService>();
         services.AddTransient<IAuthenticationService, AuthenticationService>();

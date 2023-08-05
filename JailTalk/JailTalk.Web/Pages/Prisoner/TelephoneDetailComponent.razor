@@ -9,6 +9,9 @@
     <MudTabPanel Text="Photos">
         <PrisonerPhotosComponent PrisonerId="@PrisonerId" />
     </MudTabPanel>
+    <MudTabPanel Text="Call History">
+        <CallHistoryComponent PrisonerId="@PrisonerId" />
+    </MudTabPanel>
 </MudTabs>
 @code {
     [Parameter]

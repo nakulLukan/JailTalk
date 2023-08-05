@@ -1,0 +1,40 @@
+﻿@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Prison;
+@using MediatR;
+@inject IMediator Mediator;
+
+<MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered="true" ShowMenuIcon="false" FixedHeader="true"
+    Height="400px">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6"><b>Call History</b></MudText>
+        <MudSpacer />
+        <MudLink Href="/identity-management/user-accounts/new">
+            <MudButton Variant="Variant.Text" Color="Color.Primary">Allow unlimited calls</MudButton>
+        </MudLink>
+    </ToolBarContent>
+    <Columns>
+        <PropertyColumn Property="x => x.Callee" Title="Callee" />
+        <PropertyColumn Property="x => x.ContactNumber" Title="Contact Number" />
+        <PropertyColumn Property="x => x.CallStartedOn" Title="Started On" />
+        <PropertyColumn Property="x => x.CallEndedOn" Title="Ended On" />
+        <PropertyColumn Property="x=> x.CallDuration" Title="Duration" />
+    </Columns>
+</MudDataGrid>
+@code {
+
+    [EditorRequired]
+    [Parameter]
+    public string PrisonerId { get; set; }
+
+    public List<CallHistoryListDto> Elements { get; set; }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        Elements = await Mediator.Send(new CallHistoryQuery()
+            {
+                LastNDays = 5,
+                PrisonerId = Guid.Parse(PrisonerId)
+            });
+            StateHasChanged();
+    }
+}

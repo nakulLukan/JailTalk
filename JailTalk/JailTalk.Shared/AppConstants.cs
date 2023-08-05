@@ -20,3 +20,8 @@ public static class AppRoleNames
     public const string SuperAdmin = "super-admin";
     public const string Admin = "admin";
 }
+
+public static class AppStringConstants
+{
+    public const string GridNoDataIndication = "-";
+}

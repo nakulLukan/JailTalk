@@ -21,8 +21,7 @@ public static class ServiceRegistry
         services.AddDbContext<AppDbContext>(options =>
             options
             .UseNpgsql(connectionString)
-            .UseSnakeCaseNamingConvention()
-            .LogTo(Serilog.Log.Logger.Error), ServiceLifetime.Transient);
+            .UseSnakeCaseNamingConvention(), ServiceLifetime.Transient);
         services.AddTransient<IAppDbContext>(provider => provider.GetRequiredService<AppDbContext>());
 
         services.AddTransient<IAppImageEditor, AppImageEditor>();

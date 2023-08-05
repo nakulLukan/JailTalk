@@ -7,23 +7,17 @@ using Swashbuckle.AspNetCore.SwaggerUI;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Console.WriteLine($"Current Directory: {Directory.GetCurrentDirectory()}");
-Log.Logger = new LoggerConfiguration()
-        .WriteTo.File($"{Directory.GetCurrentDirectory()}/logs/log-.txt", rollingInterval: RollingInterval.Day)
-        .CreateLogger();
 builder.Configuration.AddConfiguration(new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile("appconfig.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
                 .Build());
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
 
-// Add services to the container.
+Log.Logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(builder.Configuration)
+        .CreateLogger();
+Log.Logger.Information($"Current Directory: {Directory.GetCurrentDirectory()}");
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.RegisterService(builder.Configuration);
 
 var app = builder.Build();

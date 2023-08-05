@@ -33,6 +33,11 @@ public static class NumberExtension
         return String.Empty;
     }
 
+    /// <summary>
+    /// Converted given number of minutes into string in following format <b>HH hours, MM minutes, SS seconds</b>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public static string ToHoursMinutesSeconds(this float? value)
     {
         if (value.HasValue)

@@ -7,6 +7,7 @@ using JailTalk.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Text;
 
 namespace JailTalk.Api;
@@ -22,6 +23,12 @@ public static class ServiceRegistry
 
     private static void RegisterWebServices(IServiceCollection services, IConfiguration configuration)
     {
+        services.AddLogging(loggingBuilder =>
+        {
+            loggingBuilder.AddSerilog(dispose: true);
+        });
+        services.AddControllers();
+        services.AddEndpointsApiExplorer();
         services.AddHttpContextAccessor();
         services.AddMemoryCache();
         services.AddScoped<IAuthenticationService>(prv => null);
