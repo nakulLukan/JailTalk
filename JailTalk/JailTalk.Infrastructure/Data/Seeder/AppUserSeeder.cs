@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Data;
 
 namespace JailTalk.Infrastructure.Data.Seeder;
 
@@ -27,12 +28,14 @@ public static class AppUserSeeder
                 NormalizedEmail = user.Email.Normalized(),
                 LockoutEnabled = true,
             };
-
             var password = new PasswordHasher<AppUser>();
             var hashed = password.HashPassword(newUser, user.Password);
             newUser.PasswordHash = hashed;
             var result = await userManager.CreateAsync(newUser);
-            await userManager.AddToRoleAsync(newUser, user.Role.Normalized());
+            Serilog.Log.Logger.Information("User : {user} add status: {status}", user.UserName, result.Succeeded);
+            result = await userManager.AddToRoleAsync(newUser, user.Role.Normalized());
+            Serilog.Log.Logger.Information("User assigned to role: {role} add status: {status}", user.Role, result.Succeeded);
+
         }
     }
 }

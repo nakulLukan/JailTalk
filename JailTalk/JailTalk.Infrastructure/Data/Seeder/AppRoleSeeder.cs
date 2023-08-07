@@ -8,19 +8,20 @@ namespace JailTalk.Infrastructure.Data.Seeder;
 
 public static class AppRoleSeeder
 {
-    public static async Task SeedRoles(this AppDbContext dbContext)
+    public static async Task SeedRoles(this AppDbContext dbContext, Microsoft.AspNetCore.Identity.RoleManager<AppRole> roleManager)
     {
         var existingRoles = await dbContext.Roles.Select(x => x.Name).ToListAsync();
-        var roleStore = new RoleStore<AppRole>(dbContext);
 
         foreach (var role in AppRolesData.Roles.Where(role => !existingRoles.Contains(role.RoleName)))
         {
-            await roleStore.CreateAsync(new AppRole
+            var result = await roleManager.CreateAsync(new AppRole
             {
                 Name = role.RoleName,
                 NormalizedName = role.RoleName.Normalized(),
                 Description = role.Description,
             });
+
+            Serilog.Log.Logger.Information("Role: {role} add status: {status}", role.RoleName, result.Succeeded);
         }
     }
 }

@@ -25,7 +25,8 @@ using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await dbContext.Database.MigrateAsync();
-    await dbContext.SeedRoles();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppRole>>();
+    await dbContext.SeedRoles(roleManager);
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
     await dbContext.SeedDefaultUsers(builder.Configuration, userManager);
 }
