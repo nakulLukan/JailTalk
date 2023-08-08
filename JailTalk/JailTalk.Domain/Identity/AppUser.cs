@@ -11,6 +11,12 @@ public class AppUser : IdentityUser
     public string FullName { get; set; }
 
     /// <summary>
+    /// Flag to indicate whether this user was seeded. All users with this field as true will get deleted if not mentioned in the
+    /// appsettings.json
+    /// </summary>
+    public bool IsSystemGeneratedUser { get; set; }
+
+    /// <summary>
     /// The prison to which this user is associated to administrate.
     /// If value is null then the user has access to all prisons in the system
     /// </summary>

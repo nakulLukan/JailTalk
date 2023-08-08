@@ -2,7 +2,6 @@
 using JailTalk.Shared.Extensions;
 using JailTalk.Shared.Models.Identity;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System.Data;
@@ -18,6 +17,12 @@ public static class AppUserSeeder
         var users = configuration.GetRequiredSection("Identity:DefaultUsers").Get<List<DefaultUserDto>>();
 
         var existingUsers = await dbContext.Users.Select(x => x.UserName).ToListAsync();
+        var numberOfUsersDeleted = await dbContext.Users
+            .Where(x => x.IsSystemGeneratedUser)
+            .Where(x => !users.Select(y => y.UserName.Normalized()).Contains(x.NormalizedUserName))
+            .ExecuteDeleteAsync();
+        Serilog.Log.Logger.Information("Number of users deleted: {deleteCount}", numberOfUsersDeleted);
+
         foreach (var user in users.Where(x => !existingUsers.Contains(x.UserName)))
         {
             AppUser newUser = new AppUser()
@@ -27,6 +32,7 @@ public static class AppUserSeeder
                 Email = user.Email,
                 NormalizedEmail = user.Email.Normalized(),
                 LockoutEnabled = true,
+                IsSystemGeneratedUser = true
             };
             var password = new PasswordHasher<AppUser>();
             var hashed = password.HashPassword(newUser, user.Password);
@@ -35,7 +41,6 @@ public static class AppUserSeeder
             Serilog.Log.Logger.Information("User : {user} add status: {status}", user.UserName, result.Succeeded);
             result = await userManager.AddToRoleAsync(newUser, user.Role.Normalized());
             Serilog.Log.Logger.Information("User assigned to role: {role} add status: {status}", user.Role, result.Succeeded);
-
         }
     }
 }
