@@ -17,11 +17,16 @@ public static class AppUserSeeder
         var users = configuration.GetRequiredSection("Identity:DefaultUsers").Get<List<DefaultUserDto>>();
 
         var existingUsers = await dbContext.Users.Select(x => x.UserName).ToListAsync();
-        var numberOfUsersDeleted = await dbContext.Users
+        var usersToBeDeleted = await dbContext.Users
             .Where(x => x.IsSystemGeneratedUser)
             .Where(x => !users.Select(y => y.UserName.Normalized()).Contains(x.NormalizedUserName))
-            .ExecuteDeleteAsync();
-        Serilog.Log.Logger.Information("Number of users deleted: {deleteCount}", numberOfUsersDeleted);
+            .ToListAsync();
+        foreach (var user in usersToBeDeleted)
+        {
+            await userManager.DeleteAsync(user);
+            Serilog.Log.Logger.Information("User {username} removed deleted", user.UserName);
+        }
+        Serilog.Log.Logger.Information("Number of users deleted: {deleteCount}", usersToBeDeleted.Count);
 
         foreach (var user in users.Where(x => !existingUsers.Contains(x.UserName)))
         {
