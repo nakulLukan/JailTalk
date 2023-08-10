@@ -21,6 +21,8 @@ public class PrisonerEFConfig : IEntityTypeConfiguration<Prisoner>
         builder.Property(x => x.Gender).IsRequired().HasDefaultValue(Gender.Male);
         builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
         builder.Property(x => x.IsBlocked).IsRequired().HasDefaultValue(false);
+        builder.Property(x => x.JailId).IsRequired(false);
+        builder.Property(x => x.AllowUnlimitedCallsTill).IsRequired(false).HasDefaultValue(null);
 
         builder.HasOne(x => x.Address)
             .WithMany()

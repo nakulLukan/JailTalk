@@ -11,9 +11,15 @@ public class Prisoner : DomainBase
     public string LastName { get; set; }
     public string FullName { get; set; }
     public long? AddressId { get; set; }
-    public int JailId { get; set; }
+    public int? JailId { get; set; }
     public bool IsBlocked { get; set; }
     public bool IsActive { get; set; }
+
+    /// <summary>
+    /// This field can be used to let a prisoner to talk any number of times till the given date.
+    /// Usually, this value should be 1 day.
+    /// </summary>
+    public DateTimeOffset? AllowUnlimitedCallsTill { get; set; }
     public Gender Gender { get; set; }
 
     public AddressBook Address { get; set; }

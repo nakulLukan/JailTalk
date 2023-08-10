@@ -1,6 +1,7 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Dto.Prison;
+using JailTalk.Application.Services;
 using JailTalk.Shared;
 using JailTalk.Shared.Utilities;
 using MediatR;
@@ -45,7 +46,8 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
             {
                 x.Id,
                 x.Balance,
-                PrisonerGender = x.Prisoner.Gender
+                PrisonerGender = x.Prisoner.Gender,
+                IsUnlimitedCallPriviledgeEnabled = PrisonerHelper.IsUnlimitedCallPriviledgeEnabled(x.Prisoner.AllowUnlimitedCallsTill)
             })
             .FirstOrDefaultAsync(cancellationToken);
 
@@ -53,6 +55,7 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
             prisonerId,
             phoneBalanceEntity.PrisonerGender,
             phoneBalanceEntity.Balance,
+            phoneBalanceEntity.IsUnlimitedCallPriviledgeEnabled,
             cancellationToken);
         RequestCallResultDto response = await AddCallHistoryEntryGetResponse(request,
                                                                              availableTalkTime,
@@ -106,7 +109,12 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
         return response;
     }
 
-    private async Task<int> ValidateAndGetAvailableTalkTime(Guid prisonerId, Gender prisonerGender, float phoneBalance, CancellationToken cancellationToken)
+    private async Task<int> ValidateAndGetAvailableTalkTime(
+        Guid prisonerId,
+        Gender prisonerGender,
+        float phoneBalance,
+        bool isUnlimitedCallPriviledgeEnabled,
+        CancellationToken cancellationToken)
     {
         // Get amount charged for a phone call per minute.
         var chargePerMinute = await _appSettingsProvider.GetCallPriceChargedPerMinute();
@@ -114,16 +122,20 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
         // Call duration per day varies for each gender.
         var maxAllowedTalkTimeInMinutes = await _appSettingsProvider.GetMaxAllowedCallDuration(prisonerGender);
 
-        var todaysTotalTalkTime = await _dbContext.CallHistory
+        // If unlimited call is enabled then do not consider todays talk time.
+        var todaysTotalTalkTime = isUnlimitedCallPriviledgeEnabled ? await _dbContext.CallHistory
             .Where(x => x.PhoneDirectory.PrisonerId == prisonerId
                 && x.EndedOn.HasValue && x.CallStartedOn >= AppDateTime.UtcNowAtStartOfTheDay)
-            .SumAsync(x => (x.EndedOn.Value - x.CallStartedOn).TotalSeconds, cancellationToken);
+            .SumAsync(x => (x.EndedOn.Value - x.CallStartedOn).TotalSeconds, cancellationToken)
+        : 0;
 
 
         // Available talk time = Minimum of allowed talk time in seconds VS available balance amount converted to value per second - Total talktime per day.
-        var availableTalkTime = Convert.ToInt32(
-                Math.Ceiling(MathF.Min(maxAllowedTalkTimeInMinutes * 60,
-                MathF.Ceiling((phoneBalance / chargePerMinute) * 60))));
+        // If the user is allowed to have unlimited calls till end of the day then allow the user to consume all his balance
+        float secondsAllowedIfCallPriviledgeEnabled = isUnlimitedCallPriviledgeEnabled ? (float)(AppDateTime.UtcNow - AppDateTime.TillEndOfDay).TotalSeconds : 0F;
+        var availableCallTimeInSeconds = MathF.Max(maxAllowedTalkTimeInMinutes * 60, secondsAllowedIfCallPriviledgeEnabled);
+        var availableTalkTime = (int)Math.Min(availableCallTimeInSeconds,
+                                                MathF.Ceiling((phoneBalance / chargePerMinute) * 60));
         availableTalkTime = (int)Math.Max(0, availableTalkTime - todaysTotalTalkTime);
         if (availableTalkTime < MINIMUM_TALK_TIME_REQUIRED)
         {

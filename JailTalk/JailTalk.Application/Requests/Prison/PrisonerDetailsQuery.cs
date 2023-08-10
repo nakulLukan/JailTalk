@@ -1,6 +1,7 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Dto.Prison;
 using JailTalk.Application.Extensions;
+using JailTalk.Application.Services;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
 using MediatR;
@@ -36,6 +37,7 @@ public class PrisonerDetailsQueryHandler : IRequestHandler<PrisonerDetailsQuery,
                 MiddleName = x.MiddleName,
                 Gender = x.Gender.ToString(),
                 Pid = x.Pid,
+                HasUnlimitedCallPriviledgeEnabled = PrisonerHelper.IsUnlimitedCallPriviledgeEnabled(x.AllowUnlimitedCallsTill),
                 Address = new Dto.Lookup.AddressDetailDto
                 {
                     City = x.Address.City,
@@ -46,13 +48,7 @@ public class PrisonerDetailsQueryHandler : IRequestHandler<PrisonerDetailsQuery,
                     Street = x.Address.Street
                 },
             })
-            .SingleOrDefaultAsync(x => x.Id == request.Id);
-
-        if (prisoner is null)
-        {
-            throw new AppException("Unknown prisoner");
-        }
-
+            .SingleOrDefaultAsync(x => x.Id == request.Id) ?? throw new AppException("Unknown prisoner");
         prisoner.AddressAsText = prisoner.Address.AddressAsText();
         return new ResponseDto<PrisonerDetailDto>(prisoner);
     }

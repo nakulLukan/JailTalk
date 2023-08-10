@@ -6,6 +6,7 @@ using JailTalk.Domain.System;
 using JailTalk.Infrastructure.Data.Seeder;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using System.Reflection;
 
 namespace JailTalk.Infrastructure.Data;
@@ -38,6 +39,16 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, string>, IAppDbC
     public void ClearChanges()
     {
         this.ChangeTracker.Clear();
+    }
+
+    public void Set<TEntity, TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> property, TProperty value)
+    {
+        if (property.Body is MemberExpression memberExpression)
+        {
+            string propertyName = memberExpression.Member.Name;
+            entity.GetType().GetProperty(propertyName).SetValue(entity, value, null);
+            Entry(entity).Property(propertyName).IsModified = true;
+        }
     }
 
     public DbSet<LookupMaster> LookupMasters { get; set; }

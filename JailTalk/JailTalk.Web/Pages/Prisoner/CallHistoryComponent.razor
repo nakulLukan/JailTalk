@@ -1,16 +1,18 @@
 ﻿@using JailTalk.Application.Dto.Prison;
 @using JailTalk.Application.Requests.Prison;
+@using JailTalk.Shared;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
 @using MediatR;
 @inject IMediator Mediator;
+@inject IAppMediator AppMediator;
 
 <MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered="true" ShowMenuIcon="false" FixedHeader="true"
-    Height="400px">
+             Height="400px">
     <ToolBarContent>
         <MudText Typo="Typo.h6"><b>Call History</b></MudText>
         <MudSpacer />
-        <MudLink Href="/identity-management/user-accounts/new">
-            <MudButton Variant="Variant.Text" Color="Color.Primary">Allow unlimited calls</MudButton>
-        </MudLink>
+        <MudButton Variant="Variant.Outlined" Color="@GetUnlimitedCallPriviledgeButtonColor()" OnClick="AllowOrRevokeUnlimitedCallAction">@UnLimitedCallActionName()</MudButton>
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.Callee" Title="Callee" />
@@ -26,15 +28,56 @@
     [Parameter]
     public string PrisonerId { get; set; }
 
+    [Parameter]
+    public bool IsUnlimitedCallEnabled { get; set; }
+
     public List<CallHistoryListDto> Elements { get; set; }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        Elements = await Mediator.Send(new CallHistoryQuery()
+        var elementsTask = Mediator.Send(new CallHistoryQuery()
             {
                 LastNDays = 5,
                 PrisonerId = Guid.Parse(PrisonerId)
             });
-            StateHasChanged();
+        var isUnlimitedCallEnabledTask = Mediator.Send(new UnlimitedCallPriviledgeEnabledQuery()
+            {
+                PrisonerId = Guid.Parse(PrisonerId)
+            });
+        await Task.WhenAll(elementsTask, isUnlimitedCallEnabledTask);
+        Elements = elementsTask.Result;
+        IsUnlimitedCallEnabled = isUnlimitedCallEnabledTask.Result.Data;
+        StateHasChanged();
+    }
+
+    private MudBlazor.Color GetUnlimitedCallPriviledgeButtonColor()
+    {
+        return IsUnlimitedCallEnabled ? Color.Error : Color.Tertiary;
+    }
+
+    private string UnLimitedCallActionName()
+    {
+        return IsUnlimitedCallEnabled ? "Disable Unlimited Calls" : "Allow Unlimited Calls";
+    }
+
+    private async Task AllowOrRevokeUnlimitedCallAction()
+    {
+        await AppMediator.Send(new AllowOrRevokeUnlimitedCallCommand()
+            {
+                PrisonerId = Guid.Parse(PrisonerId),
+                Action = IsUnlimitedCallEnabled ? UnlimitedCallAction.Revoke : UnlimitedCallAction.Allow
+            })
+            .OnSuccess(async data =>
+            {
+                // If the action was to disable unlimited call then change the button
+                IsUnlimitedCallEnabled = data == UnlimitedCallAction.Allow;
+                string message = !IsUnlimitedCallEnabled ? "Revoked the unlimited call priviledge" : "Prisoner given the access to make unlimited calls";
+                ToastService.Success(message);
+                await InvokeAsync(StateHasChanged);
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
     }
 }

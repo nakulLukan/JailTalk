@@ -13,6 +13,7 @@ public static class HttpHeader
 public static class CommonExceptionMessages
 {
     public const string UserNotFound = "Unknown user";
+    public const string PrisonerNotFound = "Unknown prisoner";
 }
 
 public static class AppRoleNames

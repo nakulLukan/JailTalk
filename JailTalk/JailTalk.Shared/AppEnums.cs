@@ -42,6 +42,15 @@ public enum Gender : int
     Others = 3,
 }
 
+/// <summary>
+/// Enum to indicate the unlimited call access action.
+/// </summary>
+public enum UnlimitedCallAction : short
+{
+    Allow = 1,
+    Revoke = 2
+}
+
 public enum ApplicationSettings : int
 {
     MaxAllowedActiveContacts = 1,

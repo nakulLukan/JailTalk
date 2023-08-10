@@ -47,13 +47,13 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
     public async Task<ResponseDto<string>> Handle(PrisonerTokenQuery request, CancellationToken cancellationToken)
     {
         var prisoner = await _dbContext.Prisoners
-            .Where(x => x.Pid == request.Pid)
+            .Where(x => x.Pid == request.Pid && x.JailId.HasValue)
             .Select(x => new PrisonerDto(
                 x.Id,
                 x.IsBlocked,
                 x.IsActive,
                 x.FullName,
-                x.JailId,
+                x.JailId.Value,
                 x.FaceEncodings.Select(y => y.FaceEncoding.Encoding).ToList(),
                 x.FaceEncodings.Select(y => y.Attachment.Data).ToList()))
             .FirstOrDefaultAsync(cancellationToken);

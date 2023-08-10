@@ -4,6 +4,7 @@ using JailTalk.Domain.Prison;
 using JailTalk.Domain.System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace JailTalk.Application.Contracts.Data;
 
@@ -28,6 +29,8 @@ public interface IAppDbContext
     public DbSet<IdentityUserRole<string>> UserRoles { get; set; }
 
     public void ClearChanges();
+
+    public void Set<TEntity, TProperty>(TEntity entity, Expression<Func<TEntity, TProperty>> property, TProperty value);
 
     Task<int> SaveAsync(CancellationToken cancellationToken);
 }

@@ -1,5 +1,6 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Dto.Prison;
+using JailTalk.Shared.Extensions;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,7 +8,7 @@ namespace JailTalk.Application.Requests.Prison;
 
 public class GetPrisonersQuery : IRequest<List<PrisonerListDto>>
 {
-    public int? JailId { get; set; }
+    public int JailId { get; set; }
 }
 
 public class GetPrisonersQueryHandler : IRequestHandler<GetPrisonersQuery, List<PrisonerListDto>>
@@ -22,8 +23,7 @@ public class GetPrisonersQueryHandler : IRequestHandler<GetPrisonersQuery, List<
     public async Task<List<PrisonerListDto>> Handle(GetPrisonersQuery request, CancellationToken cancellationToken)
     {
         var prisoners = await _dbContext.Prisoners
-            .Where(x => (request.JailId.HasValue && x.JailId == request.JailId)
-                || (!request.JailId.HasValue))
+            .WhereInPrison(x => x.JailId, request.JailId)
             .OrderBy(x => x.FirstName)
             .Select(x => new PrisonerListDto
             {
