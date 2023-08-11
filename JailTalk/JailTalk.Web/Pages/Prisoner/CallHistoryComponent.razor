@@ -1,11 +1,16 @@
-﻿@using JailTalk.Application.Dto.Prison;
+﻿@using Fluxor;
+@using JailTalk.Application.Dto.Prison;
 @using JailTalk.Application.Requests.Prison;
 @using JailTalk.Shared;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
+@using JailTalk.Web.Store.Prisoner;
 @using MediatR;
 @inject IMediator Mediator;
 @inject IAppMediator AppMediator;
+@inject IState<UnlimitedCallEnabledState> UnlimitedCallEnabledState;
+@inject IDispatcher Dispatcher;
+
 
 <MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered="true" ShowMenuIcon="false" FixedHeader="true"
              Height="400px">
@@ -28,25 +33,18 @@
     [Parameter]
     public string PrisonerId { get; set; }
 
-    [Parameter]
-    public bool IsUnlimitedCallEnabled { get; set; }
-
+    public bool IsUnlimitedCallEnabled => UnlimitedCallEnabledState.Value.IsEnabled;
     public List<CallHistoryListDto> Elements { get; set; }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
-        var elementsTask = Mediator.Send(new CallHistoryQuery()
+
+        Dispatcher.Dispatch(new UnlimitedCallEnabledFeature.GetIsEnabledAction(Guid.Parse(PrisonerId)));
+        Elements = await Mediator.Send(new CallHistoryQuery()
             {
                 LastNDays = 5,
                 PrisonerId = Guid.Parse(PrisonerId)
             });
-        var isUnlimitedCallEnabledTask = Mediator.Send(new UnlimitedCallPriviledgeEnabledQuery()
-            {
-                PrisonerId = Guid.Parse(PrisonerId)
-            });
-        await Task.WhenAll(elementsTask, isUnlimitedCallEnabledTask);
-        Elements = elementsTask.Result;
-        IsUnlimitedCallEnabled = isUnlimitedCallEnabledTask.Result.Data;
         StateHasChanged();
     }
 
@@ -70,7 +68,7 @@
             .OnSuccess(async data =>
             {
                 // If the action was to disable unlimited call then change the button
-                IsUnlimitedCallEnabled = data == UnlimitedCallAction.Allow;
+                Dispatcher.Dispatch(new UnlimitedCallEnabledFeature.SetIsEnabledAction(data == UnlimitedCallAction.Allow));
                 string message = !IsUnlimitedCallEnabled ? "Revoked the unlimited call priviledge" : "Prisoner given the access to make unlimited calls";
                 ToastService.Success(message);
                 await InvokeAsync(StateHasChanged);

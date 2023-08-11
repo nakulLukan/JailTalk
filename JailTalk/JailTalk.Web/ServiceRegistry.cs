@@ -1,4 +1,5 @@
-﻿using JailTalk.Application;
+﻿using Fluxor;
+using JailTalk.Application;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Contracts.Presentation;
 using JailTalk.Application.Contracts.UserManagement;
@@ -31,6 +32,8 @@ public static class ServiceRegistry
 
     private static void RegisterWebServices(IServiceCollection services)
     {
+
+        services.AddFluxor(options => options.ScanAssemblies(typeof(Program).Assembly));
         services.AddLogging(loggingBuilder =>
         {
             loggingBuilder.AddSerilog(dispose: true);
