@@ -1,0 +1,81 @@
+﻿@page "/application-settings"
+@using JailTalk.Application.Dto.System;
+@using JailTalk.Application.Requests.System;
+@using JailTalk.Shared;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using MediatR;
+@using System.Text.RegularExpressions;
+@inject IMediator Mediator
+@inject IAppMediator AppMediator;
+
+<HasPermissionComponent Roles="@Permissions.SuperAdminOnly" />
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered="true" ShowMenuIcon="false" FixedHeader="true">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6"><b>Application Settings</b></MudText>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.ApplicationSettingId" Title="Key" />
+            <PropertyColumn Property="x => x.Value" Title="Value" />
+            <PropertyColumn Property="x => x.LastUpdatedOn" Title="Last modified On" />
+            <PropertyColumn Property="x => x.Description" Title="Description" />
+            <TemplateColumn>
+                <CellTemplate>
+                    <MudIconButton Size="@Size.Small" Icon="@Icons.Material.Outlined.Edit" OnClick="@(()=> OnEditClicked(context.Item))" Disabled="@context.Item.IsReadonly" />
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+    </MudDataGrid>
+</MudContainer>
+
+<MudMessageBox @ref="_valueUpdatePopup" Title="Enter value" CancelText="Cancel">
+    <MessageContent>
+        <MudInput InputType="InputType.Text" @bind-Value="NewValue" Label="Value"></MudInput>
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+    </YesButton>
+</MudMessageBox>
+@code {
+    MudMessageBox _valueUpdatePopup { get; set; }
+    List<ApplicationSettingsListDto> Elements = new();
+
+    public string NewValue { get; set; } = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        Elements = await Mediator.Send(new GetApplicationSettingsQuery());
+        StateHasChanged();
+    }
+
+    private async Task OnEditClicked(ApplicationSettingsListDto item)
+    {
+        NewValue = item.Value;
+        bool? result = await _valueUpdatePopup.Show();
+        if (result.HasValue && result.Value)
+        {
+            await AppMediator.Send(new ApplicationSettingsUpdateCommand()
+                {
+                    Key = item.ApplicationSettingId,
+                    Value = NewValue
+                })
+                .OnSuccess(async data =>
+                {
+                    var removeItem = Elements.First(x => x.ApplicationSettingId == item.ApplicationSettingId);
+                    var position = Elements.IndexOf(removeItem);
+                    Elements[position] = data;
+                    await InvokeAsync(StateHasChanged);
+                    ToastService.Success("Value updated successfully");
+                })
+                .OnError(err =>
+                {
+                    ToastService.Error(err.Message);
+                });
+        }
+
+        return;
+    }
+}

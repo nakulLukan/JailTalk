@@ -9,4 +9,5 @@ public static class RegularExpressionPatternConstant
     public const string RoleName = "^[a-z-]*$";
     public const string IntegerOnly = "^[0-9]+$";
     public const string FloatOnly = "^[-+]?[0-9]*\\.?[0-9]+$";
+    public const string ApplicationSettingsKey = "^[A-Za-z0-9]+$";
 }

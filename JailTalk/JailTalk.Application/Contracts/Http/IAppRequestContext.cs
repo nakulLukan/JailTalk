@@ -9,6 +9,12 @@ public interface IAppRequestContext
     Task<string> GetUserId();
 
     /// <summary>
+    /// Username of the logged in user
+    /// </summary>
+    /// <returns></returns>
+    Task<string> GetUserName();
+
+    /// <summary>
     /// Gets the prison id of the user. If value is 0 then the user is not associated to any prison.
     /// </summary>
     /// <returns></returns>
