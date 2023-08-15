@@ -1,0 +1,70 @@
+﻿@page "/prisons/new"
+@using JailTalk.Application.Dto.Jail;
+@using JailTalk.Application.Requests.Jail;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using Microsoft.AspNetCore.Components.Forms;
+@inject IAppMediator AppMediator;
+@inject NavigationManager NavigationManager;
+
+<MudContainer MaxWidth="MaxWidth.Small">
+    <EditForm Model="model" OnValidSubmit="@OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
+            <MudPaper Class="pa-16" Elevation="4">
+                <MudGrid>
+                    <MudItem sm="12">
+                        <h3>Add Prison</h3>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudTextField Label="Prison Code" @bind-Value="@model.PrisonCode" For="@(()=> model.PrisonCode)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudTextField Label="Prison Name" @bind-Value="@model.PrisonName" For="@(()=> model.PrisonName)"></MudTextField>
+                    </MudItem>
+                    <MudDivider DividerType="DividerType.Middle" />
+
+                    <MudItem sm="12">
+                        <MudTextField Label="Name of the prison" @bind-Value="@model.Address.HouseName" For="@(()=> model.Address.HouseName)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="6">
+                        <MudTextField Label="Street" @bind-Value="@model.Address.Street" For="@(()=> model.Address.Street)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="6">
+                        <MudTextField Label="City" @bind-Value="@model.Address.City" For="@(()=> model.Address.City)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudTextField Label="Pincode" @bind-Value="@model.Address.PinCode" For="@(()=> model.Address.PinCode)"
+                                      Mask="@(new PatternMask("000 000"))"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                        <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudStack>
+    </EditForm>
+</MudContainer>
+
+@code {
+    AddPrisonDto model = new();
+    private async Task OnValidSubmit(EditContext context)
+    {
+        await AppMediator.Send(new AddPrisonCommand
+            {
+                PrisonName = model.PrisonName.Trim(),
+                Address = model.Address,
+                PrisonCode = model.PrisonCode.Trim()
+            })
+            .OnSuccess(data =>
+            {
+                ToastService.Success("New prison created successfully");
+                NavigationManager.NavigateTo("/prisons");
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
+    }
+}

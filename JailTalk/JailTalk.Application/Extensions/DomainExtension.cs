@@ -6,7 +6,7 @@ public static class DomainExtension
 {
     public static string AddressAsText(this Domain.Lookup.AddressBook address)
     {
-        return string.Join(", ",
+        return address is not null ? string.Join(", ",
         new string[] {
                 address.HouseName ?? string.Empty,
                 address.Street ?? string.Empty,
@@ -15,7 +15,8 @@ public static class DomainExtension
                 address.Country?.Value ?? string.Empty,
                 address.PinCode ?? string.Empty,
             }
-            .Where(x => !string.IsNullOrEmpty(x)));
+            .Where(x => !string.IsNullOrEmpty(x))) 
+            : string.Empty;
     }
 
     public static string AddressAsText(this AddressDetailDto address)

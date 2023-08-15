@@ -47,7 +47,8 @@ public class RegisterPrisonerCommandHandler : IRequestHandler<RegisterPrisonerCo
             UpdatedOn = AppDateTime.UtcNow,
             CreatedBy = string.Empty,
             UpdatedBy = string.Empty,
-            Gender = (Gender)request.Gender
+            Gender = (Gender)request.Gender,
+            PrisonerFunction = new()
         };
 
         _dbContext.Prisoners.Add(prisoner);

@@ -27,10 +27,10 @@ public class UnlimitedCallPriviledgeEnabledQueryHandler : IRequestHandler<Unlimi
             .Select(x => new
             {
                 x.Id,
-                x.AllowUnlimitedCallsTill
+                x.PrisonerFunction.UnlimitedCallsEndsOn
             })
             .FirstOrDefaultAsync(x => x.Id == request.PrisonerId, cancellationToken) ?? throw new AppException(CommonExceptionMessages.PrisonerNotFound);
-        return new(PrisonerHelper.IsUnlimitedCallPriviledgeEnabled(prisoner.AllowUnlimitedCallsTill));
+        return new(PrisonerHelper.IsUnlimitedCallPriviledgeEnabled(prisoner.UnlimitedCallsEndsOn));
     }
 }
 

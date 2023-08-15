@@ -10,4 +10,6 @@ public static class RegularExpressionPatternConstant
     public const string IntegerOnly = "^[0-9]+$";
     public const string FloatOnly = "^[-+]?[0-9]*\\.?[0-9]+$";
     public const string ApplicationSettingsKey = "^[A-Za-z0-9]+$";
+    public const string PrisonCode = "^[A-Za-z0-9\\-]+$";
+    public const string PrisonName = "^[A-Za-z0-9 ]+$";
 }

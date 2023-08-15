@@ -3,6 +3,7 @@ using System;
 using JailTalk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JailTalk.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230815092332_PrisonerSecondaryTableAdded")]
+    partial class PrisonerSecondaryTableAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -874,13 +877,13 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasColumnName("unlimited_calls_ends_on");
 
                     b.HasKey("Id")
-                        .HasName("pk_prisoner_functions");
+                        .HasName("pk_prisoner_function");
 
                     b.HasIndex("PrisonerId")
                         .IsUnique()
-                        .HasDatabaseName("ix_prisoner_functions_prisoner_id");
+                        .HasDatabaseName("ix_prisoner_function_prisoner_id");
 
-                    b.ToTable("prisoner_functions", (string)null);
+                    b.ToTable("prisoner_function", (string)null);
                 });
 
             modelBuilder.Entity("JailTalk.Domain.System.ApplicationSetting", b =>
@@ -1341,7 +1344,7 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasForeignKey("JailTalk.Domain.Prison.PrisonerFunction", "PrisonerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_prisoner_functions_prisoners_prisoner_id");
+                        .HasConstraintName("fk_prisoner_function_prisoners_prisoner_id");
 
                     b.Navigation("Prisoner");
                 });

@@ -1,5 +1,6 @@
 ﻿using Humanizer;
 using JailTalk.Application.Contracts.Data;
+using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Dto.Prison;
 using JailTalk.Shared;
 using JailTalk.Shared.Extensions;
@@ -17,15 +18,18 @@ public class CallHistoryQuery : IRequest<List<CallHistoryListDto>>
 public class CallHistoryQueryHandler : IRequestHandler<CallHistoryQuery, List<CallHistoryListDto>>
 {
     readonly IAppDbContext _dbContext;
+    readonly IAppRequestContext _requestContext;
 
-    public CallHistoryQueryHandler(IAppDbContext dbContext)
+    public CallHistoryQueryHandler(IAppDbContext dbContext, IAppRequestContext requestContext)
     {
         _dbContext = dbContext;
+        _requestContext = requestContext;
     }
 
     public async Task<List<CallHistoryListDto>> Handle(CallHistoryQuery request, CancellationToken cancellationToken)
     {
         var callHistory = await _dbContext.CallHistory
+            .WhereInPrison(x => x.PhoneDirectory.Prisoner.JailId, _requestContext.GetAssociatedPrisonId())
             .Where(x => x.PhoneDirectory.PrisonerId == request.PrisonerId)
             .Where(x => x.CallStartedOn >= AppDateTime.UtcDateBeforeNDays(request.LastNDays))
             .OrderByDescending(x => x.CallStartedOn)

@@ -15,16 +15,12 @@ public class Prisoner : DomainBase
     public bool IsBlocked { get; set; }
     public bool IsActive { get; set; }
 
-    /// <summary>
-    /// This field can be used to let a prisoner to talk any number of times till the given date.
-    /// Usually, this value should be 1 day.
-    /// </summary>
-    public DateTimeOffset? AllowUnlimitedCallsTill { get; set; }
     public Gender Gender { get; set; }
 
     public AddressBook Address { get; set; }
     public Jail Jail { get; set; }
     public PhoneBalance PhoneBalance { get; set; }
+    public PrisonerFunction PrisonerFunction { get; set; }
     public List<PhoneDirectory> PhoneDirectory { get; set; }
     public List<PrisonerFaceEncodingMapping> FaceEncodings { get; set; }
 }

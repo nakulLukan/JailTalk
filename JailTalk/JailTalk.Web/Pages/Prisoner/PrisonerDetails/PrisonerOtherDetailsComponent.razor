@@ -1,0 +1,22 @@
+﻿
+<MudCard Elevation="0" Class="mt-4">
+    <MudCard>
+        <MudCardContent>
+            <MudStack Row="true" Spacing="10">
+                <MudItem>
+                    <BlockPrisonerComponent PrisonerId="@PrisonerId" />
+                </MudItem>
+            </MudStack>
+        </MudCardContent>
+    </MudCard>
+</MudCard>
+@code {
+
+    [Parameter]
+    [EditorRequired]
+    public string PrisonerId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+}

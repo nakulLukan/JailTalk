@@ -7,6 +7,7 @@ public class NewAddressDto
     [Required]
     [MaxLength(50)]
     public string HouseName { get; set; }
+
     [MaxLength(50)]
     public string Street { get; set; }
 

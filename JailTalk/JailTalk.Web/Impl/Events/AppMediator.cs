@@ -3,6 +3,7 @@ using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
 using JailTalk.Web.Contracts.Events;
 using MediatR;
+using Microsoft.AspNetCore.Components;
 using Serilog;
 
 namespace JailTalk.Web.Impl.Events;
@@ -11,11 +12,13 @@ public class AppMediator : IAppMediator
 {
     private readonly IMediator mediator;
     private readonly ILogger<AppMediator> logger;
+    private readonly NavigationManager _navigationManager;
 
-    public AppMediator(IMediator mediator, ILogger<AppMediator> logger)
+    public AppMediator(IMediator mediator, ILogger<AppMediator> logger, NavigationManager navigationManager)
     {
         this.mediator = mediator;
         this.logger = logger;
+        _navigationManager = navigationManager;
     }
 
     public async Task<ResponseDto<TData>> Send<TData>(IRequest<ResponseDto<TData>> request)
@@ -30,6 +33,8 @@ public class AppMediator : IAppMediator
         }
         catch (AppException ex)
         {
+            logger.LogError(ex, "Mediator failed for request {request}", request.GetType().Name);
+            NavigateIfInAccessable(ex);
             return new ResponseDto<TData>(new ErrorDto(ex.ErrorMessage));
         }
         catch (Exception ex)
@@ -37,6 +42,14 @@ public class AppMediator : IAppMediator
             logger.LogError("{0} mediator request failed.", request.GetType().Name);
             logger.LogError("Exception: {message}\nStackTrace: {stackTrace}", ex.Message, ex.StackTrace);
             return new ResponseDto<TData>(new ErrorDto("Oops, something went wrong."));
+        }
+    }
+
+    private void NavigateIfInAccessable(AppException ex)
+    {
+        if (ex.IsInAccessible)
+        {
+            _navigationManager.NavigateTo("/unauthorized");
         }
     }
 
@@ -53,7 +66,8 @@ public class AppMediator : IAppMediator
         }
         catch (AppException ex)
         {
-            Log.Logger.Error("Validation exception, Message: {message}\nStack: {stack}", ex.Message, ex.StackTrace);
+            logger.LogError(ex, "Mediator failed for request {request}", request.GetType().Name);
+            NavigateIfInAccessable(ex);
             return new ResponseDto<TResponse>(new ErrorDto(ex.ErrorMessage));
         }
         catch (Exception ex)

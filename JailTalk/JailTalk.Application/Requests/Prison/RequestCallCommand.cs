@@ -47,7 +47,7 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
                 x.Id,
                 x.Balance,
                 PrisonerGender = x.Prisoner.Gender,
-                IsUnlimitedCallPriviledgeEnabled = PrisonerHelper.IsUnlimitedCallPriviledgeEnabled(x.Prisoner.AllowUnlimitedCallsTill)
+                IsUnlimitedCallPriviledgeEnabled = PrisonerHelper.IsUnlimitedCallPriviledgeEnabled(x.Prisoner.PrisonerFunction.UnlimitedCallsEndsOn)
             })
             .FirstOrDefaultAsync(cancellationToken);
 

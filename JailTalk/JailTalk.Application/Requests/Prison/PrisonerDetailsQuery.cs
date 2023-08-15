@@ -1,7 +1,9 @@
 ﻿using JailTalk.Application.Contracts.Data;
+using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Dto.Prison;
 using JailTalk.Application.Extensions;
 using JailTalk.Application.Services;
+using JailTalk.Shared.Extensions;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
 using MediatR;
@@ -17,15 +19,19 @@ public class PrisonerDetailsQuery : IRequest<ResponseDto<PrisonerDetailDto>>
 public class PrisonerDetailsQueryHandler : IRequestHandler<PrisonerDetailsQuery, ResponseDto<PrisonerDetailDto>>
 {
     readonly IAppDbContext _dbContext;
+    readonly IAppRequestContext _requestContext;
 
-    public PrisonerDetailsQueryHandler(IAppDbContext dbContext)
+    public PrisonerDetailsQueryHandler(IAppDbContext dbContext, IAppRequestContext requestContext)
     {
         _dbContext = dbContext;
+        _requestContext = requestContext;
     }
 
     public async Task<ResponseDto<PrisonerDetailDto>> Handle(PrisonerDetailsQuery request, CancellationToken cancellationToken)
     {
+        var prisonId = _requestContext.GetAssociatedPrisonId();
         var prisoner = await _dbContext.Prisoners
+            .WhereInPrison(x => x.JailId, prisonId)
             .Select(x => new PrisonerDetailDto
             {
                 Id = x.Id,
@@ -37,7 +43,7 @@ public class PrisonerDetailsQueryHandler : IRequestHandler<PrisonerDetailsQuery,
                 MiddleName = x.MiddleName,
                 Gender = x.Gender.ToString(),
                 Pid = x.Pid,
-                HasUnlimitedCallPriviledgeEnabled = PrisonerHelper.IsUnlimitedCallPriviledgeEnabled(x.AllowUnlimitedCallsTill),
+                HasUnlimitedCallPriviledgeEnabled = PrisonerHelper.IsUnlimitedCallPriviledgeEnabled(x.PrisonerFunction.UnlimitedCallsEndsOn),
                 Address = new Dto.Lookup.AddressDetailDto
                 {
                     City = x.Address.City,

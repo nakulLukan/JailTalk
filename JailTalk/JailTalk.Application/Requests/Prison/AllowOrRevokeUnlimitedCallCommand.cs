@@ -28,23 +28,23 @@ public class AllowOrRevokeUnlimitedCallCommandHandler : IRequestHandler<AllowOrR
     public async Task<ResponseDto<UnlimitedCallAction>> Handle(AllowOrRevokeUnlimitedCallCommand request, CancellationToken cancellationToken)
     {
         var jailId = _requestContext.GetAssociatedPrisonId();
-        var prisoner = await _dbContext.Prisoners
-            .Where(x => x.Id == request.PrisonerId)
-            .WhereInPrison(x => x.JailId, jailId)
-            .Select(x => new Prisoner
+        var prisoneryFunction = await _dbContext.PrisonerFunctions
+            .Where(x => x.PrisonerId == request.PrisonerId)
+            .WhereInPrison(x => x.Prisoner.JailId, jailId)
+            .Select(x => new PrisonerFunction
             {
                 Id = x.Id,
-                AllowUnlimitedCallsTill = x.AllowUnlimitedCallsTill,
+                UnlimitedCallsEndsOn = x.UnlimitedCallsEndsOn,
             })
             .FirstOrDefaultAsync(cancellationToken) ?? throw new AppException(CommonExceptionMessages.PrisonerNotFound);
-        
+
         switch (request.Action)
         {
             case UnlimitedCallAction.Allow:
-                _dbContext.Set(prisoner, (x) => x.AllowUnlimitedCallsTill, AppDateTime.TillEndOfDay);
+                _dbContext.Set(prisoneryFunction, (x) => x.UnlimitedCallsEndsOn, AppDateTime.TillEndOfDay);
                 break;
             case UnlimitedCallAction.Revoke:
-                _dbContext.Set(prisoner, (x) => x.AllowUnlimitedCallsTill, null);
+                _dbContext.Set(prisoneryFunction, (x) => x.UnlimitedCallsEndsOn, null);
                 break;
             default:
                 throw new NotImplementedException();

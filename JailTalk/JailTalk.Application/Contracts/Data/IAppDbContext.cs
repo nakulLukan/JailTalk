@@ -19,6 +19,7 @@ public interface IAppDbContext
     public DbSet<PhoneBalanceHistory> PhoneBalanceHistory { get; set; }
     public DbSet<PhoneDirectory> PhoneDirectory { get; set; }
     public DbSet<Prisoner> Prisoners { get; set; }
+    public DbSet<PrisonerFunction> PrisonerFunctions { get; set; }
     public DbSet<Device> Devices { get; set; }
     public DbSet<ApplicationSetting> ApplicationSettings { get; set; }
     public DbSet<Attachment> Attachments { get; set; }
