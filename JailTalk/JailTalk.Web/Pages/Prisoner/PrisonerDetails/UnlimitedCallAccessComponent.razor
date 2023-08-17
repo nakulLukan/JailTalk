@@ -1,0 +1,57 @@
+﻿@using Fluxor;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Shared;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using JailTalk.Web.Store.Prisoner;
+@inject IAppMediator AppMediator
+@inject IDispatcher Dispatcher
+@inject IState<PrisonerSecondaryDetailState> State;
+
+<MudGrid>
+    <MudItem sm="6">
+        <MudText Typo="Typo.caption">Allowed to make calls without any time restriction?</MudText>
+        <MudText><b>@(IsUnlimitedCallEnabled ? "Yes" : "No")</b></MudText>
+    </MudItem>
+    <MudItem sm="6">
+        <MudButton Variant="Variant.Filled" Color="@GetUnlimitedCallPriviledgeButtonColor()" OnClick="AllowOrRevokeUnlimitedCallAction">@UnLimitedCallActionName()</MudButton>
+    </MudItem>
+</MudGrid>
+@code {
+    [EditorRequired]
+    [Parameter]
+    public string PrisonerId { get; set; }
+
+    private bool IsUnlimitedCallEnabled => State.Value.IsUnlimitedCallEnabled;
+
+    private MudBlazor.Color GetUnlimitedCallPriviledgeButtonColor()
+    {
+        return IsUnlimitedCallEnabled ? Color.Error : Color.Tertiary;
+    }
+
+    private string UnLimitedCallActionName()
+    {
+        return IsUnlimitedCallEnabled ? "Disable Unlimited Calls" : "Allow Unlimited Calls";
+    }
+
+    private async Task AllowOrRevokeUnlimitedCallAction()
+    {
+        await AppMediator.Send(new AllowOrRevokeUnlimitedCallCommand()
+            {
+                PrisonerId = Guid.Parse(PrisonerId),
+                Action = IsUnlimitedCallEnabled ? UnlimitedCallAction.Revoke : UnlimitedCallAction.Allow
+            })
+            .OnSuccess(async data =>
+            {
+                // If the action was to disable unlimited call then change the button
+                Dispatcher.Dispatch(new PrisonerSecondaryDetailFeature.UpdateIsUnlimitedCallEnabledAction(data == UnlimitedCallAction.Allow));
+                string message = !IsUnlimitedCallEnabled ? "Revoked the unlimited call priviledge" : "Prisoner given the access to make unlimited calls";
+                ToastService.Success(message);
+                await InvokeAsync(StateHasChanged);
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
+    }
+}

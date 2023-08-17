@@ -8,16 +8,12 @@
 @using MediatR;
 @inject IMediator Mediator;
 @inject IAppMediator AppMediator;
-@inject IState<UnlimitedCallEnabledState> UnlimitedCallEnabledState;
-@inject IDispatcher Dispatcher;
 
 
 <MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered="true" ShowMenuIcon="false" FixedHeader="true"
              Height="400px">
     <ToolBarContent>
         <MudText Typo="Typo.h6"><b>Call History</b></MudText>
-        <MudSpacer />
-        <MudButton Variant="Variant.Outlined" Color="@GetUnlimitedCallPriviledgeButtonColor()" OnClick="AllowOrRevokeUnlimitedCallAction">@UnLimitedCallActionName()</MudButton>
     </ToolBarContent>
     <Columns>
         <PropertyColumn Property="x => x.Callee" Title="Callee" />
@@ -33,13 +29,11 @@
     [Parameter]
     public string PrisonerId { get; set; }
 
-    public bool IsUnlimitedCallEnabled => UnlimitedCallEnabledState.Value.IsEnabled;
     public List<CallHistoryListDto> Elements { get; set; }
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
 
-        Dispatcher.Dispatch(new UnlimitedCallEnabledFeature.GetIsEnabledAction(Guid.Parse(PrisonerId)));
         Elements = await Mediator.Send(new CallHistoryQuery()
             {
                 LastNDays = 5,
@@ -48,34 +42,4 @@
         StateHasChanged();
     }
 
-    private MudBlazor.Color GetUnlimitedCallPriviledgeButtonColor()
-    {
-        return IsUnlimitedCallEnabled ? Color.Error : Color.Tertiary;
-    }
-
-    private string UnLimitedCallActionName()
-    {
-        return IsUnlimitedCallEnabled ? "Disable Unlimited Calls" : "Allow Unlimited Calls";
-    }
-
-    private async Task AllowOrRevokeUnlimitedCallAction()
-    {
-        await AppMediator.Send(new AllowOrRevokeUnlimitedCallCommand()
-            {
-                PrisonerId = Guid.Parse(PrisonerId),
-                Action = IsUnlimitedCallEnabled ? UnlimitedCallAction.Revoke : UnlimitedCallAction.Allow
-            })
-            .OnSuccess(async data =>
-            {
-                // If the action was to disable unlimited call then change the button
-                Dispatcher.Dispatch(new UnlimitedCallEnabledFeature.SetIsEnabledAction(data == UnlimitedCallAction.Allow));
-                string message = !IsUnlimitedCallEnabled ? "Revoked the unlimited call priviledge" : "Prisoner given the access to make unlimited calls";
-                ToastService.Success(message);
-                await InvokeAsync(StateHasChanged);
-            })
-            .OnError(err =>
-            {
-                ToastService.Error(err.Message);
-            });
-    }
 }

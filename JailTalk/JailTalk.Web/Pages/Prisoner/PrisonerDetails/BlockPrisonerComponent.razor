@@ -1,6 +1,119 @@
-﻿Block user
+﻿@using Fluxor;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Application.Services;
+@using JailTalk.Shared.Extensions;
+@using JailTalk.Shared.Utilities;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using JailTalk.Web.Store.Prisoner;
+@inherits Fluxor.Blazor.Web.Components.FluxorComponent;
+@inject IState<PrisonerSecondaryDetailState> PrisonerSecondaryDetailState;
+@inject IAppMediator AppMediator;
+@inject IDispatcher Dispatcher;
+
+<MudGrid>
+    <MudItem sm="6">
+        <MudText Typo="Typo.caption">Is prisoner restricted to use the device?</MudText>
+        <MudText><b>@GetRestrictionStatusText()</b></MudText>
+    </MudItem>
+    <MudItem sm="6">
+        <MudButton Variant="Variant.Filled" Color="GetBlockCommandColor()" OnClick="OnBlockOrUnBlockPrisoner">@GetBlockCommandText()</MudButton>
+    </MudItem>
+</MudGrid>
+
+@if (!IsPrisonerBlocked)
+{
+
+    <MudMessageBox @ref="_blockUserPopup" Title="Block Prisoner" CancelText="Cancel">
+        <MessageContent>
+            <MudNumericField HideSpinButtons="true" @bind-Value="NoOfDays" Label="For how many days the prisoner should be blocked" Variant="Variant.Text" Min="1" Max="1000" />
+            <MudSpacer></MudSpacer>
+            <MudCheckBox @bind-Checked="@BlockPermenantly" Label="Block prisoner permenantly" LabelPosition="LabelPosition.Start" Color="Color.Error"></MudCheckBox>
+        </MessageContent>
+        <YesButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-3">Block</MudButton>
+        </YesButton>
+    </MudMessageBox>
+}
+else
+{
+
+    <MudMessageBox @ref="_blockUserPopup" Title="Unblock Prisoner" CancelText="Cancel">
+        <MessageContent>
+            <MudText Typo="Typo.body2">Are you sure you want to unblock the prisoner and give access to phone calls?</MudText>
+        </MessageContent>
+        <YesButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Success" Class="ml-3">Unblock</MudButton>
+        </YesButton>
+    </MudMessageBox>
+}
+
 @code {
-    [Parameter]
-    [EditorRequired]
-    public string PrisonerId { get; set; }
+    MudMessageBox _blockUserPopup;
+
+    public int NoOfDays { get; set; } = 1;
+    public bool BlockPermenantly { get; set; } = false;
+
+    private bool IsPrisonerBlocked => PrisonerSecondaryDetailState.Value.IsBlocked;
+    private DateTimeOffset? RestrictionEndsOn => PrisonerSecondaryDetailState.Value.RestrictionEndsOn;
+    private Guid PrisonerId => PrisonerSecondaryDetailState.Value.PrisonerId;
+
+    private string GetBlockCommandText()
+    {
+        return IsPrisonerBlocked ? "Unblock" : "Block";
+    }
+
+    private Color GetBlockCommandColor()
+    {
+        return IsPrisonerBlocked ? Color.Error : Color.Dark;
+    }
+
+    private string GetRestrictionStatusText()
+    {
+        var restrictionEndsOn = PrisonerSecondaryDetailState.Value.RestrictionEndsOn;
+        if (!PrisonerHelper.IsPrisonerBlocked(PrisonerSecondaryDetailState.Value.IsBlocked, restrictionEndsOn))
+        {
+            return "No Restriction";
+        }
+
+        return restrictionEndsOn.HasValue && restrictionEndsOn.Value > AppDateTime.UtcNow ?
+            $"Restricted to use the device for {MathF.Ceiling((float)(restrictionEndsOn.Value - AppDateTime.UtcNow).TotalDays)} days" :
+            "Permenantly restricted to use the phone.";
+    }
+
+    private async Task OnBlockOrUnBlockPrisoner(MouseEventArgs @event)
+    {
+        var buttonPressed = await _blockUserPopup.Show();
+        var blockPressed = buttonPressed.HasValue && buttonPressed.Value && !IsPrisonerBlocked;
+        if (!buttonPressed.HasValue) return;
+        await AppMediator.Send(new BlockOrUnblockPrisonerCommand()
+            {
+                BlockPermenantly = blockPressed && BlockPermenantly ? true : null,
+                NumberOfDaysBlocked = blockPressed && NoOfDays > 0 ? NoOfDays : null,
+                PrisonerId = PrisonerId,
+                UnBlock = !blockPressed ? true : null
+            })
+            .OnSuccess(data =>
+            {
+                if (!blockPressed)
+                {
+                    ToastService.Success($"Prisoner unblocked successfully.");
+
+                }
+                else if (BlockPermenantly)
+                {
+                    ToastService.Success($"Prisoner blocked successfully.");
+                }
+                else
+                {
+                    ToastService.Success($"Prisoner blocked for {NoOfDays} days.");
+                }
+
+                Dispatcher.Dispatch(new PrisonerSecondaryDetailFeature.GetSecondaryDetailAction(PrisonerSecondaryDetailState.Value.PrisonerId));
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
+    }
 }

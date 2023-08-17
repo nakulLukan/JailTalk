@@ -1,7 +1,7 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Dto.Prison;
 using JailTalk.Application.Extensions;
-using JailTalk.Shared.Helper;
+using JailTalk.Application.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

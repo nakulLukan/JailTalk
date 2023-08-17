@@ -29,6 +29,7 @@ public class GetPrisonersQueryHandler : IRequestHandler<GetPrisonersQuery, List<
 
         var prisoners = await _dbContext.Prisoners
             .WhereInPrison(x => x.JailId, associatedPrison)
+            .Where(x => x.JailId.HasValue)
             .OrderBy(x => x.FirstName)
             .Select(x => new PrisonerListDto
             {

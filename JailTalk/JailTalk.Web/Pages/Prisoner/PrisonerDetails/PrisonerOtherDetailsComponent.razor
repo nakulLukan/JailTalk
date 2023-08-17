@@ -1,10 +1,22 @@
-﻿
+﻿@using Fluxor;
+@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Web.Store.Prisoner;
+@using MediatR;
+@inject IMediator Mediator;
+@inject IDispatcher Dispatcher;
 <MudCard Elevation="0" Class="mt-4">
     <MudCard>
         <MudCardContent>
-            <MudStack Row="true" Spacing="10">
-                <MudItem>
-                    <BlockPrisonerComponent PrisonerId="@PrisonerId" />
+            <MudStack  Spacing="10" >
+                <MudItem sm="12">
+                    <UnlimitedCallAccessComponent PrisonerId="@PrisonerId" />
+                </MudItem>
+                <MudItem sm="12">
+                    <BlockPrisonerComponent />
+                </MudItem>
+                <MudItem sm="12">
+                    <ReleasePrisonerComponent />
                 </MudItem>
             </MudStack>
         </MudCardContent>
@@ -16,7 +28,8 @@
     [EditorRequired]
     public string PrisonerId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
+        Dispatcher.Dispatch(new PrisonerSecondaryDetailFeature.GetSecondaryDetailAction(Guid.Parse(PrisonerId)));
     }
 }

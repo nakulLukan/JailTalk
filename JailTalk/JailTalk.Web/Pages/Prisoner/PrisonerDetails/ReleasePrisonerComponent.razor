@@ -1,0 +1,54 @@
+﻿@using Fluxor;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using JailTalk.Web.Store.Prisoner;
+@inject IState<PrisonerSecondaryDetailState> PrisonerSecondaryDetailState;
+@inject IAppMediator AppMediator;
+@inject IDispatcher Dispatcher;
+
+<MudGrid>
+    <MudItem sm="6">
+        <MudText Typo="Typo.caption">Is prisoner released from prison?</MudText>
+        <MudText><b>@(IsPrisonerReleased ? "Yes" : "No")</b></MudText>
+    </MudItem>
+    <MudItem sm="6">
+        <MudButton Variant="Variant.Filled" Color="Color.Error" Disabled="IsPrisonerReleased" OnClick="@OnReleasePrisonerClicked">Release from Jail</MudButton>
+    </MudItem>
+</MudGrid>
+
+<MudMessageBox @ref="_confirmationPopup" Title="Release Prisoner" CancelText="Cancel" Class="ma-10">
+    <MessageContent>
+        <MudText Typo="Typo.body2">Are you sure you want to release the prisoner? This action may not be reversed.</MudText>
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-3">Release</MudButton>
+    </YesButton>
+</MudMessageBox>
+@code {
+    MudMessageBox _confirmationPopup;
+
+    private bool IsPrisonerReleased => PrisonerSecondaryDetailState.Value.IsPrisonerReleased;
+
+    private async Task OnReleasePrisonerClicked(MouseEventArgs @event)
+    {
+        var isPressed = await _confirmationPopup.Show();
+        if (isPressed.HasValue && isPressed.Value)
+        {
+            await AppMediator.Send(new ReleasePrisonerFromJailCommand()
+                {
+                    PrisonerId = PrisonerSecondaryDetailState.Value.PrisonerId,
+                    IsReleaseAction = true
+                })
+            .OnSuccess(data =>
+            {
+                ToastService.Success("Prisoner released from jail successfully");
+                Dispatcher.Dispatch(new PrisonerSecondaryDetailFeature.UpdateIsReleasedAction(true));
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
+        }
+    }
+}
