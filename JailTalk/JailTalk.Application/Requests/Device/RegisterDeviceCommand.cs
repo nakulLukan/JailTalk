@@ -31,6 +31,11 @@ public class RegisterDeviceCommandHandler : IRequestHandler<RegisterDeviceComman
         {
             throw new AppException("Cannot use a secret already in use.");
         }
+        
+        if (await _dbContext.Devices.AnyAsync(x => x.MacAddress == request.MacAddress, cancellationToken))
+        {
+            throw new AppException("Another device with same mac address already registered.");
+        }
 
         Domain.Prison.Device device = new Domain.Prison.Device()
         {

@@ -36,6 +36,7 @@ public class PrisonerAllActiveContactsQueryHandler : IRequestHandler<PrisonerAll
                 ContactRelationName = x.RelativeType.Value,
                 CountryCode = x.CountryCode,
                 PhoneNumber = x.PhoneNumber,
+                RelativeName = x.Name
             })
             .ToListAsync(cancellationToken);
         return contacts;

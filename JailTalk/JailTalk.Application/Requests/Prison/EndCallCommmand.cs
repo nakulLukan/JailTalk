@@ -13,6 +13,17 @@ namespace JailTalk.Application.Requests.Prison;
 public class EndCallCommmand : IRequest<EndCallResultDto>
 {
     public int CallHistoryId { get; set; }
+
+    /// <summary>
+    /// Total seconds took till the callee attended the call.
+    /// The value is expected as seconds.
+    /// </summary>
+    public int CallStartDiff { get; set; }
+
+    /// <summary>
+    /// Flag to indicate whether the callee as attended the call.
+    /// </summary>
+    public bool HasAttendedCall { get; set; }
 }
 
 public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallResultDto>
@@ -65,7 +76,9 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
         callHistory.CallTerminationReason = Shared.CallEndReason.CallEnded;
         var totalCallDuration = callHistory.EndedOn.Value - callHistory.CallStartedOn;
         var chargePerMinute = await _settingsProvider.GetCallPriceChargedPerMinute();
-        var callCost = (float)totalCallDuration.TotalMinutes * chargePerMinute;
+        var callCost = GetNetCallDurationInMinutes(totalCallDuration,
+                                                   request.CallStartDiff,
+                                                   request.HasAttendedCall) * chargePerMinute;
 
         phoneBalance.Balance -= callCost;
         phoneBalance.LastUpdatedOn = AppDateTime.UtcNow;
@@ -84,8 +97,21 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
         return new EndCallResultDto
         {
             AvailableBalance = phoneBalance.Balance,
-            CallDuration = ((float?)totalCallDuration.TotalMinutes).ToHoursMinutesSeconds()
+            CallDuration = ((float?)GetNetCallDurationInMinutes(
+                totalCallDuration,
+                request.CallStartDiff,
+                request.HasAttendedCall)).ToHoursMinutesSeconds()
         };
+    }
+
+    private static float GetNetCallDurationInMinutes(TimeSpan totalCallDuration, int callStartDiff, bool hasAttendedCall)
+    {
+        if (hasAttendedCall)
+        {
+            return ((float)totalCallDuration.TotalSeconds - callStartDiff) / 60F;
+        }
+
+        return 0;
     }
 }
 

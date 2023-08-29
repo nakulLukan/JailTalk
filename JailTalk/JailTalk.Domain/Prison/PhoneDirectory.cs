@@ -7,6 +7,7 @@ public class PhoneDirectory : DomainBase
     public Guid PrisonerId { get; set; }
     public string PhoneNumber { get; set; }
     public string CountryCode { get; set; }
+    public string Name { get; set; }
     public bool IsActive { get; set; }
     public bool IsBlocked { get; set; }
     public DateTimeOffset? LastBlockedOn { get; set; }

@@ -1,4 +1,5 @@
-﻿using JailTalk.Shared;
+﻿using JailTalk.Domain.System;
+using JailTalk.Shared;
 
 namespace JailTalk.Domain.Prison;
 public class CallHistory
@@ -8,6 +9,9 @@ public class CallHistory
     public DateTimeOffset CallStartedOn { get; set; }
     public DateTimeOffset? EndedOn { get; set; }
     public CallEndReason CallTerminationReason { get; set; }
+    public int? CallRecordingAttachmentId { get; set; }
 
     public PhoneDirectory PhoneDirectory { get; set; }
+    public Attachment CallRecordingAttachment { get; set; }
+
 }

@@ -41,6 +41,7 @@ public class PrisonerContactDetailsQueryHandler : IRequestHandler<PrisonerContac
                     x.CountryCode,
                     x.PhoneNumber
                 }),
+                Name = x.Name,
                 Status = PrisonerHelper.ConvertContactStateAsText(x.IsActive, x.IsBlocked),
                 Relationship = x.RelativeType.Value,
                 RelativeAddress = x.RelativeAddress.AddressAsText(),

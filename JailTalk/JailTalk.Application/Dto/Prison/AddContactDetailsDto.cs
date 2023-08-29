@@ -1,11 +1,10 @@
 ﻿using JailTalk.Application.Dto.Lookup;
-using JailTalk.Shared;
 using JailTalk.Shared.Constants;
 using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Prison;
 public class AddContactDetailsDto
-{   
+{
     public Guid PrisonerId { get; set; }
 
     [Required]
@@ -17,6 +16,11 @@ public class AddContactDetailsDto
     [RegularExpression(RegularExpressionPatternConstant.PhoneNumber)]
     [Required]
     public string PhoneNumber { get; set; }
+
+    [Required]
+    [MaxLength(50)]
+    [RegularExpression(RegularExpressionPatternConstant.PersonName)]
+    public string Name { get; set; }
 
     [Required]
     public int? RelationshipId { get; set; }

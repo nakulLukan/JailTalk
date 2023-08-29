@@ -12,5 +12,8 @@ public class CallHistoryEFConfig : IEntityTypeConfiguration<CallHistory>
         builder.HasOne(x => x.PhoneDirectory)
             .WithMany(x => x.CallHistory)
             .HasForeignKey(x => x.PhoneDirectoryId);
+        builder.HasOne(x => x.CallRecordingAttachment)
+            .WithMany()
+            .HasForeignKey(x => x.CallRecordingAttachmentId);
     }
 }

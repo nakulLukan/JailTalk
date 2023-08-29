@@ -12,4 +12,5 @@ public static class RegularExpressionPatternConstant
     public const string ApplicationSettingsKey = "^[A-Za-z0-9]+$";
     public const string PrisonCode = "^[A-Za-z0-9\\-]+$";
     public const string PrisonName = "^[A-Za-z0-9 ]+$";
+    public const string PersonName = "^[A-Za-z0-9 ]+$";
 }

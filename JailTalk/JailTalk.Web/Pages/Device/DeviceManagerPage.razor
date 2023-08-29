@@ -1,10 +1,12 @@
 ﻿@page "/device-manager"
+@using JailTalk.Application.Contracts.Storage;
 @using JailTalk.Application.Dto.Device;
 @using JailTalk.Application.Requests.Device;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
 @using JailTalk.Web.Impl.Events;
 @using MediatR;
+@using System.Text;
 @inject IMediator Mediator;
 
 <MudContainer MaxWidth="MaxWidth.Medium">

@@ -88,4 +88,36 @@ public class PrisonController : AppBaseController
         var data = await Mediator.Send(request);
         return Ok(data);
     }
+
+    /// <summary>
+    /// Authenticates the prisoner. 
+    /// If face validation is enabled then system checks if the given image is matching 
+    /// images of prisoner stored in the system.
+    /// </summary>
+    /// <param name="faceImageBinary">Base 64 string</param>
+    /// <param name="pid">Pid of the prisoner</param>
+    /// <returns></returns>
+    [RequestSizeLimit(15_242_880)]
+    [HttpPost("prisoners/call-recording")]
+    [ProducesResponseType(typeof(ResponseDto<long>), (int)HttpStatusCode.OK)]
+    [SessionAuthFilter]
+    public async Task<IActionResult> UploadCallRecordingAudioClip(IFormFile? audioClip, [FromForm]
+        long callHistoryId)
+    {
+        // Save the file to the specified path
+        using (var memStream = new MemoryStream())
+        {
+            if (audioClip is not null)
+            {
+                await audioClip.CopyToAsync(memStream);
+            }
+
+            var data = await Mediator.Send(new SaveCallRecordingCommand
+            {
+                AudioClipData = memStream.ToArray(),
+                CallHistoryId = callHistoryId
+            });
+            return Ok(data);
+        }
+    }
 }

@@ -68,7 +68,8 @@ public class AddContactDetailsCommandHandler : IRequestHandler<AddContactDetails
                 StateId = request.RelativeAddress.StateId,
                 HouseName = request.RelativeAddress.HouseName,
                 PinCode = request.RelativeAddress.PinCode,
-            }
+            },
+            Name = request.Name,
         };
 
         _dbContext.PhoneDirectory.Add(entry);

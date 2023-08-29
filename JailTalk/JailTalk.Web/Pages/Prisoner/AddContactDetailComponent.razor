@@ -14,9 +14,12 @@
             <MudItem sm="12">
                 <MudText Typo="Typo.h5">Enter Contact Details</MudText>
             </MudItem>
+            <MudItem sm="12">
+                <MudTextField Label="Contact Name" @bind-Value="@model.Name" For="@(()=> model.Name)"></MudTextField>
+            </MudItem>
             <MudItem sm="3">
-                <MudNumericField Adornment="Adornment.Start" AdornmentText="+" 
-                Label="Code" @bind-Value="@model.CountryCode" For="@(()=> model.CountryCode)" Variant="Variant.Text"></MudNumericField>
+                <MudNumericField Adornment="Adornment.Start" AdornmentText="+"
+                                 Label="Code" @bind-Value="@model.CountryCode" For="@(()=> model.CountryCode)" Variant="Variant.Text"></MudNumericField>
             </MudItem>
             <MudItem sm="9">
                 <MudTextField Label="Phone Number" @bind-Value="@model.PhoneNumber" For="@(()=> model.PhoneNumber)"></MudTextField>
@@ -69,7 +72,8 @@
                 IsEnabled = model.IsEnabled,
                 PrisonerId = Guid.Parse(PrisonerId),
                 RelationshipId = model.RelationshipId,
-                RelativeAddress = model.RelativeAddress
+                RelativeAddress = model.RelativeAddress,
+                Name = model.Name
             })
         .OnSuccess(async data =>
         {

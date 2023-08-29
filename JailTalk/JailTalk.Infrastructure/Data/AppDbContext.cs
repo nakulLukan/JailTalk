@@ -35,7 +35,6 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, string>, IAppDbC
     {
         return SaveChangesAsync(cancellationToken);
     }
-
     public void ClearChanges()
     {
         this.ChangeTracker.Clear();

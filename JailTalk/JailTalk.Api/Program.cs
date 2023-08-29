@@ -1,7 +1,5 @@
 using JailTalk.Api;
-using JailTalk.Infrastructure.Data;
 using JailTalk.Infrastructure.Impl.Middlewares;
-using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerUI;
 

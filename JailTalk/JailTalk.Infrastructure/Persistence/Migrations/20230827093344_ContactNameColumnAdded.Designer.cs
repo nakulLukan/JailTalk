@@ -3,6 +3,7 @@ using System;
 using JailTalk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JailTalk.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230827093344_ContactNameColumnAdded")]
+    partial class ContactNameColumnAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -421,10 +424,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<int?>("CallRecordingAttachmentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("call_recording_attachment_id");
-
                     b.Property<DateTimeOffset>("CallStartedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("call_started_on");
@@ -443,9 +442,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_call_history");
-
-                    b.HasIndex("CallRecordingAttachmentId")
-                        .HasDatabaseName("ix_call_history_call_recording_attachment_id");
 
                     b.HasIndex("PhoneDirectoryId")
                         .HasDatabaseName("ix_call_history_phone_directory_id");
@@ -1213,19 +1209,12 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JailTalk.Domain.Prison.CallHistory", b =>
                 {
-                    b.HasOne("JailTalk.Domain.System.Attachment", "CallRecordingAttachment")
-                        .WithMany()
-                        .HasForeignKey("CallRecordingAttachmentId")
-                        .HasConstraintName("fk_call_history_attachments_call_recording_attachment_id");
-
                     b.HasOne("JailTalk.Domain.Prison.PhoneDirectory", "PhoneDirectory")
                         .WithMany("CallHistory")
                         .HasForeignKey("PhoneDirectoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_call_history_phone_directory_phone_directory_id");
-
-                    b.Navigation("CallRecordingAttachment");
 
                     b.Navigation("PhoneDirectory");
                 });
