@@ -52,6 +52,15 @@ public class ApplicationSettingsProvider : IApplicationSettingsProvider
         return int.Parse(await GetApplicationSettingValue(ApplicationSettings.MaxAllowedActiveContacts));
     }
 
+    /// <summary>
+    /// Flag to indicate whether access to call recordings is enabled.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<bool> GetAllowAccessToCallRecording()
+    {
+        return bool.Parse(await GetApplicationSettingValue(ApplicationSettings.AllowAccessToCallRecording));
+    }
+
     private async Task<string> GetApplicationSettingValue(ApplicationSettings applicationSetting)
     {
         if (_memoryCache.TryGetValue(applicationSetting, out string value))

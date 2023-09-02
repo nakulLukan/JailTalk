@@ -22,14 +22,14 @@
                         <MudTextField Label="Device Code" @bind-Value="@model.Code" For="@(()=> model.Code)"></MudTextField>
                     </MudItem>
                     <MudItem sm="12">
-                        <MudTextField Label="MAC Address" Mask="@macAddressMask" @bind-Value="@model.MacAddress" For="@(()=> model.MacAddress)"></MudTextField>
+                        <MudTextField Label="MAC Address" @bind-Value="@model.MacAddress" For="@(()=> model.MacAddress)"></MudTextField>
                     </MudItem>
                     <MudItem sm="12">
                         <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.PrisonId" For="@(()=> model.PrisonId)" />
                     </MudItem>
                     <MudItem sm="12">
                         <div class="d-flex flex-grow-1 gap-4">
-                            <MudTextField Class="flex-grow-1" Mask="@secretMask" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
+                            <MudTextField Class="flex-grow-1" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
                             <MudButton Class="flex-none" OnClick="OnGenerateDeviceSecret">Generate</MudButton>
                             <MudButton Class="flex-none" Disabled="@(!model.DeviceSecret.Any())" Variant="Variant.Filled" Color="Color.Surface"
                                        OnClick="@ToggleQRCodeWindow">@QRCodePopupButtonName()</MudButton>
@@ -54,20 +54,6 @@
 @code {
     NewDeviceDto model = new();
     bool _isOpen = false;
-
-    PatternMask secretMask = new PatternMask("XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX")
-        {
-            MaskChars = new[] { new MaskChar('X', @"[0-9a-fA-F]") },
-            Placeholder = '_',
-            CleanDelimiters = true,
-        };
-
-    PatternMask macAddressMask = new PatternMask("XX-XX-XX-XX-XX-XX")
-        {
-            MaskChars = new[] { new MaskChar('X', @"[0-9a-fA-F]") },
-            Placeholder = '_',
-            CleanDelimiters = true,
-        };
 
     private async Task OnValidSubmit(EditContext context)
     {

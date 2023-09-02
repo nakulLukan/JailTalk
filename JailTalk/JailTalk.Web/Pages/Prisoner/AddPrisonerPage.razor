@@ -53,8 +53,7 @@
                         <MudTextField Label="City" @bind-Value="@model.Address.City" For="@(()=> model.Address.City)"></MudTextField>
                     </MudItem>
                     <MudItem sm="4">
-                        <MudTextField Label="Pincode" @bind-Value="@model.Address.PinCode" For="@(()=> model.Address.PinCode)"
-                                      Mask="@(new PatternMask("000 000"))"></MudTextField>
+                        <MudTextField Label="Pincode" @bind-Value="@model.Address.PinCode" For="@(()=> model.Address.PinCode)"></MudTextField>
                     </MudItem>
                     <MudItem sm="4">
                         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>

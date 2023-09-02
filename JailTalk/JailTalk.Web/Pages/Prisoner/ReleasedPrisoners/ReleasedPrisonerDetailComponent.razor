@@ -1,0 +1,81 @@
+﻿@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Dto.ReleasedPrisoner;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Application.Requests.ReleasedPrisoner;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using JailTalk.Web.Impl.Events;
+@inject IAppMediator AppMediator;
+<JailTalk.Web.Components.Common.HorizontalSpacer Spacing="6" />
+<MudGrid>
+    <MudItem xs="6">
+        <MudText>PID</MudText>
+    </MudItem>
+    <MudItem xs="6">
+        <MudText><b>@personalDetails.Pid</b> </MudText>
+    </MudItem>
+
+    <MudItem xs="6">
+        <MudText>First Name</MudText>
+    </MudItem>
+    <MudItem xs="6">
+        <MudText><b>@personalDetails.FirstName</b> </MudText>
+    </MudItem>
+
+    <MudItem xs="6">
+        <MudText>Middle Name</MudText>
+    </MudItem>
+    <MudItem xs="6">
+        <MudText><b>@personalDetails.MiddleName</b> </MudText>
+    </MudItem>
+
+    <MudItem xs="6">
+        <MudText>Last Name</MudText>
+    </MudItem>
+    <MudItem xs="6">
+        <MudText><b>@personalDetails.LastName</b> </MudText>
+    </MudItem>
+
+    <MudItem xs="6">
+        <MudText>Gender</MudText>
+    </MudItem>
+    <MudItem xs="6">
+        <MudText><b>@personalDetails.Gender</b> </MudText>
+    </MudItem>
+
+    <MudItem xs="6">
+        <MudText>Address</MudText>
+    </MudItem>
+    <MudItem xs="6">
+        <MudText><b>@personalDetails.AddressAsText</b> </MudText>
+    </MudItem>
+
+</MudGrid>
+@code {
+    [Parameter]
+    public string PrisonerId { get; set; }
+
+    ReleasedPrisonerDetailDto personalDetails = new();
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await AppMediator.Send(new ReleasedPrisonerDetailsQuery()
+            {
+                Id = Guid.Parse(PrisonerId)
+            })
+        .OnSuccess(async data =>
+        {
+            personalDetails = data;
+            await InvokeAsync(StateHasChanged);
+        })
+        .OnError(err =>
+        {
+            ToastService.Error(err.Message);
+        });
+    }
+}

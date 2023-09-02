@@ -23,4 +23,11 @@ public interface IFileStorage
     /// <param name="filePath"></param>
     /// <returns></returns>
     public string GetPresignedUrl(string fileName, string filePath);
+
+    /// <summary>
+    /// Gets a signed url with low lifetime.
+    /// </summary>
+    /// <param name="fileRelativePath"></param>
+    /// <returns></returns>
+    public string GetPresignedUrl(string fileRelativePath);
 }

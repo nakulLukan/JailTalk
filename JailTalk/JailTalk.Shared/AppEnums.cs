@@ -9,7 +9,8 @@ public enum ErrorType : short
 public enum PhoneBalanceReason : short
 {
     Recharge = 1,
-    RegularCall = 2
+    RegularCall = 2,
+    Released = 3
 }
 
 public enum CallEndReason : short
@@ -59,4 +60,5 @@ public enum ApplicationSettings : int
     MaxAllowedCallDurationOthers = 4,
     CallPricePerMinute = 5,
     MaxAllowedCallTimeInRupeesPerMonth = 6,
+    AllowAccessToCallRecording = 7,
 }

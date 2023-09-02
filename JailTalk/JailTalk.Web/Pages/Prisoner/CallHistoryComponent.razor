@@ -21,15 +21,44 @@
         <PropertyColumn Property="x => x.CallStartedOn" Title="Started On" />
         <PropertyColumn Property="x => x.CallEndedOn" Title="Ended On" />
         <PropertyColumn Property="x=> x.CallDuration" Title="Duration" />
+        <TemplateColumn Title="Recording">
+            <CellTemplate>
+                <MudStack Row>
+                    @if (context.Item.CallRecordingState.HasValue && context.Item.CallRecordingState.Value)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.PlayCircleOutline" OnClick="@(async ()=> await GetRecording(context.Item.Id))"></MudIconButton>
+                    }
+                    else if (context.Item.CallRecordingState.HasValue)
+                    {
+                        <MudIconButton Icon="@Icons.Material.Filled.PlayDisabled" Disabled Color="Color.Error"></MudIconButton>
+                    }
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
 </MudDataGrid>
+<MudMessageBox @ref="audioPlayerPopup" Title="@_fileName" YesText="Close">
+    <MessageContent>
+        <audio controls autoplay>
+            <source src="@_signedAudioSrc" />
+        </audio>
+        <MudDivider DividerType="DividerType.Middle" Class="ma-4" />
+        <MudText Class="d-block" Typo="Typo.caption">File Size: <b>@_fileSize</b> </MudText>
+        <MudText Class="d-block" Typo="Typo.caption">Call Duration: <b>@_callDuration</b> </MudText>
+    </MessageContent>
+</MudMessageBox>
 @code {
-
     [EditorRequired]
     [Parameter]
     public string PrisonerId { get; set; }
 
     public List<CallHistoryListDto> Elements { get; set; }
+    private string _signedAudioSrc = string.Empty;
+    private string _fileName = string.Empty;
+    private string _fileSize = string.Empty;
+    private string _callDuration = string.Empty;
+    private MudMessageBox audioPlayerPopup;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
@@ -42,4 +71,17 @@
         StateHasChanged();
     }
 
+    private async Task GetRecording(long callHistoryId)
+    {
+        var data = await Mediator.Send(new GetPrisonerCallRecording()
+            {
+                CallHistoryId = callHistoryId
+            });
+        _signedAudioSrc = data.SignedUrl;
+        _fileName = data.FileName;
+        _fileSize = data.FileSizeAsText;
+        _callDuration = data.CallDurationAsText;
+        StateHasChanged();
+        _ = await audioPlayerPopup.Show();
+    }
 }

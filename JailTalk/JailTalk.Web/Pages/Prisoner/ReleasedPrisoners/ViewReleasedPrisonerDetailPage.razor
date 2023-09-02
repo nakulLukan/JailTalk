@@ -1,0 +1,47 @@
+﻿@page "/prisoners/released/{PrisonerId}"
+@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@inject IAppMediator AppMediator;
+
+<MudContainer>
+    <MudText Typo="Typo.h3">@FullName</MudText>
+    <MudDivider DividerType="DividerType.FullWidth" />
+    <MudGrid>
+        <MudItem xs="12" md="4">
+            <ReleasedPrisonerDetailComponent PrisonerId="@PrisonerId" />
+        </MudItem>
+        <MudItem xs="12" md="8">
+            <ReleasedPrisonerSecondaryDetailComponent PrisonerId="@PrisonerId"/>
+        </MudItem>
+    </MudGrid>
+</MudContainer>
+@code {
+    [Parameter]
+    public string PrisonerId { get; set; }
+
+    public string FullName { get; set; }
+
+    protected override async void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        await AppMediator.Send(new PrisonerBasicInfoQuery()
+            {
+                PrisonerId = Guid.Parse(PrisonerId)
+            })
+        .OnSuccess(async data =>
+        {
+            FullName = data.FullName;
+            await InvokeAsync(StateHasChanged);
+        })
+        .OnError(err =>
+        {
+            ToastService.Error(err.Message);
+        });
+    }
+}

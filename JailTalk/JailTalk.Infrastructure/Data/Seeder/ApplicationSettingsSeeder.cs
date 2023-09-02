@@ -2,7 +2,6 @@
 using JailTalk.Shared;
 using JailTalk.Shared.Constants;
 using Microsoft.EntityFrameworkCore;
-using Org.BouncyCastle.Security;
 
 namespace JailTalk.Infrastructure.Data.Seeder;
 
@@ -73,6 +72,16 @@ public class ApplicationSettingsSeeder
                 IsReadonly = true,
                 LastUpdateBy = DefaultLastUpdatedByValue,
                 LastUpdatedOn = new DateTimeOffset(2023, 05,05, 0,0,0, TimeSpan.Zero),
+            },
+            new()
+            {
+                Id = ApplicationSettings.AllowAccessToCallRecording,
+                Value = (true).ToString(),
+                Description = "Allow user to access prisoners call recordings. Allowed Values: 'true' or 'false'",
+                RegexValidation = RegularExpressionPatternConstant.BooleanOnly,
+                IsReadonly = false,
+                LastUpdateBy = DefaultLastUpdatedByValue,
+                LastUpdatedOn = new DateTimeOffset(2023, 09, 02, 0,0,0, TimeSpan.Zero),
             }
         };
 

@@ -22,4 +22,10 @@ public interface IApplicationSettingsProvider
     /// </summary>
     /// <returns></returns>
     Task<int> GetMaxContactNumbersInActiveState();
+
+    /// <summary>
+    /// Flag to indicate whether access to call recordings is enabled.
+    /// </summary>
+    /// <returns></returns>
+    Task<bool> GetAllowAccessToCallRecording();
 }

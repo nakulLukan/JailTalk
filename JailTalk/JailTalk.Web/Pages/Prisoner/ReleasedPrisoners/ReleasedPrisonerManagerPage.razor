@@ -1,0 +1,57 @@
+﻿@page "/prisoners/released"
+@using JailTalk.Application.Dto.Device;
+@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Dto.ReleasedPrisoner;
+@using JailTalk.Application.Requests.Device;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Application.Requests.ReleasedPrisoner;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using JailTalk.Web.Impl.Events;
+@using MediatR;
+@inject IMediator Mediator;
+@inject NavigationManager NavigationManager;
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudDataGrid T="ReleasedPrisonerListDto" Items="@Prisoners" SortMode="SortMode.Multiple" Filterable="true"
+                 Hideable="true" RowClick="OnRowClick" Bordered Dense Hover RowClass="cursor-pointer">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Manage Prisoners (Released)</MudText>
+            <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Enter PID" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.Pid" Title="PID" Filterable="true" Sortable="true" />
+            <PropertyColumn Property="x => x.FullName" Title="Full Name" Filterable="true" Sortable="true" />
+            <PropertyColumn Property="x => x.LastReleasedOn" Title="Last Released On"  />
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="ReleasedPrisonerListDto" />
+        </PagerContent>
+    </MudDataGrid>
+</MudContainer>
+
+@code {
+    private bool _loading = true;
+    private string _searchString = "";
+
+    private List<ReleasedPrisonerListDto> Prisoners = new List<ReleasedPrisonerListDto>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            Prisoners = await Mediator.Send(new GetAllReleasedPrisonersQuery()
+                {
+                    Pid = _searchString,
+                });
+            _loading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OnRowClick(DataGridRowClickEventArgs<ReleasedPrisonerListDto> tableRowClickEventArgs)
+    {
+        NavigationManager.NavigateTo($"prisoners/released/{tableRowClickEventArgs.Item.PrisonerId}");
+    }
+}

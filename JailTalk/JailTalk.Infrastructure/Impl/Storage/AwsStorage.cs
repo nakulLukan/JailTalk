@@ -69,6 +69,24 @@ public class AwsStorage : IFileStorage
         return signedUrl;
     }
 
+    /// <summary>
+    /// Gets a signed url with low lifetime.
+    /// </summary>
+    /// <param name="fileRelativePath"></param>
+    /// <returns></returns>
+    public string GetPresignedUrl(string fileRelativePath)
+    {
+        GetPreSignedUrlRequest request = new GetPreSignedUrlRequest
+        {
+            BucketName = _bucketName,
+            Key = fileRelativePath,
+            Expires = DateTime.Now.AddMinutes(30) // Set expiration time for the URL
+        };
+
+        string signedUrl = _client.GetPreSignedURL(request);
+        return signedUrl;
+    }
+
     private AmazonS3Client InitialiseAwsClient(IConfiguration configuration)
     {
         string accessKey = configuration["Aws:S3:AccessKey"];

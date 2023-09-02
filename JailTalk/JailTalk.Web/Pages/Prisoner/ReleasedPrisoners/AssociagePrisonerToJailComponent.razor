@@ -1,0 +1,89 @@
+﻿@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Application.Requests.ReleasedPrisoner;
+@using JailTalk.Shared.Extensions;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using MediatR;
+@using Microsoft.AspNetCore.Components.Forms
+@inject IAppMediator AppMediator;
+@inject IMediator Mediator;
+@inject NavigationManager NavigationManager;
+
+<MudCard Elevation="0">
+    <MudCard>
+        <MudCardContent>
+            <MudStack Row="true" Spacing="10">
+                <MudItem>
+                    <MudText Typo="Typo.overline">Last Associated Prison</MudText>
+                    <MudText Typo="Typo.h6"><b>@_lastAssociatedPrison</b></MudText>
+                </MudItem>
+                <MudItem>
+                    <MudText Typo="Typo.overline">Last Released On</MudText>
+                    <MudText Typo="Typo.h6"><b> @_lastReleasedOn</b></MudText>
+                </MudItem>
+                <MudSpacer />
+                <MudItem>
+
+                    <div>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OnAssociateClicked" Size="Size.Small">Associate Prisoner </MudButton>
+                    </div>
+                </MudItem>
+            </MudStack>
+        </MudCardContent>
+    </MudCard>
+</MudCard>
+<MudMessageBox @ref="_associatePrisonerPopup" CancelText="Cancel" Title="Associate Prisoner to a Jail">
+    <MessageContent>
+        <MudText Class="mb-2" Typo="Typo.subtitle1">Select a prison to which this prisoner has to be associated.</MudText>
+        <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="@jailId" />
+    </MessageContent>
+    <YesButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Success">Associate</MudButton>
+    </YesButton>
+</MudMessageBox>
+@code {
+    [Parameter]
+    public string PrisonerId { get; set; }
+
+    private string _lastAssociatedPrison = string.Empty;
+    private string _lastReleasedOn = string.Empty;
+    private MudMessageBox _associatePrisonerPopup;
+    private int? jailId;
+    private bool disableAssociateButton = false;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var response = await Mediator.Send(new ReleasedPrisonerLastAssociatedJailDetailQuery
+            {
+                PrisonerId = Guid.Parse(PrisonerId)
+            });
+        _lastAssociatedPrison = response.LastAssociatedPrison;
+        _lastReleasedOn = response.LastReleasedOn;
+        StateHasChanged();
+    }
+
+    private async Task OnAssociateClicked()
+    {
+        var confirm = await _associatePrisonerPopup.Show();
+        if (!confirm.HasValue || !confirm.Value)
+        {
+            return;
+        }
+
+        await AppMediator.Send(new AssociatePrisonerToJailCommand()
+            {
+                JailId = jailId,
+                PrisonerId = Guid.Parse(PrisonerId)
+            })
+            .OnSuccess(data =>
+            {
+                ToastService.Success("Prisoner associated to the given jail successfully.");
+                NavigationManager.NavigateTo("/prisoners/released");
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
+    }
+}

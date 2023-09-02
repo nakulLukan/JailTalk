@@ -3,6 +3,7 @@ using System;
 using JailTalk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JailTalk.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230902075903_PropertyTypeUpdate")]
+    partial class PropertyTypeUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1000,16 +1003,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                             LastUpdatedOn = new DateTimeOffset(new DateTime(2023, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             RegexValidation = "^[0-9]+$",
                             Value = "450"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            Description = "Allow user to access prisoners call recordings. Allowed Values: 'true' or 'false'",
-                            IsReadonly = false,
-                            LastUpdateBy = "System",
-                            LastUpdatedOn = new DateTimeOffset(new DateTime(2023, 9, 2, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
-                            RegexValidation = "^(true|false)$",
-                            Value = "True"
                         });
                 });
 

@@ -33,6 +33,7 @@ public class ReleasePrisonerFromJailCommandHandler : IRequestHandler<ReleasePris
         var prison = _requestContext.GetAssociatedPrisonId();
         var prisoner = await _dbContext.Prisoners.AsTracking()
             .Include(x => x.PrisonerFunction)
+            .Include(x => x.PhoneBalance)
             .Where(x => x.Id == request.PrisonerId)
             .WhereInPrison(x => x.JailId, prison)
             .FirstOrDefaultAsync(cancellationToken) ?? throw new AppException(CommonExceptionMessages.PrisonerNotFound, true);
@@ -49,6 +50,25 @@ public class ReleasePrisonerFromJailCommandHandler : IRequestHandler<ReleasePris
 
         prisoner.PrisonerFunction.LastReleasedOn = AppDateTime.UtcNow;
         prisoner.PrisonerFunction.LastAssociatedJailId = currentJailId;
+
+        // If the prisoner is newly created and released from prison before recharging account balance then phone balance need not be tracked
+        if (prisoner.PhoneBalance is not null)
+        {
+            // Update the balance amount. When prisoner is released from jail the balance amount should be 0.
+            var currentBalance = prisoner.PhoneBalance.Balance;
+            prisoner.PhoneBalance.Balance = 0;
+            prisoner.PhoneBalance.LastUpdatedOn = AppDateTime.UtcNow;
+
+            _dbContext.PhoneBalanceHistory.Add(new()
+            {
+                AmountDifference = currentBalance,
+                CallRequestId = null,
+                CreatedOn = AppDateTime.UtcNow,
+                NetAmount = 0,
+                PrisonerId = prisoner.Id,
+                RechargedByUserId = await _requestContext.GetUserId(),
+            });
+        }
 
         await _dbContext.SaveAsync(cancellationToken);
         return true;

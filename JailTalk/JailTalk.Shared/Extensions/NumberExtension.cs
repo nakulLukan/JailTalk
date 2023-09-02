@@ -50,4 +50,19 @@ public static class NumberExtension
 
         return String.Empty;
     }
+
+    /// <summary>
+    /// Converted given total bytes into string representation
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static string FileSizeAsString(this long? value)
+    {
+        if (value.HasValue)
+        {
+            return value.Value.Bytes().Humanize();
+        }
+
+        return String.Empty;
+    }
 }

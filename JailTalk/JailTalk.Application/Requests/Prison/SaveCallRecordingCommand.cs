@@ -85,8 +85,9 @@ public class SaveCallRecordingCommandHandler : IRequestHandler<SaveCallRecording
         var attachment = new Domain.System.Attachment
         {
             FileName = fileName,
-            Path = filePath + "/" + fileName,
-            IsBlob = false
+            RelativeFilePath = filePath + "/" + fileName,
+            IsBlob = false,
+            FileSizeInBytes = request.AudioClipData.Length,
         };
 
         _dbContext.Attachments.Add(attachment);

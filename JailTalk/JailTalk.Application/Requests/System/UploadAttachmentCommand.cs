@@ -32,7 +32,8 @@ public class UploadAttachmentCommandHandler : IRequestHandler<UploadAttachmentCo
             Data = data,
             FileName = request.FileName,
             IsBlob = true,
-            Path = null
+            RelativeFilePath = null,
+            FileSizeInBytes = data.Length,
         };
         _dbContext.Attachments.Add(attachment);
 
