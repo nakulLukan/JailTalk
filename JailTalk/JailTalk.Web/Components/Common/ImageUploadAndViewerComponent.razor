@@ -4,7 +4,7 @@
     <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
         <MudFileUpload T="IReadOnlyList<IBrowserFile>" OnFilesChanged="OnInputFileChanged" AppendMultipleFiles Hidden="false"
                        Class="flex-shrink-1 " InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20"
-                       InputStyle="opacity:0"
+                       InputStyle="opacity:0" Accept=".jpg, .jpeg, .png"
         @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass" MaximumFileCount="3">
             <ButtonTemplate>
                 <MudPaper Height="300px" Width="200px" Outlined="true" Class="@DragClass">
@@ -55,6 +55,10 @@
     private string DragClass = DefaultDragClass;
     private List<IBrowserFile> files = new List<IBrowserFile>();
     private MudMessageBox _imageDeleteConfirmation;
+    private readonly string[] allowedExtensions = new string[]
+    {
+        ".png", ".jpg", ".jpeg"
+    };
 
     [Parameter]
     public List<ImageViewDto> Attachments { get; set; }
@@ -101,6 +105,12 @@
         if (MaximumImageCount.HasValue && projectedImageCount > MaximumImageCount.Value)
         {
             ToastService.Error($"Cannot upload more than '{MaximumImageCount}' images.");
+            return;
+        }
+
+        if (files.Any(x => !allowedExtensions.Contains(Path.GetExtension(x.Name))))
+        {
+            ToastService.Error($"Only image files are supported. Please upload files with extension .jpg, .jpeg or .png");
             return;
         }
 

@@ -4,6 +4,8 @@ namespace JailTalk.Shared.Extensions;
 
 public static class DateExtensions
 {
+    private static readonly TimeZoneInfo _timeZone = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+
     public static string ToDateString(this DateTimeOffset? dateTime)
     {
         return dateTime.HasValue ? dateTime.Value.ToString("yyyy-MM-dd") : string.Empty;
@@ -16,7 +18,7 @@ public static class DateExtensions
 
     public static string ToLocalDateTimeString(this DateTimeOffset dateTime)
     {
-        return dateTime.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss");
+        return dateTime.ToOffset(_timeZone.BaseUtcOffset).ToString("yyyy-MM-dd HH:mm:ss");
     }
 
     /// <summary>
