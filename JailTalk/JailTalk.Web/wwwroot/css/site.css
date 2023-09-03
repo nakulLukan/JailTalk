@@ -1,0 +1,36 @@
+body {
+    height: 100vh;
+}
+
+.default-bg {
+    background: #e8e8e8
+}
+
+.db {
+    cursor: pointer;
+    border: 1px solid black;
+}
+
+.mud-table, .mud-tabs {
+    border: 1px solid;
+    background: white;
+}
+
+.no-border{
+    border: none;
+}
+
+.app-image-tile {
+    max-width: 100px;
+    align-items: center;
+}
+
+    .app-image-tile img{
+        height: 84px;
+        width: 84px;
+    }
+
+    .app-image-tile span {
+        text-overflow: clip;
+        word-wrap: break-word;
+    }

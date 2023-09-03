@@ -1,12 +1,12 @@
 ﻿@using JailTalk.Shared.Utilities;
 @inject NavigationManager NavigationManager
 
-<MudCard Elevation="1" Outlined=true @onclick="@NavigateToRoute" Class="cursor-pointer grey lighten-4">
+<MudCard Elevation="1" Outlined=true @onclick="@NavigateToRoute" Class="db">
     <MudCardContent>
         <MudPaper Elevation="0" Width="100px" Height="100px"
                   Square=true
                   Class="d-flex align-center justify-center shades transparent">
-            <MudText Align="Align.Center">@Name</MudText>
+            <MudText Typo=Typo.h6 Align="Align.Center">@Name</MudText>
         </MudPaper>
     </MudCardContent>
 </MudCard>

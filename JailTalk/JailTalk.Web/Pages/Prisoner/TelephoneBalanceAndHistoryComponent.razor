@@ -6,7 +6,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @inject IAppMediator AppMediator;
 
-<MudCard Elevation="0">
+<MudCard Elevation="4" Outlined>
     <MudCard>
         <MudCardContent>
             <MudStack Row="true" Spacing="10">
@@ -20,47 +20,29 @@
                 </MudItem>
                 <MudSpacer />
                 <MudItem>
-
-                    <div>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@ToggleOpen">Recharge Balance</MudButton>
-                        <MudPopover Open="@_isOpen" Fixed="true" Class="px-4 py-2 blue lighten-5"
-                                    AnchorOrigin="Origin.CenterLeft" TransformOrigin="Origin.CenterRight"
-                                    Style="max-width: 250px">
-                            <MudGrid Justify="Justify.FlexEnd">
-                                <MudItem xs="12">
-                                    <MudNumericField Adornment="Adornment.Start" AdornmentAriaLabel="Curreny" AdornmentIcon="@Icons.Material.TwoTone.CurrencyRupee" @bind-Value="@rechargeAmount" Label="Enter Top-up Amount"
-                                                     Min="1" />
-                                </MudItem>
-                                <MudItem>
-                                    <MudButton Class="ml-auto mr-n3 mb-1" Color="Color.Success" Variant="Variant.Filled"
-                                               ButtonType="ButtonType.Submit" OnClick="OnRechargeSubmit">Recharge</MudButton>
-                                </MudItem>
-                                <MudItem>
-                                    <MudButton OnClick="@ToggleOpen" Class="ml-auto mr-n3 mb-1" Color="Color.Error">Cancel</MudButton>
-                                </MudItem>
-                            </MudGrid>
-                        </MudPopover>
-                    </div>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@OnRechargeSubmit">Recharge Balance</MudButton>
                 </MudItem>
             </MudStack>
         </MudCardContent>
     </MudCard>
 </MudCard>
+<MudMessageBox @ref="_rechargePopup" CancelText="Cancel" Title="Recharge Account" Class="ma-10" >
+    <MessageContent>
+        <MudNumericField Adornment="Adornment.Start" AdornmentAriaLabel="Curreny"
+                         AdornmentIcon="@Icons.Material.TwoTone.CurrencyRupee" @bind-Value="@rechargeAmount" Label="Enter Top-up Amount"
+                         Min="1" />
+    </MessageContent>
+    <YesButton>
+        <MudButton Color="Color.Success" Variant="Variant.Filled">Recharge</MudButton>
+    </YesButton>
+</MudMessageBox>
 @code {
     [Parameter]
     public string PrisonerId { get; set; }
-
+    MudMessageBox _rechargePopup;
     AccountBalanceDto balanceInfo = new();
 
     float? rechargeAmount = 0;
-    public bool _isOpen;
-    public void ToggleOpen()
-    {
-        if (_isOpen)
-            _isOpen = false;
-        else
-            _isOpen = true;
-    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -87,20 +69,23 @@
 
     private async Task OnRechargeSubmit()
     {
-        await AppMediator.Send(new RechargeAccountCommand
-            {
-                PrisonerId = Guid.Parse(PrisonerId),
-                RechargeAmount = rechargeAmount.Value
-            })
-            .OnSuccess(async data =>
-            {
-                _isOpen = false;
-                ToastService.Success("Account Recharged Successfully");
-                await GetAccountBalanceDetails(Guid.Parse(PrisonerId));
-            })
-            .OnError(err =>
-            {
-                ToastService.Error(err.Message);
-            });
+        var rechargePressed = await _rechargePopup.Show();
+        if (rechargePressed.HasValue && rechargePressed.Value)
+        {
+            await AppMediator.Send(new RechargeAccountCommand
+                {
+                    PrisonerId = Guid.Parse(PrisonerId),
+                    RechargeAmount = rechargeAmount.Value
+                })
+                .OnSuccess(async data =>
+                {
+                    ToastService.Success("Account Recharged Successfully");
+                    await GetAccountBalanceDetails(Guid.Parse(PrisonerId));
+                })
+                .OnError(err =>
+                {
+                    ToastService.Error(err.Message);
+                });
+        }
     }
 }

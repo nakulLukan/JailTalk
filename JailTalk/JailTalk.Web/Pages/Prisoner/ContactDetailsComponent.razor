@@ -8,7 +8,8 @@
 @inject IMediator Mediator;
 @inject IAppMediator AppMediator;
 
-<MudTable Items="@contacts" Dense="true" Hover="true" Bordered="true" Striped="true">
+<MudTable Items="@contacts" Dense="true" Hover="true" Bordered="true" Striped="true"
+          Class="no-border" Elevation="4" Outlined>
     <ToolBarContent>
         <MudText Typo="Typo.h6">Contacts</MudText>
         <MudSpacer />
