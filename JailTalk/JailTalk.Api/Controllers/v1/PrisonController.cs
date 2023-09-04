@@ -62,6 +62,19 @@ public class PrisonController : AppBaseController
     }
 
     /// <summary>
+    /// Account balance information of the prisoner.
+    /// </summary>
+    /// <returns></returns>
+    [HttpGet("prisoners/account-balance-info")]
+    [ProducesResponseType(typeof(AccountBalanceDto), (int)HttpStatusCode.OK)]
+    [SessionAuthFilter]
+    public async Task<IActionResult> GetAccountBalanceInfo()
+    {
+        var data = await Mediator.Send(new AccountBalanceQuery());
+        return Ok(data);
+    }
+
+    /// <summary>
     /// Requests for a phone call
     /// </summary>
     /// <param name="request"></param>

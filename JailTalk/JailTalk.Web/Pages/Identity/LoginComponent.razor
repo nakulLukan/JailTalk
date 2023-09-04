@@ -15,7 +15,10 @@
         <MudPaper Class="pa-16" Elevation="4">
             <MudGrid>
                 <MudItem sm="12">
-                    <MudText Typo="Typo.h4">Sign-In</MudText>
+                    <MudText Typo="Typo.h4">JAIL Connect</MudText>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudText Typo="Typo.caption" Class="app-hallow-text">Welcome to JAIL Connect. Please enter you credentials to login to the application.</MudText>
                 </MudItem>
                 <MudItem sm="12">
                     <MudTextField Label="Username" @bind-Value="@model.Email" For="@(()=> model.Email)"></MudTextField>
@@ -23,9 +26,9 @@
                 <MudItem sm="12">
                     <MudTextField Label="Password" @bind-Value="@model.Password" For="@(()=> model.Password)" InputType="InputType.Password"></MudTextField>
                 </MudItem>
-                <MudItem sm="4">
+                <MudItem sm="12" Class="d-flex justify-space-between">
                     <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Login</MudButton>
-                    <MudLink Href="/forgot-password"><MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary">Forgot Password</MudButton></MudLink>
+                    <MudLink Href="/forgot-password"><MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Surface">Forgot Password</MudButton></MudLink>
                 </MudItem>
             </MudGrid>
         </MudPaper>

@@ -6,6 +6,11 @@ body {
     background: #e8e8e8
 }
 
+.app-hallow-text {
+    color: #979292;
+    background: #00000000;
+}
+
 .db {
     cursor: pointer;
     border: 1px solid black;

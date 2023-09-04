@@ -1,45 +1,55 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Dto.Prison;
-using JailTalk.Shared.Extensions;
-using JailTalk.Shared.Models;
+using JailTalk.Application.Services;
+using JailTalk.Shared;
+using JailTalk.Shared.Utilities;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace JailTalk.Application.Requests.Prison;
 
-public class AccountBalanceQuery : IRequest<ResponseDto<AccountBalanceDto>>
+public class AccountBalanceQuery : IRequest<AccountBalanceDto>
 {
+    /// <summary>
+    /// Value will be default if request is from mobile app.
+    /// </summary>
     public Guid PrisonerId { get; set; }
 }
 
-public class AccountBalanceQueryHandler : IRequestHandler<AccountBalanceQuery, ResponseDto<AccountBalanceDto>>
+public class AccountBalanceQueryHandler : IRequestHandler<AccountBalanceQuery, AccountBalanceDto>
 {
     readonly IAppDbContext _dbContext;
     readonly IApplicationSettingsProvider _settingsProvider;
     readonly IAppRequestContext _requestContext;
+    readonly IDeviceRequestContext _deviceRequestContext;
 
-    public AccountBalanceQueryHandler(IAppDbContext dbContext, IApplicationSettingsProvider settingsProvider, IAppRequestContext requestContext)
+    public AccountBalanceQueryHandler(IAppDbContext dbContext, IApplicationSettingsProvider settingsProvider, IAppRequestContext requestContext, IDeviceRequestContext deviceRequestContext)
     {
         _dbContext = dbContext;
         _settingsProvider = settingsProvider;
         _requestContext = requestContext;
+        _deviceRequestContext = deviceRequestContext;
     }
 
-    public async Task<ResponseDto<AccountBalanceDto>> Handle(AccountBalanceQuery request, CancellationToken cancellationToken)
+    public async Task<AccountBalanceDto> Handle(AccountBalanceQuery request, CancellationToken cancellationToken)
     {
-        var prisonId = _requestContext.GetAssociatedPrisonId();
-        var chargePerMinute = await _settingsProvider.GetCallPriceChargedPerMinute();
-        var accountInfo = await _dbContext.PhoneBalances
-            .WhereInPrison(x => x.Prisoner.JailId, prisonId)
-            .Where(x => x.PrisonerId == request.PrisonerId)
-            .Select(x => new AccountBalanceDto
-            {
-                PrisonerId = request.PrisonerId,
-                AccountBalanceAmount = x.Balance,
-                TalkTimeLeft = ((float?)(x.Balance / chargePerMinute)).ToHoursMinutesSeconds(),
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+        // If request is from mobile app then request context will be null.
+        int? userJailId = null;
+        if (_requestContext != null)
+        {
+            userJailId = _requestContext.GetAssociatedPrisonId();
+        }
+
+        // If request is from mobile app then prisoner id will be default in the request.
+        // So update the value from the device token.
+        if (request.PrisonerId == Guid.Empty)
+        {
+            request.PrisonerId = _deviceRequestContext.GetPrisonerId();
+        }
+
+        // Get account balance info.
+        var accountInfo = await PrisonerAccountService.GetPrisonerAccountBalance((_dbContext, _settingsProvider),
+            request.PrisonerId, userJailId, cancellationToken) ?? throw new AppException(CommonExceptionMessages.PrisonerNotFound);
 
         if (accountInfo is null)
         {
@@ -51,6 +61,6 @@ public class AccountBalanceQueryHandler : IRequestHandler<AccountBalanceQuery, R
             };
         }
 
-        return new(accountInfo);
+        return accountInfo;
     }
 }
