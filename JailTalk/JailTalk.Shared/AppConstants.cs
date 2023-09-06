@@ -15,6 +15,7 @@ public static class CommonExceptionMessages
     public const string UserNotFound = "Unknown user";
     public const string PrisonerNotFound = "Unknown prisoner";
     public const string ItemNotFound = "Not Found";
+    public const string DeviceNotFound = "Device Not Found";
 }
 
 public static class AppRoleNames

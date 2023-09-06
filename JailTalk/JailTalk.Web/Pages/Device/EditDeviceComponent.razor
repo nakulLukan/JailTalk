@@ -1,0 +1,109 @@
+﻿@page "/device-manager/edit/{deviceId}"
+@using JailTalk.Application.Dto.Device;
+@using JailTalk.Application.Dto.Prison;
+@using JailTalk.Application.Requests.Device;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using MediatR;
+@using Microsoft.AspNetCore.Components.Forms
+@inject IAppMediator AppMediator;
+@inject IMediator Mediator;
+@inject NavigationManager NavigationManager;
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="default-bg">
+    <MudPaper Class="pa-16" Elevation="4">
+        <EditForm Model="model" OnValidSubmit="@OnValidSubmit">
+            <DataAnnotationsValidator />
+            <MudGrid>
+                <MudItem sm="12">
+                    <MudText Typo="Typo.h4">Device Code: <b>@_deviceCode </b></MudText>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudTextField Label="MAC Address" @bind-Value="@model.MacAddress" For="@(()=> model.MacAddress)"></MudTextField>
+                </MudItem>
+                <MudItem sm="12">
+                    <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.PrisonId" For="@(()=> model.PrisonId)" />
+                </MudItem>
+                <MudItem sm="12">
+                    <div class="d-flex flex-grow-1 gap-4">
+                        <MudTextField Class="flex-grow-1" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
+                        <MudButton Class="flex-none" OnClick="OnGenerateDeviceSecret">Generate</MudButton>
+                        <MudButton Class="flex-none" Disabled="@(!model.DeviceSecret.Any())" Variant="Variant.Filled" Color="Color.Surface"
+                                   OnClick="@ToggleQRCodeWindow">@QRCodePopupButtonName()</MudButton>
+                        <MudPopover Open="@_isOpen" Fixed="false" Class="flex-none px-4 pt-4" AnchorOrigin="Origin.CenterRight"
+                                    TransformOrigin="Origin.CenterLeft">
+                            <JailTalk.Web.Components.Common.QRCodeGenerator SecretMessage="@model.DeviceSecret" />
+                        </MudPopover>
+                    </div>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudSwitch @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
+                </MudItem>
+                <MudItem sm="4">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                    <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Reset</MudButton>
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </MudPaper>
+</MudContainer>
+@code {
+    [Parameter]
+    public string DeviceId { get; set; } = string.Empty;
+    EditDeviceDto model = new();
+    private string _deviceCode { get; set; }
+    bool _isOpen = false;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var response = await Mediator.Send(new GetDeviceDetailsById()
+            {
+                DeviceId = Guid.Parse(DeviceId)
+            });
+        model = new()
+            {
+                IsActive = response.IsActive,
+                DeviceId = response.DeviceId,
+                DeviceSecret = response.DeviceSecret,
+                MacAddress = response.MacAddress,
+                PrisonId = response.PrisonId
+            };
+        _deviceCode = response.Code;
+        StateHasChanged();
+    }
+    private async Task OnValidSubmit(EditContext context)
+    {
+        await AppMediator.Send(new EditDeviceCommand
+            {
+                DeviceId = model.DeviceId,
+                DeviceSecret = model.DeviceSecret,
+                IsActive = model.IsActive,
+                MacAddress = model.MacAddress,
+                PrisonId = model.PrisonId
+            })
+        .OnSuccess(data =>
+        {
+            ToastService.Success("Device details updated successfully.");
+            NavigationManager.NavigateTo("device-manager");
+        })
+        .OnError(err =>
+        {
+            ToastService.Error(err.Message);
+        });
+    }
+
+    private void OnGenerateDeviceSecret()
+    {
+        model.DeviceSecret = Guid.NewGuid().ToString();
+    }
+
+    private void ToggleQRCodeWindow()
+    {
+        _isOpen = !_isOpen;
+    }
+
+    private string QRCodePopupButtonName()
+    {
+        return _isOpen ? "Close" : "Show QR Code";
+    }
+}

@@ -8,40 +8,34 @@
 @using MediatR;
 @using System.Text;
 @inject IMediator Mediator;
+@inject NavigationManager NavigationManager;
 
 <MudContainer MaxWidth="MaxWidth.Medium">
-
-    <MudTable Items="@Elements"
-              Dense="false" Hover="true" Bordered="true"
-    @bind-SelectedItem="selectedItem1" FixedHeader="true" Loading="_loading">
-        <ToolBarContent>
-            <MudText Typo="Typo.h6">Device Manager</MudText>
-            <MudSpacer />
-            <MudStack Row="true" AlignItems="AlignItems.End">
+    <MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered ShowMenuIcon="false" FixedHeader Dense 
+                  Hover RowClass="cursor-pointer">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6"><b>Device Manager </b></MudText>
+                <MudSpacer />
                 <MudLink Href="/device-manager/new">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary">Register Device</MudButton>
                 </MudLink>
-                <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
-            </MudStack>
-        </ToolBarContent>
-        <HeaderContent>
-            <MudTh>S/L</MudTh>
-            <MudTh>Device Code</MudTh>
-            <MudTh>Prison</MudTh>
-            <MudTh>Status</MudTh>
-            <MudTh>Device Secret</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd DataLabel="S/L">@context.Serial</MudTd>
-            <MudTd DataLabel="Device Code">@context.Code</MudTd>
-            <MudTd DataLabel="Prison">@context.Prison</MudTd>
-            <MudTd DataLabel="Status"> @(context.IsActive ? "Enabled" : "Disabled")</MudTd>
-                <MudTd DataLabel="Device Secret">@context.DeviceSecret</MudTd>
-            </RowTemplate>
-            <PagerContent>
-                <MudTablePager />
-            </PagerContent>
-        </MudTable>
+            </ToolBarContent>
+            <Columns>
+                <PropertyColumn Property="x => x.Serial" Title="S/L" />
+                <PropertyColumn Property="x => x.Code" Title="Device Code" />
+                <PropertyColumn Property="x => x.Prison" Title="Prison" />
+                <PropertyColumn Property="@(context=> context.IsActive ? "Enabled" : "Disabled")" Title="Status" />
+                <PropertyColumn Property="x=> x.DeviceSecret" Title="Device Secret" />
+                <TemplateColumn Title="Action">
+                    <CellTemplate>
+                        <MudButton  OnClick="@(()=> OnEditClicked(context.Item.DeviceId.ToString()))" Variant="Variant.Filled">Edit</MudButton>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <NoRecordsContent>
+                <MudText Typo="Typo.caption"><b>No Records Found !!!</b></MudText>
+            </NoRecordsContent>
+        </MudDataGrid>
     </MudContainer>
 
     @code {
@@ -67,5 +61,10 @@
     private bool FilterFunc(DeviceListDto element, string searchString)
     {
         return false;
+    }
+
+    private void OnEditClicked(string deviceId)
+    {
+        NavigationManager.NavigateTo($"device-manager/edit/{deviceId}");
     }
 }

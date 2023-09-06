@@ -3,12 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Device;
 
-public class NewDeviceDto
+public class EditDeviceDto
 {
-    [Required]
-    [MaxLength(50)]
-    [RegularExpression(RegularExpressionPatternConstant.DeviceCode)]
-    public string Code { get; set; }
+    public Guid DeviceId { get; set; }
 
     [Required]
     public int? PrisonId { get; set; }

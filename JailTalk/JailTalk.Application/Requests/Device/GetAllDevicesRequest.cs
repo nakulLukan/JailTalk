@@ -33,6 +33,7 @@ public class GetAllDevicesRequestHandler : IRequestHandler<GetAllDevicesRequest,
         int index = 1;
         return new(devices.Select(x => new DeviceListDto
         {
+            DeviceId = x.Id,
             Code = x.Code,
             DeviceSecret = x.DeviceSecretIdentifier.ToString().Mask(4, 4),
             IsActive = x.IsActive,
