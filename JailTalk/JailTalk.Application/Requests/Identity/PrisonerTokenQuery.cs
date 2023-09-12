@@ -21,7 +21,7 @@ namespace JailTalk.Application.Requests.Identity;
 
 public class PrisonerTokenQuery : IRequest<ResponseDto<string>>
 {
-    public byte[] FaceImageData { get; set; }
+    public byte[] UnknwonFaceImageData { get; set; }
     public string Pid { get; set; }
 }
 
@@ -33,7 +33,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
     readonly ILogger<PrisonerTokenQueryHandler> _logger;
     readonly IAppFaceRecognition _faceRecognition;
 
-    record PrisonerDto(Guid Id, bool IsBlocked, bool IsActive, string FullName, int PrisonId, List<double[]> FaceEncodings, List<byte[]> FaceImages);
+    record PrisonerDto(Guid Id, bool IsBlocked, bool IsActive, string FullName, int PrisonId, List<string> FacePath);
 
     public PrisonerTokenQueryHandler(IConfiguration configuration, IAppDbContext dbContext, IDeviceRequestContext requestContext, ILogger<PrisonerTokenQueryHandler> logger, IAppFaceRecognition faceRecognition)
     {
@@ -54,8 +54,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
                 x.IsActive,
                 x.FullName,
                 x.JailId.Value,
-                x.FaceEncodings.Select(y => y.FaceEncoding.Encoding).ToList(),
-                x.FaceEncodings.Select(y => y.Attachment.Data).ToList()))
+                x.FaceEncodings.Select(y => y.Attachment.RelativeFilePath).ToList()))
             .FirstOrDefaultAsync(cancellationToken);
         if (prisoner is null)
         {
@@ -88,15 +87,15 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
         _logger.LogInformation("About to match face details of prisoner #{pid}", request.Pid);
         var hasMatch = false;
         List<Task<bool>> results = new();
-        foreach (var existingFace in prisoner.FaceImages)
+        foreach (var path in prisoner.FacePath)
         {
-            results.Add(_faceRecognition.IsFaceMatching(existingFace, request.FaceImageData));
+            results.Add(_faceRecognition.IsFaceMatching(path, request.UnknwonFaceImageData));
         }
 
         await Task.WhenAll(results);
         _logger.LogInformation("Face match results completed");
 
-        hasMatch = results.All(x => x.Result);
+        hasMatch = results.Any(x => x.Result);
         if (!hasMatch)
         {
             throw new AppApiException(HttpStatusCode.Unauthorized, "PT-0004", "Face Id does not match");

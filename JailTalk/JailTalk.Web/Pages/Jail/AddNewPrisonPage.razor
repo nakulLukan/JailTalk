@@ -25,12 +25,9 @@
                     <MudDivider DividerType="DividerType.Middle" />
 
                     <MudItem sm="12">
-                        <MudTextField Label="Name of the prison" @bind-Value="@model.Address.HouseName" For="@(()=> model.Address.HouseName)"></MudTextField>
-                    </MudItem>
-                    <MudItem sm="6">
                         <MudTextField Label="Street" @bind-Value="@model.Address.Street" For="@(()=> model.Address.Street)"></MudTextField>
                     </MudItem>
-                    <MudItem sm="6">
+                    <MudItem sm="12">
                         <MudTextField Label="City" @bind-Value="@model.Address.City" For="@(()=> model.Address.City)"></MudTextField>
                     </MudItem>
                     <MudItem sm="12">

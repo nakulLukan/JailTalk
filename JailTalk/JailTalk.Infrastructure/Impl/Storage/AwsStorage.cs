@@ -76,6 +76,11 @@ public class AwsStorage : IFileStorage
     /// <returns></returns>
     public string GetPresignedUrl(string fileRelativePath)
     {
+        if (string.IsNullOrEmpty(fileRelativePath))
+        {
+            return string.Empty;
+        }
+
         GetPreSignedUrlRequest request = new GetPreSignedUrlRequest
         {
             BucketName = _bucketName,
@@ -85,6 +90,17 @@ public class AwsStorage : IFileStorage
 
         string signedUrl = _client.GetPreSignedURL(request);
         return signedUrl;
+    }
+
+    public async Task<bool> DeleteFile(string fullFilePath)
+    {
+        var response = await _client.DeleteObjectAsync(new()
+        {
+            BucketName = _bucketName,
+            Key = fullFilePath,
+        });
+
+        return response.HttpStatusCode == System.Net.HttpStatusCode.NoContent;
     }
 
     private AmazonS3Client InitialiseAwsClient(IConfiguration configuration)

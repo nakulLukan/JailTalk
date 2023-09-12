@@ -11,6 +11,5 @@ public class ReleasedPrisonerDetailDto
     public string LastName { get; set; }
     public string FullName { get; set; }
     public string Gender { get; set; }
-    public string AddressAsText { get; set; }
     public string LastReleasedOnAsText { get; set; }
 }

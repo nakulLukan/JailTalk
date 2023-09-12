@@ -1,6 +1,7 @@
 ﻿@using JailTalk.Application.Dto.System;
 @using JailTalk.Application.Requests.Prison;
 @using JailTalk.Application.Requests.System;
+@using JailTalk.Application.Services;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
 @using MediatR;
@@ -43,6 +44,7 @@
         {
             using (var outputStream = new MemoryStream())
             {
+                string relativeBasePath = PrisonerHelper.GetPrisonerAttachmentBasePath(PrisonerId) + "/photos";
                 try
                 {
                     await image.DataStream.CopyToAsync(outputStream);
@@ -51,7 +53,8 @@
                             Data = outputStream.ToArray(),
                             FileContent = image.ContentType,
                             FileName = image.FileName,
-                            SaveAsThumbnail = false
+                            SaveAsThumbnail = false,
+                            FileDestinationBasePath = relativeBasePath
                         });
                     uploadedAttachmentIds.Add(imageId.Data);
                 }

@@ -2,5 +2,5 @@
 
 public class ImageViewDto : AttachmentBaseDto
 {
-    public string Base64ImageSrc { get; set; }
+    public string ImageSrc { get; set; }
 }

@@ -38,15 +38,6 @@ public class ReleasedPrisonerDetailsQueryHandler : IRequestHandler<ReleasedPriso
                 Gender = x.Gender.ToString(),
                 Pid = x.Pid,
                 LastReleasedOn = x.PrisonerFunction.LastReleasedOn,
-                Address = new Dto.Lookup.AddressDetailDto
-                {
-                    City = x.Address.City,
-                    Country = x.Address.Country.Value,
-                    State = x.Address.State.Value,
-                    HouseName = x.Address.HouseName,
-                    PinCode = x.Address.PinCode,
-                    Street = x.Address.Street
-                },
             })
             .SingleOrDefaultAsync(x => x.Id == request.Id) ?? throw new AppException("Unknown prisoner");
         return new ResponseDto<ReleasedPrisonerDetailDto>(new ReleasedPrisonerDetailDto()
@@ -54,7 +45,6 @@ public class ReleasedPrisonerDetailsQueryHandler : IRequestHandler<ReleasedPriso
             Id = prisoner.Id,
             FirstName = prisoner.FirstName,
             LastJailCode = prisoner.LastJailCode,
-            AddressAsText = prisoner.Address.AddressAsText(),
             FullName = prisoner.FullName,
             Gender = prisoner.Gender.ToString(),
             LastJailName = prisoner.LastName,

@@ -40,7 +40,7 @@ public enum Gender : int
 {
     Male = 1,
     Female = 2,
-    Others = 3,
+    Transgender = 3,
 }
 
 /// <summary>

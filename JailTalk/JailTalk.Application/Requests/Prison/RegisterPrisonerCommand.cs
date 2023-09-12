@@ -36,12 +36,6 @@ public class RegisterPrisonerCommandHandler : IRequestHandler<RegisterPrisonerCo
             LastName = request.LastName.Trim(),
             MiddleName = request.MiddleName.Trim(),
             FullName = string.Join(' ', new string[] { request.FirstName.Trim(), request.MiddleName.Trim(), request.LastName.Trim() }),
-            Address = new Domain.Lookup.AddressBook
-            {
-                HouseName = request.Address.HouseName,
-                PinCode = request.Address.PinCode,
-                Street = request.Address.Street,
-            },
             Pid = request.Pid.Trim(),
             CreatedOn = AppDateTime.UtcNow,
             UpdatedOn = AppDateTime.UtcNow,

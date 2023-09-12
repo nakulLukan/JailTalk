@@ -15,10 +15,6 @@ public class PrisonerFaceEncodingMappingEFConfig : IEntityTypeConfiguration<Pris
             .WithMany(x => x.FaceEncodings)
             .HasForeignKey(x => x.PrisonerId);
 
-        builder.HasOne(x => x.FaceEncoding)
-            .WithOne()
-            .HasForeignKey<PrisonerFaceEncodingMapping>(x => x.FaceEncodingId);
-
         builder.HasOne(x => x.Attachment)
             .WithOne()
             .HasForeignKey<PrisonerFaceEncodingMapping>(x => x.ImageId);

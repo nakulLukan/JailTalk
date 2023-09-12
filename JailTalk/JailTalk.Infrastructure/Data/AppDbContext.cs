@@ -64,5 +64,4 @@ public class AppDbContext : IdentityDbContext<AppUser, AppRole, string>, IAppDbC
     public DbSet<ApplicationSetting> ApplicationSettings { get; set; }
     public DbSet<Attachment> Attachments { get; set; }
     public DbSet<PrisonerFaceEncodingMapping> PrisonerFaceEncodingMappings { get; set; }
-    public DbSet<AppFaceEncoding> AppFaceEncodings { get; set; }
 }

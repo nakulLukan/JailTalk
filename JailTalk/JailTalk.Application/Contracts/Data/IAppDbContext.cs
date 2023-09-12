@@ -24,7 +24,6 @@ public interface IAppDbContext
     public DbSet<ApplicationSetting> ApplicationSettings { get; set; }
     public DbSet<Attachment> Attachments { get; set; }
     public DbSet<PrisonerFaceEncodingMapping> PrisonerFaceEncodingMappings { get; set; }
-    public DbSet<AppFaceEncoding> AppFaceEncodings { get; set; }
     public DbSet<AppUser> Users { get; set; }
     public DbSet<AppRole> Roles { get; set; }
     public DbSet<IdentityUserRole<string>> UserRoles { get; set; }

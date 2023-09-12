@@ -3,6 +3,7 @@ using System;
 using JailTalk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JailTalk.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230911171017_FaceEncodingRemoved")]
+    partial class FaceEncodingRemoved
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -814,10 +817,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<int?>("DpAttachmentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("dp_attachment_id");
-
                     b.Property<int?>("LastAssociatedJailId")
                         .HasColumnType("integer")
                         .HasColumnName("last_associated_jail_id");
@@ -840,9 +839,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_prisoner_functions");
-
-                    b.HasIndex("DpAttachmentId")
-                        .HasDatabaseName("ix_prisoner_functions_dp_attachment_id");
 
                     b.HasIndex("LastAssociatedJailId")
                         .HasDatabaseName("ix_prisoner_functions_last_associated_jail_id");
@@ -1310,11 +1306,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JailTalk.Domain.Prison.PrisonerFunction", b =>
                 {
-                    b.HasOne("JailTalk.Domain.System.Attachment", "DpAttachment")
-                        .WithMany()
-                        .HasForeignKey("DpAttachmentId")
-                        .HasConstraintName("fk_prisoner_functions_attachments_dp_attachment_id");
-
                     b.HasOne("JailTalk.Domain.Prison.Jail", "LastAssociatedJail")
                         .WithMany()
                         .HasForeignKey("LastAssociatedJailId")
@@ -1326,8 +1317,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_prisoner_functions_prisoners_prisoner_id");
-
-                    b.Navigation("DpAttachment");
 
                     b.Navigation("LastAssociatedJail");
 

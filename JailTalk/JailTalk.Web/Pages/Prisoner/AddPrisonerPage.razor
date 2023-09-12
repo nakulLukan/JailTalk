@@ -35,26 +35,14 @@
                         <MudRadioGroup @bind-SelectedOption="@model.Gender" For="@(() => model.Gender)" Name="Gender">
                             <MudRadio Option="@(Gender.Male)" Color="Color.Primary">Male</MudRadio>
                             <MudRadio Option="@(Gender.Female)" Color="Color.Secondary">Female</MudRadio>
-                            <MudRadio Option="@(Gender.Others)" Color="Color.Tertiary">Others</MudRadio>
+                            <MudRadio Option="@(Gender.Transgender)" Color="Color.Tertiary">Transgender</MudRadio>
                         </MudRadioGroup>
                     </MudItem>
 
                     <MudItem sm="12">
                         <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.JailId" For="@(()=> model.JailId)" />
                     </MudItem>
-                    <MudDivider DividerType="DividerType.Middle" />
-                    <MudItem sm="12">
-                        <MudTextField Label="House/Flat Name" @bind-Value="@model.Address.HouseName" For="@(()=> model.Address.HouseName)"></MudTextField>
-                    </MudItem>
-                    <MudItem sm="4">
-                        <MudTextField Label="Street" @bind-Value="@model.Address.Street" For="@(()=> model.Address.Street)"></MudTextField>
-                    </MudItem>
-                    <MudItem sm="4">
-                        <MudTextField Label="City" @bind-Value="@model.Address.City" For="@(()=> model.Address.City)"></MudTextField>
-                    </MudItem>
-                    <MudItem sm="4">
-                        <MudTextField Label="Pincode" @bind-Value="@model.Address.PinCode" For="@(()=> model.Address.PinCode)"></MudTextField>
-                    </MudItem>
+
                     <MudItem sm="4">
                         <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
                         <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
@@ -73,16 +61,15 @@
             {
                 Pid = model.Pid,
                 FirstName = model.FirstName,
-                LastName = model.LastName,
+                LastName = model.LastName ?? string.Empty,
                 MiddleName = model.MiddleName ?? string.Empty,
                 JailId = model.JailId.Value,
-                Address = model.Address,
                 Gender = model.Gender
             })
         .OnSuccess(data =>
         {
             ToastService.Success("Prisoner details added successfully.");
-            NavigationManager.NavigateTo("prisoners");
+            NavigationManager.NavigateTo($"prisoners/{data.ToString()}");
         })
         .OnError(err =>
         {

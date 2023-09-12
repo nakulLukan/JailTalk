@@ -22,5 +22,9 @@ public class PrisonerFunctionEFConfig : IEntityTypeConfiguration<PrisonerFunctio
         builder.HasOne(x => x.LastAssociatedJail)
             .WithMany()
             .HasForeignKey(x => x.LastAssociatedJailId);
+
+        builder.HasOne(x => x.DpAttachment)
+            .WithMany()
+            .HasForeignKey(x => x.DpAttachmentId);
     }
 }

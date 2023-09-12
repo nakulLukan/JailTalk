@@ -42,7 +42,7 @@ public class PrisonController : AppBaseController
             var data = await Mediator.Send(new PrisonerTokenQuery
             {
                 Pid = pid,
-                FaceImageData = memStream.ToArray()
+                UnknwonFaceImageData = memStream.ToArray()
             });
             return Ok(data);
         }

@@ -39,4 +39,8 @@
     <ProjectReference Include="..\JailTalk.Shared\JailTalk.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistence\EntityConfigurations\Identity\" />
+  </ItemGroup>
+
 </Project>

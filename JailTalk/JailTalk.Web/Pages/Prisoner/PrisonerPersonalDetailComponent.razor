@@ -6,6 +6,9 @@
 @inject IAppMediator AppMediator;
 <JailTalk.Web.Components.Common.HorizontalSpacer Spacing="6"/>
 <MudGrid>
+    <MudItem xs="12">
+        <MudImage Src="@personalDetails.DpSrc" Alt="Prisoner Display Picture" Elevation="25" Class="rounded-lg" Height="150" Width="150" ObjectFit="ObjectFit.None"/>
+    </MudItem>
     <MudItem xs="6">
         <MudText>PID</MudText>
     </MudItem>
@@ -53,12 +56,6 @@
     </MudItem>
     <MudItem xs="6">
         <MudText><b>@personalDetails.JailName</b> </MudText>
-    </MudItem>
-    <MudItem xs="6">
-        <MudText>Address</MudText>
-    </MudItem>
-    <MudItem xs="6">
-        <MudText><b>@personalDetails.AddressAsText</b> </MudText>
     </MudItem>
 </MudGrid>
 @code {

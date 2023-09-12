@@ -1,4 +1,5 @@
 ﻿using JailTalk.Shared.Utilities;
+using System.Globalization;
 
 namespace JailTalk.Application.Services;
 
@@ -29,5 +30,10 @@ public class PrisonerHelper
             false when isBlocked => "Disabled, Blocked",
             _ => string.Empty
         };
+    }
+
+    public static string GetPrisonerAttachmentBasePath(string prisonerId)
+    {
+        return $"prisoners/{prisonerId}";
     }
 }

@@ -10,14 +10,12 @@ public class Prisoner : DomainBase
     public string MiddleName { get; set; }
     public string LastName { get; set; }
     public string FullName { get; set; }
-    public long? AddressId { get; set; }
     public int? JailId { get; set; }
     public bool IsBlocked { get; set; }
     public bool IsActive { get; set; }
 
     public Gender Gender { get; set; }
 
-    public AddressBook Address { get; set; }
     public Jail Jail { get; set; }
     public PhoneBalance PhoneBalance { get; set; }
     public PrisonerFunction PrisonerFunction { get; set; }

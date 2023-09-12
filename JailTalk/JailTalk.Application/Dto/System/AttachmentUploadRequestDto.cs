@@ -6,4 +6,5 @@ public class AttachmentUploadRequestDto
     public string FileContent { get; set; }
     public byte[] Data { get; set; }
     public bool SaveAsThumbnail { get; set; }
+    public string FileDestinationBasePath { get; set; }
 }

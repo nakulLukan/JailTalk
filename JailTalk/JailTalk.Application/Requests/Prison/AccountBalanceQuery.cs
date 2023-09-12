@@ -49,7 +49,7 @@ public class AccountBalanceQueryHandler : IRequestHandler<AccountBalanceQuery, A
 
         // Get account balance info.
         var accountInfo = await PrisonerAccountService.GetPrisonerAccountBalance((_dbContext, _settingsProvider),
-            request.PrisonerId, userJailId, cancellationToken) ?? throw new AppException(CommonExceptionMessages.PrisonerNotFound);
+            request.PrisonerId, userJailId, cancellationToken);
 
         if (accountInfo is null)
         {

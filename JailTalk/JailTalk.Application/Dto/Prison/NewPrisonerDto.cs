@@ -22,8 +22,6 @@ public class NewPrisonerDto
     [Required]
     public Gender Gender { get; set; }
 
-    [Required]
     [MaxLength(50)]
     public string LastName { get; set; }
-    public NewAddressDto Address { get; set; } = new NewAddressDto();
 }

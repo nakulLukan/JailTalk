@@ -10,11 +10,13 @@ public class AwsFaceRecognition : IAppFaceRecognition
 {
     readonly AmazonRekognitionClient client;
     readonly ILogger<AwsFaceRecognition> logger;
+    readonly string _bucketName;
 
     public AwsFaceRecognition(IConfiguration configuration, ILogger<AwsFaceRecognition> logger)
     {
         this.logger = logger;
         client = InitialiseAwsClient(configuration);
+        _bucketName = configuration["Aws:S3:BucketName"];
     }
 
     AmazonRekognitionClient InitialiseAwsClient(IConfiguration configuration)
@@ -44,20 +46,20 @@ public class AwsFaceRecognition : IAppFaceRecognition
         throw new NotImplementedException();
     }
 
+    public async Task<bool> IsFaceMatching(string knownFaceRelativePath, byte[] unknownEncoding)
+    {
+        var request = GetRequest(null, knownFaceRelativePath, unknownEncoding);
+        return await Compare(request);
+    }
+
     public async Task<bool> IsFaceMatching(byte[] knownImage, byte[] unknownImage)
     {
-        var request = new CompareFacesRequest
-        {
-            SourceImage = new Image()
-            {
-                Bytes = new MemoryStream(knownImage)
-            },
-            TargetImage = new Image()
-            {
-                Bytes = new MemoryStream(unknownImage)
-            },
-        };
+        var request = GetRequest(knownImage, null, unknownImage);
+        return await Compare(request);
+    }
 
+    private async Task<bool> Compare(CompareFacesRequest request)
+    {
         var response = await client.CompareFacesAsync(request);
         if (response.FaceMatches.Count == 0)
         {
@@ -72,5 +74,41 @@ public class AwsFaceRecognition : IAppFaceRecognition
         var confidence = response.FaceMatches[0].Similarity;
         logger.LogInformation("Face match confidence: {confidence}", confidence);
         return confidence > 95F;
+    }
+
+    private CompareFacesRequest GetRequest(byte[] knownFaceData, string knownFaceRelativePath, byte[] unknownFaceData)
+    {
+        if (knownFaceData == null)
+        {
+            return new CompareFacesRequest
+            {
+                SourceImage = new Image()
+                {
+                    S3Object = new()
+                    {
+                        Bucket = _bucketName,
+                        Name = knownFaceRelativePath,
+                    }
+                },
+                TargetImage = new Image()
+                {
+                    Bytes = new MemoryStream(unknownFaceData)
+                },
+            };
+        }
+        else
+        {
+            return new CompareFacesRequest
+            {
+                SourceImage = new Image()
+                {
+                    Bytes = new MemoryStream(knownFaceData)
+                },
+                TargetImage = new Image()
+                {
+                    Bytes = new MemoryStream(unknownFaceData)
+                },
+            };
+        }
     }
 }

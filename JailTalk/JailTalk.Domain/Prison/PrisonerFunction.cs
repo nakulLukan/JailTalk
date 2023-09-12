@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+﻿using JailTalk.Domain.System;
 
 namespace JailTalk.Domain.Prison;
 public class PrisonerFunction
@@ -33,6 +28,12 @@ public class PrisonerFunction
     /// </summary>
     public DateTimeOffset? UnlimitedCallsEndsOn { get; set; }
 
+    /// <summary>
+    /// Attachment to be shown as prisoner's display picture
+    /// </summary>
+    public int? DpAttachmentId { get; set; }
+
     public Prisoner Prisoner { get; set; }
     public Jail LastAssociatedJail { get; set; }
+    public Attachment DpAttachment { get; set; }
 }

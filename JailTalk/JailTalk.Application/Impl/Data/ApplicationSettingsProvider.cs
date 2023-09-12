@@ -29,7 +29,7 @@ public class ApplicationSettingsProvider : IApplicationSettingsProvider
         {
             Gender.Male => int.Parse(await GetApplicationSettingValue(ApplicationSettings.MaxAllowedCallDurationMale)),
             Gender.Female => int.Parse(await GetApplicationSettingValue(ApplicationSettings.MaxAllowedCallDurationFemale)),
-            Gender.Others => int.Parse(await GetApplicationSettingValue(ApplicationSettings.MaxAllowedCallDurationOthers)),
+            Gender.Transgender => int.Parse(await GetApplicationSettingValue(ApplicationSettings.MaxAllowedCallDurationOthers)),
             _ => throw new ArgumentException($"{nameof(gender)}: {gender}"),
         };
     }

@@ -33,7 +33,7 @@
                       BadgeClass="cursor-pointer" OnClick="@(()=> OnPhotoDeletedClicked(imageDto.Id))">
                 <MudStack Class="app-image-tile" Spacing="1">
                     <MudItem>
-                        <MudImage Src="@imageDto.Base64ImageSrc" ObjectPosition="ObjectPosition.Center"
+                        <MudImage Src="@imageDto.ImageSrc" ObjectPosition="ObjectPosition.Center"
                                   ObjectFit="ObjectFit.Cover" Alt="@imageDto.FileName" />
                     </MudItem>
                     <MudItem>

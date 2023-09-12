@@ -30,4 +30,11 @@ public interface IFileStorage
     /// <param name="fileRelativePath"></param>
     /// <returns></returns>
     public string GetPresignedUrl(string fileRelativePath);
+
+    /// <summary>
+    /// Delete file from storage
+    /// </summary>
+    /// <param name="fullFilePath"></param>
+    /// <returns></returns>
+    public Task<bool> DeleteFile(string fullFilePath);
 }
