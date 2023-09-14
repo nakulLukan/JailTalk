@@ -72,13 +72,25 @@ public class UnLinkAttachmentFromPrisonerCommandHandler : IRequestHandler<UnLink
 
     private async Task DeleteRecords(PrisonerFaceEncodingMapping prisonerFaceEncoding, CancellationToken cancellationToken)
     {
-
         // Delete the records from db and storage
-        var attachment = prisonerFaceEncoding.Attachment;
-        await _fileStorage.DeleteFile(AttachmentHelper.GenerateFullPath(attachment.RelativeFilePath, attachment.FileName));
+        await DeleteInStorage(prisonerFaceEncoding);
         _appDbContext.PrisonerFaceEncodingMappings.Remove(prisonerFaceEncoding);
         _appDbContext.Attachments.Remove(prisonerFaceEncoding.Attachment);
         await _appDbContext.SaveAsync(cancellationToken);
+    }
+
+    private async Task DeleteInStorage(PrisonerFaceEncodingMapping prisonerFaceEncoding)
+    {
+        var attachment = prisonerFaceEncoding.Attachment;
+        string objectKey = AttachmentHelper.GenerateFullPath(attachment.RelativeFilePath, attachment.FileName);
+        try
+        {
+            await _fileStorage.DeleteFile(objectKey);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete file {filePath} in the storage", objectKey);
+        }
     }
 }
 
