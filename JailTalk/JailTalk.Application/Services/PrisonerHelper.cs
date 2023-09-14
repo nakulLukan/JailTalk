@@ -32,8 +32,13 @@ public class PrisonerHelper
         };
     }
 
-    public static string GetPrisonerAttachmentBasePath(string prisonerId)
+    /// <summary>
+    /// Get prisoners base attachment path
+    /// </summary>
+    /// <param name="pid">Prisoners PID value</param>
+    /// <returns></returns>
+    public static string GetPrisonerAttachmentBasePath(string pid)
     {
-        return $"prisoners/{prisonerId}";
+        return $"prisoners/{pid}";
     }
 }

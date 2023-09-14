@@ -46,7 +46,8 @@ public class PrisonerSecondaryDetailFeature
                 IsUnlimitedCallEnabled = action.Data.IsUnlimitedCallEnabled,
                 IsPrisonerReleased = action.Data.IsReleased,
                 RestrictionEndsOn = action.Data.RetrictionEndsOn,
-                PrisonerId = action.Data.PrisonerId
+                PrisonerId = action.Data.PrisonerId,
+                Pid = action.Data.Pid
             };
         }
 

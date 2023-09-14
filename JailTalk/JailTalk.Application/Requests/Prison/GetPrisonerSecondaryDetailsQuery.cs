@@ -33,6 +33,7 @@ public class GetPrisonerSecondaryDetailsQueryHandler : IRequestHandler<GetPrison
             .WhereInPrison(x => x.Prisoner.JailId, prisonId)
             .Select(x => new
             {
+                x.Prisoner.Pid,
                 x.PrisonerId,
                 x.Prisoner.IsBlocked,
                 x.PunishmentEndsOn,
@@ -50,7 +51,8 @@ public class GetPrisonerSecondaryDetailsQueryHandler : IRequestHandler<GetPrison
             LastReleasedOn = secondaryDetails.LastReleasedOn,
             IsUnlimitedCallEnabled = PrisonerHelper.IsUnlimitedCallPriviledgeEnabled(secondaryDetails.UnlimitedCallsEndsOn),
             IsReleased = !secondaryDetails.JailId.HasValue,
-            LastAssociatedJailCode = secondaryDetails.LastAssociatedJailCode
+            LastAssociatedJailCode = secondaryDetails.LastAssociatedJailCode,
+            Pid = secondaryDetails.Pid
         };
     }
 

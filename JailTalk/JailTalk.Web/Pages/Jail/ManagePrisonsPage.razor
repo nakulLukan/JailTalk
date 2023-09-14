@@ -20,6 +20,9 @@
             <PropertyColumn Property="x => x.Name" Title="Prison Name" />
             <PropertyColumn Property="x => x.AddressAsText" Title="Address" />
         </Columns>
+        <NoRecordsContent>
+            <JailTalk.Web.Components.Common.NoRecordsComponent />
+        </NoRecordsContent>
     </MudDataGrid>
 </MudContainer>
 @code {

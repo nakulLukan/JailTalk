@@ -9,4 +9,5 @@ public record PrisonerSecondaryDetailState
     public DateTimeOffset? RestrictionEndsOn { get; init; }
     public bool IsPrisonerReleased { get; init; }
     public Guid PrisonerId { get; set; }
+    public string Pid { get; set; }
 }

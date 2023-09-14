@@ -2,6 +2,7 @@
 using JailTalk.Application.Contracts.AI;
 using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
+using JailTalk.Application.Services;
 using JailTalk.Shared;
 using JailTalk.Shared.Constants;
 using JailTalk.Shared.Models;
@@ -54,7 +55,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
                 x.IsActive,
                 x.FullName,
                 x.JailId.Value,
-                x.FaceEncodings.Select(y => y.Attachment.RelativeFilePath).ToList()))
+                x.FaceEncodings.Select(y => AttachmentHelper.GenerateFullPath(y.Attachment.RelativeFilePath, y.Attachment.FileName)).ToList()))
             .FirstOrDefaultAsync(cancellationToken);
         if (prisoner is null)
         {

@@ -11,45 +11,43 @@
 <MudContainer MaxWidth="MaxWidth.Medium">
     <EditForm Model="model" OnValidSubmit="@OnValidSubmit">
         <DataAnnotationsValidator />
-        <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
-            <MudPaper Class="pa-16" Elevation="4">
-                <MudGrid>
-                    <MudItem sm="12">
-                        <h3>Add new Prisoner</h3>
-                    </MudItem>
-                    <MudItem sm="12">
-                        <MudTextField Label="PID" @bind-Value="@model.Pid" For="@(()=> model.Pid)"></MudTextField>
-                    </MudItem>
-                    <MudItem sm="4">
-                        <MudTextField Label="First Name" @bind-Value="@model.FirstName" For="@(()=> model.FirstName)"></MudTextField>
-                    </MudItem>
-                    <MudItem sm="4">
-                        <MudTextField Label="Middle Name" @bind-Value="@model.MiddleName" For="@(()=> model.MiddleName)"></MudTextField>
-                    </MudItem>
-                    <MudItem sm="4">
-                        <MudTextField Label="Last Name" @bind-Value="@model.LastName" For="@(()=> model.LastName)"></MudTextField>
-                    </MudItem>
+        <MudPaper Class="pa-16" Elevation="4">
+            <MudGrid>
+                <MudItem sm="12">
+                    <MudText Typo="Typo.h5">Enter Prisoner Details</MudText>
+                </MudItem>
+                <MudItem sm="12">
+                    <MudTextField Label="PID" @bind-Value="@model.Pid" For="@(()=> model.Pid)"></MudTextField>
+                </MudItem>
+                <MudItem sm="4">
+                    <MudTextField Label="First Name" @bind-Value="@model.FirstName" For="@(()=> model.FirstName)"></MudTextField>
+                </MudItem>
+                <MudItem sm="4">
+                    <MudTextField Label="Middle Name" @bind-Value="@model.MiddleName" For="@(()=> model.MiddleName)"></MudTextField>
+                </MudItem>
+                <MudItem sm="4">
+                    <MudTextField Label="Last Name" @bind-Value="@model.LastName" For="@(()=> model.LastName)"></MudTextField>
+                </MudItem>
 
-                    <MudItem sm="12">
-                        <MudText>Gender</MudText>
-                        <MudRadioGroup @bind-SelectedOption="@model.Gender" For="@(() => model.Gender)" Name="Gender">
-                            <MudRadio Option="@(Gender.Male)" Color="Color.Primary">Male</MudRadio>
-                            <MudRadio Option="@(Gender.Female)" Color="Color.Secondary">Female</MudRadio>
-                            <MudRadio Option="@(Gender.Transgender)" Color="Color.Tertiary">Transgender</MudRadio>
-                        </MudRadioGroup>
-                    </MudItem>
+                <MudItem sm="12">
+                    <MudText>Gender</MudText>
+                    <MudRadioGroup @bind-SelectedOption="@model.Gender" For="@(() => model.Gender)" Name="Gender">
+                        <MudRadio Option="@(Gender.Male)" Color="Color.Primary">Male</MudRadio>
+                        <MudRadio Option="@(Gender.Female)" Color="Color.Secondary">Female</MudRadio>
+                        <MudRadio Option="@(Gender.Transgender)" Color="Color.Tertiary">Transgender</MudRadio>
+                    </MudRadioGroup>
+                </MudItem>
 
-                    <MudItem sm="12">
-                        <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.JailId" For="@(()=> model.JailId)" />
-                    </MudItem>
+                <MudItem sm="12">
+                    <JailTalk.Web.Components.Prison.JailSelectComponent @bind-Value="model.JailId" For="@(()=> model.JailId)" />
+                </MudItem>
 
-                    <MudItem sm="4">
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
-                        <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
-                    </MudItem>
-                </MudGrid>
-            </MudPaper>
-        </MudStack>
+                <MudItem sm="4">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                    <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
+                </MudItem>
+            </MudGrid>
+        </MudPaper>
     </EditForm>
 </MudContainer>
 @code {

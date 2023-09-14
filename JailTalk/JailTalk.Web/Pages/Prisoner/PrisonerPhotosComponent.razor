@@ -1,12 +1,15 @@
-﻿@using JailTalk.Application.Dto.System;
+﻿@using Fluxor;
+@using JailTalk.Application.Dto.System;
 @using JailTalk.Application.Requests.Prison;
 @using JailTalk.Application.Requests.System;
 @using JailTalk.Application.Services;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
+@using JailTalk.Web.Store.Prisoner;
 @using MediatR;
 @inject IMediator Mediator;
 @inject IAppMediator AppMediator;
+@inject IState<PrisonerSecondaryDetailState> PrisonerSecondaryDetailState;
 
 <JailTalk.Web.Components.Common.ImageUploadAndViewerComponent Attachments="@images"
                                                               OnUpload="OnPhotosUpload"
@@ -44,7 +47,7 @@
         {
             using (var outputStream = new MemoryStream())
             {
-                string relativeBasePath = PrisonerHelper.GetPrisonerAttachmentBasePath(PrisonerId) + "/photos";
+                string relativeBasePath = PrisonerHelper.GetPrisonerAttachmentBasePath(PrisonerSecondaryDetailState.Value.Pid) + "/photos";
                 try
                 {
                     await image.DataStream.CopyToAsync(outputStream);

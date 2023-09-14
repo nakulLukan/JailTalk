@@ -4,10 +4,10 @@
 @using JailTalk.Web.Extensions;
 @using JailTalk.Web.Impl.Events;
 @inject IAppMediator AppMediator;
-<JailTalk.Web.Components.Common.HorizontalSpacer Spacing="6"/>
+<JailTalk.Web.Components.Common.HorizontalSpacer Spacing="6" />
 <MudGrid>
     <MudItem xs="12">
-        <MudImage Src="@personalDetails.DpSrc" Alt="Prisoner Display Picture" Elevation="25" Class="rounded-lg" Height="150" Width="150" ObjectFit="ObjectFit.None"/>
+        <MudImage Src="@dpSrc" Alt="Prisoner Display Picture" Elevation="25" Class="rounded-lg" Height="150" Width="150" ObjectFit="ObjectFit.Cover" />
     </MudItem>
     <MudItem xs="6">
         <MudText>PID</MudText>
@@ -62,6 +62,7 @@
     [Parameter]
     public string PrisonerId { get; set; }
 
+    private string dpSrc => string.IsNullOrEmpty(personalDetails.DpSrc) ? Assets.DefaultProfilePlaceholder : personalDetails.DpSrc;
     PrisonerDetailDto personalDetails = new();
 
     protected override async void OnAfterRender(bool firstRender)

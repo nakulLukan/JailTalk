@@ -3,6 +3,7 @@
 public class PrisonerSecondaryDetailDto
 {
     public Guid PrisonerId { get; set; }
+    public string Pid { get; set; }
 
     public bool IsBlocked { get; set; }
     public DateTimeOffset? RetrictionEndsOn { get; set; }
