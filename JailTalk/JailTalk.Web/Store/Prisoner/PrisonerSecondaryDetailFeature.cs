@@ -1,6 +1,6 @@
 ﻿using Fluxor;
 using JailTalk.Application.Dto.Prison;
-using JailTalk.Application.Requests.Prison;
+using JailTalk.Application.Requests.Prisoner;
 using JailTalk.Web.Contracts.Events;
 
 namespace JailTalk.Web.Store.Prisoner;

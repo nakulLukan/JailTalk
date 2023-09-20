@@ -1,9 +1,10 @@
 ﻿@page "/prisoners/{PrisonerId}"
 @using JailTalk.Application.Dto.Prison;
-@using JailTalk.Application.Requests.Prison;
+@using JailTalk.Application.Requests.Prisoner;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Contracts.Interop;
 @using JailTalk.Web.Extensions;
+@using JailTalk.Web.Pages.Prisoner.PrisonerSecondaryDetails
 @inject IAppMediator AppMediator;
 <MudContainer>
     <MudGrid>
@@ -11,7 +12,7 @@
             <PrisonerPersonalDetailComponent PrisonerId="@PrisonerId" />
         </MudItem>
         <MudItem xs="12" md="8">
-            <TelephoneDetailComponent PrisonerId="@PrisonerId" />
+            <SecondaryDetailComponent PrisonerId="@PrisonerId" />
         </MudItem>
     </MudGrid>
 </MudContainer>

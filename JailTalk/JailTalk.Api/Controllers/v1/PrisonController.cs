@@ -1,7 +1,9 @@
 ﻿using JailTalk.Api.Filters;
 using JailTalk.Application.Dto.Prison;
 using JailTalk.Application.Requests.Identity;
-using JailTalk.Application.Requests.Prison;
+using JailTalk.Application.Requests.Prisoner.AccountManagement;
+using JailTalk.Application.Requests.Prisoner.CallManagement;
+using JailTalk.Application.Requests.Prisoner.Contacts;
 using JailTalk.Shared.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

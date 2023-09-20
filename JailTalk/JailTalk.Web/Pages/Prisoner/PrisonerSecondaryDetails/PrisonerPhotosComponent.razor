@@ -1,0 +1,121 @@
+﻿@using Fluxor;
+@using JailTalk.Application.Dto.System;
+@using JailTalk.Application.Requests.Prisoner.Attachments;
+@using JailTalk.Application.Requests.System;
+@using JailTalk.Application.Services;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using JailTalk.Web.Store.Prisoner;
+@using MediatR;
+@inject IMediator Mediator;
+@inject IAppMediator AppMediator;
+@inject IState<PrisonerSecondaryDetailState> PrisonerSecondaryDetailState;
+
+<JailTalk.Web.Components.Common.ImageUploadAndViewerComponent Attachments="@images"
+                                                              OnUpload="OnPhotosUpload"
+                                                              OnPhotoDeleted="OnPhotoDelete"
+                                                              MaximumImageCount="3" />
+
+@code {
+    [EditorRequired]
+    [Parameter]
+    public string PrisonerId { get; set; }
+
+    List<ImageViewDto> images = new();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        await LoadPrisonerImages();
+    }
+
+    private async Task LoadPrisonerImages()
+    {
+        images = await Mediator.Send(new GetPrisonerImagesQuery()
+            {
+                PrisonerId = Guid.Parse(PrisonerId)
+            });
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnPhotosUpload(List<ImageUploadDto> images)
+    {
+        int totalFilesFailed = 0;
+        int totalFilesUploaded = 0;
+        List<int> uploadedAttachmentIds = new();
+        foreach (var image in images)
+        {
+            using (var outputStream = new MemoryStream())
+            {
+                string relativeBasePath = PrisonerHelper.GetPrisonerAttachmentBasePath(PrisonerSecondaryDetailState.Value.Pid) + "/photos";
+                try
+                {
+                    await image.DataStream.CopyToAsync(outputStream);
+                    var imageId = await Mediator.Send(new UploadAttachmentCommand
+                        {
+                            Data = outputStream.ToArray(),
+                            FileContent = image.ContentType,
+                            FileName = image.FileName,
+                            SaveAsThumbnail = false,
+                            FileDestinationBasePath = relativeBasePath
+                        });
+                    uploadedAttachmentIds.Add(imageId.Data);
+                }
+                catch (Exception)
+                {
+                    totalFilesFailed++;
+                }
+            }
+        }
+
+        if (totalFilesFailed > 0)
+        {
+            ToastService.Error($"'{totalFilesFailed}' failed to upload.");
+        }
+        if (totalFilesUploaded > 0)
+        {
+            ToastService.Success($"'{totalFilesUploaded}' uploaded successfully.");
+        }
+
+        await ExtractFaceEncodings(uploadedAttachmentIds);
+    }
+
+    private async Task ExtractFaceEncodings(List<int> uploadedAttachmentIds)
+    {
+        await AppMediator.Send(new LinkAttachmentToPrisonerCommand()
+            {
+                AttachmentIds = uploadedAttachmentIds,
+                PrisonerId = Guid.Parse(PrisonerId),
+            })
+        .OnSuccess(async data =>
+        {
+            ToastService.Success("Facial Encodings extracted successfully.");
+            await LoadPrisonerImages();
+        })
+        .OnError(err =>
+        {
+            ToastService.Error(err.Message);
+        });
+    }
+
+    private async Task OnPhotoDelete(int imageId)
+    {
+        await AppMediator
+        .Send(new UnLinkAttachmentFromPrisonerCommand
+            {
+                ImageId = imageId,
+                PrisonerId = Guid.Parse(PrisonerId)
+            })
+        .OnSuccess(async data =>
+        {
+            ToastService.Success("Image deleted successfully.");
+            images.RemoveAll(x => x.Id == imageId);
+
+            await InvokeAsync(StateHasChanged);
+        })
+        .OnError(err =>
+        {
+            ToastService.Error(err.Message);
+        });
+    }
+}
