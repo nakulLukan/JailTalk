@@ -1,6 +1,9 @@
-﻿using JailTalk.Application.Contracts.Data;
+﻿using FluentValidation;
+using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Dto.Prison;
+using JailTalk.Application.Requests.System;
+using JailTalk.Application.Services;
 using JailTalk.Domain.Prison;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
@@ -12,21 +15,25 @@ namespace JailTalk.Application.Requests.Prison;
 public class AddContactDetailsCommand : AddContactDetailsDto, IRequest<ResponseDto<long>>
 {
 }
+
 public class AddContactDetailsCommandHandler : IRequestHandler<AddContactDetailsCommand, ResponseDto<long>>
 {
     readonly IAppDbContext _dbContext;
     readonly IAppRequestContext _requestContext;
     readonly IApplicationSettingsProvider _settingsProvider;
+    readonly IMediator _mediator;
 
-    public AddContactDetailsCommandHandler(IAppDbContext dbContext, IAppRequestContext requestContext, IApplicationSettingsProvider settingsProvider)
+    public AddContactDetailsCommandHandler(IAppDbContext dbContext, IAppRequestContext requestContext, IApplicationSettingsProvider settingsProvider, IMediator mediator)
     {
         _dbContext = dbContext;
         _requestContext = requestContext;
         _settingsProvider = settingsProvider;
+        _mediator = mediator;
     }
 
     public async Task<ResponseDto<long>> Handle(AddContactDetailsCommand request, CancellationToken cancellationToken)
     {
+        await new AddContactDetailsCommandValidator().ValidateAndThrowAsync(request, cancellationToken);
         string absolutePhoneNumber = request.CountryCode + request.PhoneNumber;
         if (await _dbContext.PhoneDirectory.AnyAsync(x => x.PrisonerId == request.PrisonerId
             && x.CountryCode == request.CountryCode
@@ -70,11 +77,59 @@ public class AddContactDetailsCommandHandler : IRequestHandler<AddContactDetails
                 PinCode = request.RelativeAddress.PinCode,
             },
             Name = request.Name,
+            IdProofTypeId = request.ContactProofTypeId,
+            IdProofValue = request.ContactProofValue,
         };
 
         _dbContext.PhoneDirectory.Add(entry);
         await _dbContext.SaveAsync(cancellationToken);
+        await CheckAndUploadProof(request, entry, cancellationToken);
         return new(entry.Id);
+    }
+
+    private async Task CheckAndUploadProof(AddContactDetailsCommand request, PhoneDirectory entry, CancellationToken cancellationToken)
+    {
+        if (request.ContactProofAttachment != null)
+        {
+            var attachmentPath = await PrisonerHelper.GetPrisonerAttachmentBasePath(request.PrisonerId, _dbContext) + "/contacts/proof";
+            var attachmentId = await _mediator.Send(new UploadAttachmentCommand
+            {
+                Data = request.ContactProofAttachment.DataStream.ToArray(),
+                FileContent = request.ContactProofAttachment.ContentType,
+                FileName = request.ContactProofAttachment.FileName,
+                FileDestinationBasePath = attachmentPath,
+                SaveAsThumbnail = false
+            });
+
+            entry.IdProofAttachmentId = attachmentId.Data;
+            await _dbContext.SaveAsync(cancellationToken);
+        }
     }
 }
 
+public class AddContactDetailsCommandValidator : AbstractValidator<AddContactDetailsCommand>
+{
+    public AddContactDetailsCommandValidator()
+    {
+        RuleFor(x => x.ContactProofTypeId)
+            .NotEmpty()
+                .WithMessage("Choose the ID Proof")
+            .NotNull()
+                .WithMessage("Choose the ID Proof")
+            .When(x => !string.IsNullOrEmpty(x.ContactProofValue));
+
+        RuleFor(x => x.ContactProofValue)
+            .NotEmpty()
+                .WithMessage("Enter the ID proof value")
+            .NotNull()
+                .WithMessage("Enter the ID proof value")
+            .When(x => x.ContactProofTypeId.HasValue);
+
+        RuleFor(x => x.ContactProofAttachment)
+            .NotNull()
+                .WithMessage("Please upload the proof.")
+            .Must(x => x is not null && x.DataStream is not null && x.DataStream.Length > 0)
+                .WithMessage("Please upload the proof.")
+            .When(x => x.ContactProofTypeId.HasValue);
+    }
+}

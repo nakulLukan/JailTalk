@@ -32,6 +32,13 @@ public class LookupSeeder
                 IsActive = true,
                 Name = "Relationship",
             },
+            new()
+            {
+                Id = (int)LookupMasters.IdProof,
+                InternalName = "IdProof",
+                IsActive = true,
+                Name = "ID Proof",
+            },
         };
 
         foreach (var lookup in lookupMasters)
@@ -44,6 +51,9 @@ public class LookupSeeder
 
         // Relationship Seeder
         lookupDetailId = SeedRelationships(lookupDetailId, lookupDetails);
+
+        // Relationship Seeder
+        lookupDetailId = SeedIdProofs(lookupDetailId, lookupDetails);
 
         foreach (var lookupDetail in lookupDetails)
         {
@@ -136,6 +146,34 @@ public class LookupSeeder
                 LookupMasterId = (int)LookupMasters.Relationship
             },
                 });
+        return lookupDetailId;
+    }
+
+
+    private static int SeedIdProofs(int lookupDetailId, List<LookupDetail> lookupDetails)
+    {
+        lookupDetails.AddRange(new List<LookupDetail>()
+        {
+            new()
+            {
+                Id = lookupDetailId++,
+                InternalName = "aadhar",
+                IsActive = true,
+                Order = 1,
+                Value = "Aadhar",
+                LookupMasterId = (int)LookupMasters.IdProof
+            },
+            new()
+            {
+                Id = lookupDetailId++,
+                InternalName = "driving_license",
+                IsActive = true,
+                Order = 2,
+                Value = "Driving License",
+                LookupMasterId = (int)LookupMasters.IdProof
+            },
+        });
+
         return lookupDetailId;
     }
 }

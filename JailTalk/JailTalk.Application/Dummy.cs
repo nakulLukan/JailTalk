@@ -1,6 +1,6 @@
 ﻿namespace JailTalk.Application
 {
-    internal class Dummy
+    public class Dummy
     {
     }
 }

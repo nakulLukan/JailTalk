@@ -7,8 +7,11 @@ using JailTalk.Domain.Identity;
 using JailTalk.Infrastructure;
 using JailTalk.Infrastructure.Data;
 using JailTalk.Web.Contracts.Events;
+using JailTalk.Web.Contracts.Interop;
 using JailTalk.Web.Impl.Events;
 using JailTalk.Web.Impl.Http;
+using JailTalk.Web.Impl.Identity;
+using JailTalk.Web.Impl.Interop;
 using JailTalk.Web.Impl.Presentation;
 using JailTalk.Web.Impl.UserManagement;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -32,7 +35,8 @@ public static class ServiceRegistry
 
     private static void RegisterWebServices(IServiceCollection services)
     {
-
+        services.AddScoped<IAppJSInterop, AppJSInterop>();
+        services.AddScoped<IAppAuthenticator, AppAuthenticator>();
         services.AddFluxor(options => options.ScanAssemblies(typeof(Program).Assembly));
         services.AddLogging(loggingBuilder =>
         {

@@ -1,10 +1,45 @@
-﻿using JailTalk.Shared.Utilities;
-using System.Globalization;
+﻿using JailTalk.Application.Contracts.Data;
+using JailTalk.Shared;
+using JailTalk.Shared.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace JailTalk.Application.Services;
 
 public class PrisonerHelper
 {
+    #region Mapper for prisoner id to PID
+    private static Semaphore _prionserIdToCodeMapperMutex = new Semaphore(1, 1);
+    private static IDictionary<Guid, string> _prionserIdToCodeMapper = null;
+
+
+    public static async Task<string> GetPrisonerCodeFromId(Guid prisonerId, IAppDbContext dbContext)
+    {
+        await CheckAndLoadPrisonerIdToPidLookup(dbContext);
+        if (!_prionserIdToCodeMapper.ContainsKey(prisonerId))
+        {
+            throw new AppException(CommonExceptionMessages.PrisonerNotFound);
+        }
+
+        return _prionserIdToCodeMapper[prisonerId];
+    }
+
+    private static async Task CheckAndLoadPrisonerIdToPidLookup(IAppDbContext dbContext)
+    {
+        _prionserIdToCodeMapperMutex.WaitOne();
+        if (_prionserIdToCodeMapper == null)
+        {
+            _prionserIdToCodeMapper = await dbContext.Prisoners
+            .Select(x => new
+            {
+                x.Id,
+                x.Pid
+            })
+            .ToDictionaryAsync(x => x.Id, x => x.Pid);
+        }
+        _prionserIdToCodeMapperMutex.Release();
+    }
+    #endregion
+
     public static bool IsUnlimitedCallPriviledgeEnabled(DateTimeOffset? allowedTill)
         => allowedTill.HasValue ? allowedTill.Value > AppDateTime.UtcNow : false;
 
@@ -32,13 +67,21 @@ public class PrisonerHelper
         };
     }
 
+    #region Get storage base path for all prisoner related attachments
+    public static async Task<string> GetPrisonerAttachmentBasePath(Guid prisonerId, IAppDbContext dbContext)
+    {
+        var pid = await GetPrisonerCodeFromId(prisonerId, dbContext);
+        return GetPrisonerAttachmentBasePath(pid);
+    }
+
     /// <summary>
     /// Get prisoners base attachment path
     /// </summary>
-    /// <param name="pid">Prisoners PID value</param>
+    /// <param name="pid"></param>
     /// <returns></returns>
     public static string GetPrisonerAttachmentBasePath(string pid)
     {
         return $"prisoners/{pid}";
     }
+    #endregion
 }

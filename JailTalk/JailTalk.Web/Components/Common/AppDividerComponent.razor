@@ -1,0 +1,7 @@
+﻿<HorizontalSpacer Spacing="12" />
+<MudText Typo="Typo.caption"> <b>@Label</b></MudText>
+<MudDivider DividerType="@DividerType" />
+@code {
+    [Parameter][EditorRequired] public string Label { get; set; }
+    [Parameter] public DividerType DividerType { get; set; } = DividerType.FullWidth;
+}

@@ -3,10 +3,14 @@
 @using JailTalk.Application.Services;
 @using JailTalk.Shared.Models;
 @using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Contracts.Interop;
 @using JailTalk.Web.Extensions;
+@using JailTalk.Web.Impl.Identity;
 @using MediatR;
 @inject IMediator Mediator;
 @inject IAppMediator AppMediator;
+@inject IAppJSInterop JsRuntime;
+@inject IAppAuthenticator AppAuthenticator;
 
 <MudTable Items="@contacts" Dense="true" Hover="true" Bordered="true" Striped="true"
           Class="no-border" Elevation="4" Outlined>
@@ -21,6 +25,7 @@
         <MudTh>Contact Number</MudTh>
         <MudTh>Relationship</MudTh>
         <MudTh>Address</MudTh>
+        <MudTh>Proof</MudTh>
         <MudTh>Status</MudTh>
         <MudTh>Action</MudTh>
     </HeaderContent>
@@ -30,6 +35,17 @@
         <MudTd DataLabel="Contact Number">@context.ContactNumber</MudTd>
         <MudTd DataLabel="Relationship">@context.Relationship</MudTd>
         <MudTd DataLabel="Address">@context.RelativeAddress</MudTd>
+        <MudTd DataLabel="Proof">
+
+            @if (string.IsNullOrEmpty(context.ProofType))
+            {
+                <MudText Typo="Typo.inherit" Color="Color.Error">Not Uploaded</MudText>
+            }
+            else
+            {
+                <MudLink Typo="Typo.inherit" Class="cursor-pointer" OnClick="@(async () => await OpenProofInNewTab(context.Id))">@context.ProofType</MudLink>
+            }
+        </MudTd>
         <MudTd DataLabel="Status">@context.Status</MudTd>
         <MudTd DataLabel="Action">
             <MudMenu Icon="@Icons.Material.Filled.MoreVert">
@@ -40,7 +56,7 @@
             </MudTd>
         </RowTemplate>
         <NoRecordsContent>
-                <JailTalk.Web.Components.Common.NoRecordsComponent />
+            <JailTalk.Web.Components.Common.NoRecordsComponent />
         </NoRecordsContent>
     </MudTable>
 
@@ -159,5 +175,27 @@
         _editContactId = contactId;
         _editIsOpen = true;
         _addIsOpen = false;
+    }
+
+    private async Task OpenProofInNewTab(long contactId)
+    {
+        if (!AppAuthenticator.CheckHasPermission(Permissions.Admin))
+        {
+            ToastService.Error("Permission Denied");
+            return;
+        }
+
+        await AppMediator.Send(new DownloadContactProofQuery()
+            {
+                ContactId = contactId
+            })
+        .OnSuccess(async url =>
+        {
+            await JsRuntime.OpenDocumentInNewTab(url);
+        })
+        .OnError(err =>
+        {
+            ToastService.Error(err.Message);
+        });
     }
 }

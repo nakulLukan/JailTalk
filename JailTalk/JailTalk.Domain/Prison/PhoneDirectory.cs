@@ -1,4 +1,5 @@
 ﻿using JailTalk.Domain.Lookup;
+using JailTalk.Domain.System;
 
 namespace JailTalk.Domain.Prison;
 public class PhoneDirectory : DomainBase
@@ -13,9 +14,14 @@ public class PhoneDirectory : DomainBase
     public DateTimeOffset? LastBlockedOn { get; set; }
     public int RelativeTypeId { get; set; }
     public long RelativeAddressId { get; set; }
+    public int? IdProofTypeId { get; set; }
+    public string IdProofValue { get; set; }
+    public int? IdProofAttachmentId { get; set; }
 
     public Prisoner Prisoner { get; set; }
     public LookupDetail RelativeType { get; set; }
+    public LookupDetail IdProofType { get; set; }
     public AddressBook RelativeAddress { get; set; }
+    public Attachment IdProofAttachment { get; set; }
     public List<CallHistory> CallHistory { get; set; }
 }

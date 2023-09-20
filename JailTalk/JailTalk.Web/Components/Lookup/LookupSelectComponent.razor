@@ -4,7 +4,7 @@
 @using MediatR;
 @inject IMediator Mediator;
 
-<MudSelect Label="@Label" AnchorOrigin="Origin.BottomCenter" ValueChanged="ValueChanged" For="For">
+<MudSelect Label="@Label" AnchorOrigin="Origin.BottomCenter" @bind-Value="@Value" For="For">
     <MudSelectItem T="int?" Value="default(int?)">Select</MudSelectItem>
     @foreach (var lookupValue in lookupDetails)
     {
@@ -39,16 +39,11 @@
     [Category("Validation")]
     public Expression<Func<int?>> For { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            lookupDetails = await Mediator.Send(new LookupSelectQuery()
+        lookupDetails = await Mediator.Send(new LookupSelectQuery()
             {
-                    LookupMasterInternalName = LookupMaster
+                LookupMasterInternalName = LookupMaster
             });
-        }
-
     }
-
 }

@@ -14,6 +14,7 @@
             <MudItem sm="12">
                 <MudText Typo="Typo.h5">Enter Contact Details</MudText>
             </MudItem>
+
             <MudItem sm="12">
                 <MudTextField Label="Contact Name" @bind-Value="@model.Name" For="@(()=> model.Name)"></MudTextField>
             </MudItem>
@@ -33,6 +34,9 @@
             </MudItem>
 
             <MudItem sm="12">
+                <JailTalk.Web.Components.Common.AppDividerComponent Label="Address" />
+            </MudItem>
+            <MudItem sm="12">
                 <MudTextField Label="House/Flat Name" @bind-Value="@model.RelativeAddress.HouseName" For="@(()=> model.RelativeAddress.HouseName)"></MudTextField>
             </MudItem>
             <MudItem sm="4">
@@ -45,7 +49,20 @@
                 <MudTextField Label="Pincode" @bind-Value="@model.RelativeAddress.PinCode" For="@(()=> model.RelativeAddress.PinCode)"></MudTextField>
             </MudItem>
             <MudItem sm="12">
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                <JailTalk.Web.Components.Common.AppDividerComponent Label="Contact Proof Details" />
+            </MudItem>
+            <MudItem sm="4">
+                <JailTalk.Web.Components.Lookup.LookupSelectComponent Label="Proof" LookupMaster="@LookupMasters.IdProof.ToString()" For="@(() => model.ContactProofTypeId)"
+                @bind-Value="model.ContactProofTypeId" />
+            </MudItem>
+            <MudItem>
+                <MudTextField Label="Proof Number" @bind-Value="@model.ContactProofValue" For="@(()=> model.ContactProofValue)"></MudTextField>
+            </MudItem>
+            <MudItem>
+                <JailTalk.Web.Components.Common.FileSelectorComponent Label="Upload Proof" @bind-File="model.ContactProofAttachment" Accept=".png, .jpeg, .jpg, .pdf" />
+            </MudItem>
+            <MudItem sm="12">
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
                 <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
             </MudItem>
         </MudGrid>
@@ -72,11 +89,21 @@
                 PrisonerId = Guid.Parse(PrisonerId),
                 RelationshipId = model.RelationshipId,
                 RelativeAddress = model.RelativeAddress,
-                Name = model.Name
+                Name = model.Name,
+                ContactProofValue = model.ContactProofValue,
+                ContactProofTypeId = model.ContactProofTypeId,
+                ContactProofAttachment = model.ContactProofAttachment
             })
         .OnSuccess(async data =>
         {
             await InvokeAsync(() => OnSubmitSuccess.InvokeAsync(data));
+        })
+        .OnFormError(async err =>
+        {
+            foreach (var e in err)
+            {
+                await InvokeAsync(() => OnSubmitFailed.InvokeAsync(new ErrorDto(e.Value.FirstOrDefault(), ErrorType.Error)));
+            }
         })
         .OnError(async err =>
         {

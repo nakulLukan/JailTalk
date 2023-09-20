@@ -1,5 +1,6 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Dto.Prison;
+using JailTalk.Domain.Prison;
 using JailTalk.Shared.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,8 +35,20 @@ public static class PrisonerAccountService
                 PrisonerId = x.PrisonerId,
                 AccountBalanceAmount = x.Balance,
                 TalkTimeLeft = ((float?)(x.Balance / chargePerMinute)).ToHoursMinutesSeconds(),
+                PrisonerName = GetPrisonerName(x.Prisoner),
+                Pid = x.Prisoner.Pid
             })
             .FirstOrDefaultAsync(cancellationToken);
         return accountInfo;
+    }
+
+    public static string GetPrisonerName(Prisoner x)
+    {
+        return string.Join(" ", new string[]
+                        {
+                            x.FirstName,
+                            x.MiddleName,
+                            x.LastName
+                        }).Replace("  ", " ");
     }
 }

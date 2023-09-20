@@ -1,5 +1,6 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization;
-@inject AuthenticationStateProvider AuthenticationStateProvider;
+﻿@using JailTalk.Web.Impl.Identity;
+@using Microsoft.AspNetCore.Components.Authorization;
+@inject IAppAuthenticator AuthenticationStateProvider;
 @inject NavigationManager NavigationManager;
 @code {
     [EditorRequired]
@@ -8,12 +9,7 @@
 
     protected override void OnInitialized()
     {
-        if (Roles == "none")
-        {
-            return;
-        }
-        var user = AuthenticationStateProvider.GetAuthenticationStateAsync().Result.User;
-        if (!Roles.Split(',').Any(role => user.IsInRole(role.Trim())))
+        if (!AuthenticationStateProvider.CheckHasPermission(Roles))
         {
             NavigationManager.NavigateTo("/unauthorized");
         }

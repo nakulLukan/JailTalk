@@ -1,5 +1,6 @@
 ﻿using JailTalk.Application.Dto.Lookup;
 using JailTalk.Shared.Constants;
+using JailTalk.Shared.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Prison;
@@ -13,7 +14,7 @@ public class AddContactDetailsDto
     public string CountryCode { get; set; }
 
     [MaxLength(15)]
-    [RegularExpression(RegularExpressionPatternConstant.PhoneNumber)]
+    [RegularExpression(RegularExpressionPatternConstant.PhoneNumber, ErrorMessage = "Phone number should have 10 numbers")]
     [Required]
     public string PhoneNumber { get; set; }
 
@@ -26,4 +27,18 @@ public class AddContactDetailsDto
     public int? RelationshipId { get; set; }
     public NewAddressDto RelativeAddress { get; set; } = new();
     public bool IsEnabled { get; set; } = true;
+
+    /// <summary>
+    /// Id proof of the contact
+    /// </summary>
+    public int? ContactProofTypeId { get; set; }
+
+    /// <summary>
+    /// Value of the id proof of the contact
+    /// </summary>
+    [RegularExpression(RegularExpressionPatternConstant.IdProof)]
+    [MaxLength(50)]
+    public string ContactProofValue { get; set; }
+
+    public BrowserFileDto ContactProofAttachment { get; set; }
 }

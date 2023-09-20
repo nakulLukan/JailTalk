@@ -10,7 +10,7 @@ public static class ServiceRegistry
 {
     public static void RegisterApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddValidatorsFromAssemblyContaining<Dummy>();
+        services.AddValidatorsFromAssemblyContaining<Dummy>(ServiceLifetime.Transient);
         services.AddTransient<IApplicationSettingsProvider, ApplicationSettingsProvider>();
     }
 }

@@ -34,6 +34,7 @@ public enum LookupMasters : int
     State = 1,
     Country = 2,
     Relationship = 3,
+    IdProof = 4
 }
 
 public enum Gender : int

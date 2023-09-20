@@ -2,9 +2,8 @@
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Dto.Prison;
 using JailTalk.Application.Services;
-using JailTalk.Shared;
-using JailTalk.Shared.Utilities;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace JailTalk.Application.Requests.Prison;
 
@@ -50,14 +49,30 @@ public class AccountBalanceQueryHandler : IRequestHandler<AccountBalanceQuery, A
         // Get account balance info.
         var accountInfo = await PrisonerAccountService.GetPrisonerAccountBalance((_dbContext, _settingsProvider),
             request.PrisonerId, userJailId, cancellationToken);
+        accountInfo = await IfNullGetDefaultAccountInfo(request, accountInfo, cancellationToken);
 
+        return accountInfo;
+    }
+
+    private async Task<AccountBalanceDto> IfNullGetDefaultAccountInfo(AccountBalanceQuery request, AccountBalanceDto accountInfo, CancellationToken cancellationToken)
+    {
         if (accountInfo is null)
         {
+            var prisonerBasicInfo = await _dbContext.Prisoners
+                .Select(x => new
+                {
+                    x.Id,
+                    x.Pid,
+                    Name = PrisonerAccountService.GetPrisonerName(x)
+                })
+                .FirstOrDefaultAsync(x => x.Id == request.PrisonerId, cancellationToken);
             accountInfo = new()
             {
                 AccountBalanceAmount = 0,
                 PrisonerId = request.PrisonerId,
-                TalkTimeLeft = "-"
+                TalkTimeLeft = "-",
+                PrisonerName = prisonerBasicInfo.Name,
+                Pid = prisonerBasicInfo.Pid,
             };
         }
 

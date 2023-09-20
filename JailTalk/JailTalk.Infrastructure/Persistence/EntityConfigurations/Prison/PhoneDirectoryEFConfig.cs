@@ -13,6 +13,7 @@ public class PhoneDirectoryEFConfig : IEntityTypeConfiguration<PhoneDirectory>
         builder.Property(x => x.CountryCode).IsRequired(true).HasMaxLength(5);
         builder.Property(x => x.LastBlockedOn).IsRequired(false);
         builder.Property(x => x.Name).IsRequired(false).HasMaxLength(50);
+        builder.Property(x => x.IdProofValue).IsRequired(false).HasMaxLength(50);
         builder.HasOne(x => x.Prisoner)
             .WithMany()
             .HasForeignKey(x => x.PrisonerId);
@@ -20,6 +21,14 @@ public class PhoneDirectoryEFConfig : IEntityTypeConfiguration<PhoneDirectory>
         builder.HasOne(x => x.RelativeAddress)
             .WithMany()
             .HasForeignKey(x => x.RelativeAddressId);
+
+        builder.HasOne(x => x.IdProofType)
+            .WithMany()
+            .HasForeignKey(x => x.IdProofTypeId);
+
+        builder.HasOne(x => x.IdProofAttachment)
+            .WithMany()
+            .HasForeignKey(x => x.IdProofAttachmentId);
 
         builder.HasMany(x => x.CallHistory)
             .WithOne(x => x.PhoneDirectory)

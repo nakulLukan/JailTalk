@@ -26,6 +26,7 @@ public class PrisonerContactDetailsQueryHandler : IRequestHandler<PrisonerContac
         var contactDetails = await _dbContext.PhoneDirectory
             .Include(x => x.RelativeAddress)
             .Include(x => x.RelativeType)
+            .Include(x => x.IdProofType)
             .Where(x => x.PrisonerId == request.PrisonerId)
             .ToListAsync(cancellationToken);
         int index = 1;
@@ -46,7 +47,8 @@ public class PrisonerContactDetailsQueryHandler : IRequestHandler<PrisonerContac
                 Relationship = x.RelativeType.Value,
                 RelativeAddress = x.RelativeAddress.AddressAsText(),
                 IsActive = x.IsActive,
-                IsBlocked = x.IsBlocked
+                IsBlocked = x.IsBlocked,
+                ProofType = x.IdProofType?.Value
             })
             .ToList();
     }

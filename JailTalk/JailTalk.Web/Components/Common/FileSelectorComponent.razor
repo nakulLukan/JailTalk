@@ -1,0 +1,60 @@
+﻿@using JailTalk.Application.Requests.System;
+@using JailTalk.Shared.Models;
+@using MediatR;
+@using Microsoft.AspNetCore.Components.Forms;
+
+<MudFileUpload T="IBrowserFile" FilesChanged="UploadFile" Accept="@Accept">
+    <ButtonTemplate>
+        <MudButton HtmlTag="label"
+                   Variant="Variant.Outlined"
+                   Color="ButtonColor"
+                   StartIcon="@Icons.Material.Filled.CloudUpload"
+                   for="@context"
+        >
+            @Label
+        </MudButton>
+    </ButtonTemplate>
+</MudFileUpload>
+<MudText Typo="Typo.caption">@fileName</MudText>
+@code {
+
+    [Parameter] public Color ButtonColor { get; set; } = Color.Primary;
+    [Parameter] public string Label { get; set; } = "Upload File";
+
+    #region File Parameter
+    BrowserFileDto _file;
+    [Parameter]
+    public BrowserFileDto File
+    {
+        get => _file; set
+        {
+            if (_file == value) return;
+            _file = value;
+            FileChanged.InvokeAsync(value);
+        }
+    }
+    [Parameter] public EventCallback<BrowserFileDto> FileChanged { get; set; }
+    #endregion File Parameter
+
+    [Parameter]
+    public string Accept { get; set; } = "*";
+
+    private string fileName;
+    private async Task UploadFile(IBrowserFile file)
+    {
+        _file?.Dispose();
+        MemoryStream ms = new MemoryStream();
+        await file.OpenReadStream(10_00_00_000).CopyToAsync(ms);
+        fileName = file.Name;
+        _file = new BrowserFileDto
+            {
+                FileName = file.Name,
+                ContentType = file.ContentType,
+                Size = file.Size,
+                LastModified = file.LastModified,
+                DataStream = ms
+            };
+
+        await FileChanged.InvokeAsync(_file);
+    }
+}

@@ -4,8 +4,8 @@
 @using System.Linq.Expressions;
 @inject IMediator Mediator;
 
-<MudSelect Label="@LabelName" AnchorOrigin="Origin.BottomCenter" ValueChanged="ValueChanged" For="For">
-    <MudSelectItem T="int?" Value="default(int?)">Select</MudSelectItem>
+<MudSelect Label="@LabelName" AnchorOrigin="Origin.BottomCenter" @bind-Value="@Value" For="For">
+    <MudSelectItem T="int?" Value="default(int?)" >Select</MudSelectItem>
     @foreach (var prison in prisons)
     {
         <MudSelectItem T="int?" Value="prison.Id">@prison.Name</MudSelectItem>
@@ -36,13 +36,8 @@
     [Category("Validation")]
     public Expression<Func<int?>> For { get; set; }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (firstRender)
-        {
-            prisons = await Mediator.Send(new GetJailNamesQuery());
-        }
-
+        prisons = await Mediator.Send(new GetJailNamesQuery());
     }
-
 }

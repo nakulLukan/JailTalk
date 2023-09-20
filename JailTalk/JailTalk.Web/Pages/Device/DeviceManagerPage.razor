@@ -28,7 +28,8 @@
                 <PropertyColumn Property="x=> x.DeviceSecret" Title="Device Secret" />
                 <TemplateColumn Title="Action">
                     <CellTemplate>
-                        <MudButton  OnClick="@(()=> OnEditClicked(context.Item.DeviceId.ToString()))" Variant="Variant.Filled">Edit</MudButton>
+                        <MudButton OnClick="@(()=> OnEditClicked(context.Item.DeviceId.ToString()))"
+                            Variant="Variant.Text" Size="Size.Small">Edit</MudButton>
                     </CellTemplate>
                 </TemplateColumn>
             </Columns>
