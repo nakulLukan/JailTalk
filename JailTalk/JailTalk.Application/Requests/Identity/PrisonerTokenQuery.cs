@@ -20,13 +20,13 @@ using System.Text;
 
 namespace JailTalk.Application.Requests.Identity;
 
-public class PrisonerTokenQuery : IRequest<ResponseDto<string>>
+public class PrisonerTokenQuery : IRequest<ApiResponseDto<string>>
 {
     public byte[] UnknwonFaceImageData { get; set; }
     public string Pid { get; set; }
 }
 
-public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, ResponseDto<string>>
+public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, ApiResponseDto<string>>
 {
     readonly IConfiguration _configuration;
     readonly IAppDbContext _dbContext;
@@ -45,7 +45,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
         _faceRecognition = faceRecognition;
     }
 
-    public async Task<ResponseDto<string>> Handle(PrisonerTokenQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDto<string>> Handle(PrisonerTokenQuery request, CancellationToken cancellationToken)
     {
         var prisoner = await _dbContext.Prisoners
             .Where(x => x.Pid == request.Pid && x.JailId.HasValue)
@@ -80,7 +80,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Res
         }
 
         var token = CreateToken(prisoner);
-        return new ResponseDto<string>(token);
+        return new ApiResponseDto<string>(token);
     }
 
     private async Task AuthenticateByFaceId(PrisonerTokenQuery request, PrisonerDto prisoner)

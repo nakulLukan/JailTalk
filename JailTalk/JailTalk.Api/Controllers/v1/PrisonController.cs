@@ -29,7 +29,7 @@ public class PrisonController : AppBaseController
     /// <returns></returns>
     [RequestSizeLimit(5_242_880)]
     [HttpPost("prisoners/validate")]
-    [ProducesResponseType(typeof(ResponseDto<string>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponseDto<string>), (int)HttpStatusCode.OK)]
     public async Task<IActionResult> AuthenticatePrisoner(IFormFile? faceImageBinary, [FromForm]
         string pid)
     {

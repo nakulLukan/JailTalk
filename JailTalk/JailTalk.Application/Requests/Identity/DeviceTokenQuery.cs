@@ -16,13 +16,13 @@ using System.Text;
 
 namespace JailTalk.Application.Requests.Identity;
 
-public class DeviceTokenQuery : IRequest<ResponseDto<string>>
+public class DeviceTokenQuery : IRequest<ApiResponseDto<string>>
 {
     public string MacAddress { get; set; }
     public Guid DeviceSecretIdentifier { get; set; }
 }
 
-public class JwtTokenRequestHandler : IRequestHandler<DeviceTokenQuery, ResponseDto<string>>
+public class JwtTokenRequestHandler : IRequestHandler<DeviceTokenQuery, ApiResponseDto<string>>
 {
     readonly IConfiguration _configuration;
     readonly IAppDbContext _dbContext;
@@ -33,11 +33,11 @@ public class JwtTokenRequestHandler : IRequestHandler<DeviceTokenQuery, Response
         _dbContext = dbContext;
     }
 
-    public async Task<ResponseDto<string>> Handle(DeviceTokenQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDto<string>> Handle(DeviceTokenQuery request, CancellationToken cancellationToken)
     {
         var device = await ValidateDevice(request, cancellationToken);
         string jwt = CreateToken(device);
-        return new ResponseDto<string>(jwt);
+        return new ApiResponseDto<string>(jwt);
     }
 
     private async Task<Domain.Prison.Device> ValidateDevice(DeviceTokenQuery request, CancellationToken cancellationToken)
