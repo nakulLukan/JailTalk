@@ -53,6 +53,7 @@ public class SaveCallRecordingCommandHandler : IRequestHandler<SaveCallRecording
                 x.Id,
                 x.CallRecordingAttachmentId,
                 x.PhoneDirectory.Prisoner.Pid,
+                x.PhoneDirectory.IsCallRecordingAllowed
             })
             .FirstOrDefaultAsync(cancellationToken) ?? throw new AppApiException(HttpStatusCode.NotFound, "SCR-E-003", "Invalid call history ID.");
 
@@ -64,6 +65,11 @@ public class SaveCallRecordingCommandHandler : IRequestHandler<SaveCallRecording
         if (!_audioService.IsValidAudioFile(request.AudioClipData))
         {
             throw new AppApiException(HttpStatusCode.BadRequest, "SCR-E-002", "The audio clip is not in a valid audio format.");
+        }
+        // If call recording is disabled then do not save the recording.
+        if (!callHistory.IsCallRecordingAllowed)
+        {
+            throw new AppApiException(HttpStatusCode.BadRequest, "SCR-E-003", "Call recording is not enabled for this contact.");
         }
 
         string fileName = $"recording_{callHistory.Pid}_{AppDateTime.UtcNow.ToFileTimeString()}.mp3";
