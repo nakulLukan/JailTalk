@@ -9,7 +9,7 @@
 
 <Microsoft.AspNetCore.Components.Forms.EditForm Model="model" OnValidSubmit="OnSubmit">
     <Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator />
-    <MudPaper Elevation="0">
+    <MudPaper Elevation="0" Class="px-6 pb-6">
         <MudGrid>
             <MudItem sm="12">
                 <MudText Typo="Typo.h5">Enter Contact Details</MudText>
@@ -29,8 +29,10 @@
                 <JailTalk.Web.Components.Lookup.LookupSelectComponent Label="Relationship" For="@(()=> model.RelationshipId)"
                 @bind-Value="@model.RelationshipId" LookupMaster="@LookupMasters.Relationship.ToString()" />
             </MudItem>
-            <MudItem sm="4">
-                <MudCheckBox T="bool" Label="Enabled?" @bind-Checked="model.IsEnabled"></MudCheckBox>
+            <MudItem sm="12">
+                    <MudCheckBox T="bool" Label="Set as Active?" @bind-Checked="model.IsEnabled"></MudCheckBox>
+                <MudCheckBox T="bool" Label="Allow Call Recording" @bind-Checked="model.IsCallRecordingAllowed"></MudCheckBox>
+               
             </MudItem>
 
             <MudItem sm="12">
@@ -92,7 +94,8 @@
                 Name = model.Name,
                 ContactProofValue = model.ContactProofValue,
                 ContactProofTypeId = model.ContactProofTypeId,
-                ContactProofAttachment = model.ContactProofAttachment
+                ContactProofAttachment = model.ContactProofAttachment,
+                IsCallRecordingAllowed = model.IsCallRecordingAllowed
             })
         .OnSuccess(async data =>
         {

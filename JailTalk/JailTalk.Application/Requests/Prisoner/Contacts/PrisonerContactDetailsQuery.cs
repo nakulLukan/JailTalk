@@ -48,7 +48,8 @@ public class PrisonerContactDetailsQueryHandler : IRequestHandler<PrisonerContac
                 RelativeAddress = x.RelativeAddress.AddressAsText(),
                 IsActive = x.IsActive,
                 IsBlocked = x.IsBlocked,
-                ProofType = x.IdProofType?.Value
+                ProofType = x.IdProofType?.Value,
+                IsCallRecordingEnabled = x.IsCallRecordingAllowed
             })
             .ToList();
     }

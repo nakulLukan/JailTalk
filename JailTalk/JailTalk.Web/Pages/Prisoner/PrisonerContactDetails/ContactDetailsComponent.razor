@@ -24,9 +24,10 @@
         <MudTh>Contact Name</MudTh>
         <MudTh>Contact Number</MudTh>
         <MudTh>Relationship</MudTh>
-        <MudTh>Address</MudTh>
         <MudTh>Proof</MudTh>
         <MudTh>Status</MudTh>
+        <MudTh>Call Recording</MudTh>
+        <MudTh>Address</MudTh>
         <MudTh>Action</MudTh>
     </HeaderContent>
     <RowTemplate>
@@ -34,7 +35,6 @@
         <MudTd DataLabel="Contact Name">@context.Name</MudTd>
         <MudTd DataLabel="Contact Number">@context.ContactNumber</MudTd>
         <MudTd DataLabel="Relationship">@context.Relationship</MudTd>
-        <MudTd DataLabel="Address">@context.RelativeAddress</MudTd>
         <MudTd DataLabel="Proof">
 
             @if (string.IsNullOrEmpty(context.ProofType))
@@ -47,6 +47,8 @@
             }
         </MudTd>
         <MudTd DataLabel="Status">@context.Status</MudTd>
+        <MudTd DataLabel="Call Recording">@(context.IsCallRecordingEnabled ? "Enabled" : "Disabled")</MudTd>
+            <MudTd DataLabel="Address">@context.RelativeAddress</MudTd>
         <MudTd DataLabel="Action">
             <MudMenu Icon="@Icons.Material.Filled.MoreVert">
                 <MudMenuItem OnClick="@(()=> OnEditContactClicked(context.Id))">Edit</MudMenuItem>

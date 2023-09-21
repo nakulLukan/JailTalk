@@ -79,6 +79,7 @@ public class AddContactDetailsCommandHandler : IRequestHandler<AddContactDetails
             Name = request.Name,
             IdProofTypeId = request.ContactProofTypeId,
             IdProofValue = request.ContactProofValue,
+            IsCallRecordingAllowed = request.IsCallRecordingAllowed
         };
 
         _dbContext.PhoneDirectory.Add(entry);

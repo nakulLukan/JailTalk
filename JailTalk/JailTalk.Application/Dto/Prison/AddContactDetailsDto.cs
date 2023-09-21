@@ -41,4 +41,6 @@ public class AddContactDetailsDto
     public string ContactProofValue { get; set; }
 
     public BrowserFileDto ContactProofAttachment { get; set; }
+
+    public bool IsCallRecordingAllowed { get; set; }
 }

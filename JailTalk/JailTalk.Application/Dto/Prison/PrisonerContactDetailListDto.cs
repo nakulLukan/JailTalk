@@ -20,4 +20,5 @@ public class PrisonerContactDetailListDto
     public string Status { get; set; }
     public bool IsBlocked { get; set; }
     public bool IsActive { get; set; }
+    public bool IsCallRecordingEnabled { get; set; }
 }
