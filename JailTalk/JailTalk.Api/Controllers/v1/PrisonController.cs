@@ -109,12 +109,12 @@ public class PrisonController : AppBaseController
     /// If face validation is enabled then system checks if the given image is matching 
     /// images of prisoner stored in the system.
     /// </summary>
-    /// <param name="faceImageBinary">Base 64 string</param>
-    /// <param name="pid">Pid of the prisoner</param>
+    /// <param name="audioClip">Audio clip</param>
+    /// <param name="callHistoryId">Associated call history id</param>
     /// <returns></returns>
     [RequestSizeLimit(15_242_880)]
     [HttpPost("prisoners/call-recording")]
-    [ProducesResponseType(typeof(ResponseDto<long>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(ApiResponseDto<long>), (int)HttpStatusCode.OK)]
     [SessionAuthFilter]
     public async Task<IActionResult> UploadCallRecordingAudioClip(IFormFile? audioClip, [FromForm]
         long callHistoryId)

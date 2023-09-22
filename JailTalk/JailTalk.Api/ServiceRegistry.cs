@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using System.Reflection;
 using System.Text;
 
 namespace JailTalk.Api;
@@ -61,6 +62,12 @@ public static class ServiceRegistry
                     new string[] { }
                 }
             });
+
+            config.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
+                $"{Assembly.GetExecutingAssembly().GetName().Name}.xml"));
+            config.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,
+                $"{typeof(Application.ServiceRegistry).Assembly.GetName().Name}.xml"));
+            config.UseInlineDefinitionsForEnums();
         });
         services.AddAuthentication(auth =>
         {

@@ -1,6 +1,7 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Dto.Prison;
+using JailTalk.Shared;
 using JailTalk.Shared.Extensions;
 using JailTalk.Shared.Utilities;
 using MediatR;
@@ -12,11 +13,14 @@ namespace JailTalk.Application.Requests.Prisoner.CallManagement;
 
 public class EndCallCommmand : IRequest<EndCallResultDto>
 {
+    /// <summary>
+    /// Call history id
+    /// </summary>
     public int CallHistoryId { get; set; }
 
     /// <summary>
     /// Total seconds took till the callee attended the call.
-    /// The value is expected as seconds.
+    /// The value is expected in seconds.
     /// </summary>
     public int CallStartDiff { get; set; }
 
@@ -24,6 +28,17 @@ public class EndCallCommmand : IRequest<EndCallResultDto>
     /// Flag to indicate whether the callee as attended the call.
     /// </summary>
     public bool HasAttendedCall { get; set; }
+
+    /// <summary>
+    /// Reason for ending the call.
+    /// <para>1 - CallerRegularCut</para>
+    /// <para>2 - CallConference</para>
+    /// <para>3 - RecieverRegularCut</para>
+    /// <para>4 - InsufficientBalance</para>
+    /// <para>5 - NetworkError</para>
+    /// </summary>
+    /// <completionlist cref="Shared.CallEndReason"/>
+    public CallEndReason CallEndReason { get; set; }
 }
 
 public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallResultDto>
@@ -73,7 +88,7 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
             .FirstOrDefaultAsync(cancellationToken);
 
         callHistory.EndedOn = AppDateTime.UtcNow;
-        callHistory.CallTerminationReason = Shared.CallEndReason.CallEnded;
+        callHistory.CallTerminationReason =request.CallEndReason;
         var totalCallDuration = callHistory.EndedOn.Value - callHistory.CallStartedOn;
         var chargePerMinute = await _settingsProvider.GetCallPriceChargedPerMinute();
         var callCost = GetNetCallDurationInMinutes(totalCallDuration,

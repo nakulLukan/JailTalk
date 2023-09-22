@@ -15,13 +15,13 @@ using System.Net;
 
 namespace JailTalk.Application.Requests.Prisoner.CallManagement;
 
-public class SaveCallRecordingCommand : IRequest<ResponseDto<long>>
+public class SaveCallRecordingCommand : IRequest<ApiResponseDto<long>>
 {
     public byte[] AudioClipData { get; set; }
     public long CallHistoryId { get; set; }
 }
 
-public class SaveCallRecordingCommandHandler : IRequestHandler<SaveCallRecordingCommand, ResponseDto<long>>
+public class SaveCallRecordingCommandHandler : IRequestHandler<SaveCallRecordingCommand, ApiResponseDto<long>>
 {
     readonly IAppDbContext _dbContext;
     readonly IDeviceRequestContext _requestContext;
@@ -43,7 +43,7 @@ public class SaveCallRecordingCommandHandler : IRequestHandler<SaveCallRecording
         _audioService = audioService;
     }
 
-    public async Task<ResponseDto<long>> Handle(SaveCallRecordingCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDto<long>> Handle(SaveCallRecordingCommand request, CancellationToken cancellationToken)
     {
         var prisonerId = _requestContext.GetPrisonerId();
         var callHistory = await _dbContext.CallHistory

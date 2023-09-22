@@ -1,4 +1,6 @@
-﻿namespace JailTalk.Shared;
+﻿using System.Runtime.Serialization;
+
+namespace JailTalk.Shared;
 
 public enum ErrorType : short
 {
@@ -15,8 +17,15 @@ public enum PhoneBalanceReason : short
 
 public enum CallEndReason : short
 {
-    CallEnded = 1,
+    CallerRegularCut = 1,
 
+    CallConference = 2,
+
+    RecieverRegularCut = 3,
+
+    InsufficientBalance = 4,
+
+    NetworkError = 5
 }
 
 public enum States : int
