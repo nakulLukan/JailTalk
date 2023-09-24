@@ -36,7 +36,7 @@ public class AddContactDetailsDto
     /// <summary>
     /// Value of the id proof of the contact
     /// </summary>
-    [RegularExpression(RegularExpressionPatternConstant.IdProof)]
+    [RegularExpression(RegularExpressionPatternConstant.IdProof, ErrorMessage = "Specials characters should be limited. Only aphanumeric values with these ( ,-,/) special characters are allowed.")]
     [MaxLength(50)]
     public string ContactProofValue { get; set; }
 

@@ -8,7 +8,7 @@ public class NewPrisonerDto
 {
     [Required]
     [MaxLength(10)]
-    [RegularExpression(RegularExpressionPatternConstant.IntegerOnly)]
+    [RegularExpression(RegularExpressionPatternConstant.IntegerOnly, ErrorMessage = "PID should be numerical value.")]
     public string Pid { get; set; }
 
     [Required]

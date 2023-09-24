@@ -26,8 +26,7 @@ public class PrisonerAllActiveContactsQueryHandler : IRequestHandler<PrisonerAll
         var prisonerId = _requestContext.GetPrisonerId();
         var contacts = await _dbContext.PhoneDirectory
             .Where(x => x.PrisonerId == prisonerId
-                && x.IsActive
-                && !x.IsBlocked)
+                && x.IsActive)
             .OrderBy(x => x.IsActive)
                 .ThenBy(x => x.RelativeType.Value)
             .Select(x => new ShowContactsDto
@@ -37,7 +36,8 @@ public class PrisonerAllActiveContactsQueryHandler : IRequestHandler<PrisonerAll
                 CountryCode = x.CountryCode,
                 PhoneNumber = x.PhoneNumber,
                 RelativeName = x.Name,
-                IsCallRecordingEnabled = x.IsCallRecordingAllowed
+                IsCallRecordingEnabled = x.IsCallRecordingAllowed,
+                IsContactBlocked = x.IsBlocked
             })
             .ToListAsync(cancellationToken);
         return contacts;

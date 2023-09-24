@@ -12,4 +12,5 @@ public class ShowContactsDto
     /// </summary>
     public bool IsCallRecordingEnabled { get; set; }
     public long Id { get; set; }
+    public bool IsContactBlocked { get; set; }
 }
