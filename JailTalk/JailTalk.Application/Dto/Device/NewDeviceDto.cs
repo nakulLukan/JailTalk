@@ -15,7 +15,7 @@ public class NewDeviceDto
 
     [Required]
     [MaxLength(50)]
-    [RegularExpression(RegularExpressionPatternConstant.MacAddress, ErrorMessage = "Wrong format. Enter value in the following format 'xx-xx-xx-xx-xx-xx'")]
+    [RegularExpression(RegularExpressionPatternConstant.MacAddress, ErrorMessage = "Wrong format. Only alpha numeric values are allowed.")]
     public string MacAddress { get; set; }
 
     [Required]

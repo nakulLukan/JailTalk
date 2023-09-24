@@ -67,7 +67,7 @@ public class EditDeviceCommandHandler : IRequestHandler<EditDeviceCommand, Respo
         if (await _dbContext.Devices.AnyAsync(x => x.Id != request.DeviceId
             && x.MacAddress == request.MacAddress, cancellationToken))
         {
-            throw new AppException("Another device with same mac address already registered.");
+            throw new AppException("Another device with ID already registered.");
         }
     }
 }

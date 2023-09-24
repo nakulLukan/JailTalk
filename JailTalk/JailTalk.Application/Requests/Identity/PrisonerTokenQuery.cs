@@ -59,7 +59,7 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Api
         // Check if the prisoners are allowed to make calls. If the request is made during offtime then throw error.
         await ValidateTimeWindow();
         var prisoner = await _dbContext.Prisoners
-            .Where(x => x.Pid == request.Pid && x.JailId.HasValue)
+            .Where(x => x.PidNumber == long.Parse(request.Pid) && x.JailId.HasValue)
             .Select(x => new PrisonerDto(
                 x.Id,
                 x.IsBlocked,
@@ -159,6 +159,7 @@ public class PrisonerTokenQueryValidator : AbstractValidator<PrisonerTokenQuery>
         RuleFor(x => x.Pid)
             .NotNull()
             .NotEmpty()
+            .Matches(RegularExpressionPatternConstant.IntegerOnly)
             .MaximumLength(50);
     }
 }

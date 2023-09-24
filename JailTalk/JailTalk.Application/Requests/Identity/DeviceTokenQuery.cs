@@ -18,7 +18,14 @@ namespace JailTalk.Application.Requests.Identity;
 
 public class DeviceTokenQuery : IRequest<ApiResponseDto<string>>
 {
+    /// <summary>
+    /// Device android id
+    /// </summary>
     public string MacAddress { get; set; }
+
+    /// <summary>
+    /// Device secret key shared with the system
+    /// </summary>
     public Guid DeviceSecretIdentifier { get; set; }
 }
 

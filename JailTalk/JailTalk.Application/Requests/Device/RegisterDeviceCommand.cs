@@ -34,7 +34,7 @@ public class RegisterDeviceCommandHandler : IRequestHandler<RegisterDeviceComman
         
         if (await _dbContext.Devices.AnyAsync(x => x.MacAddress == request.MacAddress, cancellationToken))
         {
-            throw new AppException("Another device with same mac address already registered.");
+            throw new AppException("Another device with same ID already registered.");
         }
 
         Domain.Prison.Device device = new Domain.Prison.Device()
