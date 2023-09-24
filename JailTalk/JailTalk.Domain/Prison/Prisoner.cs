@@ -1,10 +1,10 @@
-﻿using JailTalk.Domain.Lookup;
-using JailTalk.Shared;
+﻿using JailTalk.Shared;
 
 namespace JailTalk.Domain.Prison;
 public class Prisoner : DomainBase
 {
     public Guid Id { get; set; }
+    public long PidNumber { get; set; }
     public string Pid { get; set; }
     public string FirstName { get; set; }
     public string MiddleName { get; set; }

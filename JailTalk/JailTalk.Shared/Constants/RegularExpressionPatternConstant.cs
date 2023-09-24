@@ -16,4 +16,5 @@ public static class RegularExpressionPatternConstant
     public const string PrisonCode = "^[A-Za-z0-9\\-]+$";
     public const string PrisonName = "^[A-Za-z0-9 ]+$";
     public const string PersonName = "^[A-Za-z0-9 ]+$";
+    public const string TelephoneAccessTimeWindow = "^[0-9]+[0-9]+[:][0-9]+[0-9]+[-][0-9]+[0-9]+[:][0-9]+[0-9]+$";
 }

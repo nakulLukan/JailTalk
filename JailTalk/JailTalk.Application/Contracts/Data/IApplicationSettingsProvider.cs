@@ -28,4 +28,11 @@ public interface IApplicationSettingsProvider
     /// </summary>
     /// <returns></returns>
     Task<bool> GetAllowAccessToCallRecording();
+
+    /// <summary>
+    /// Time window during which prisoners are allowed to make phone calls.
+    /// <para>Returns (Start time in minutes, End time in minutes)</para>
+    /// </summary>
+    /// <returns></returns>
+    Task<(int From, int To)> GetDailyCallTimeWindow();
 }

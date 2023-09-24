@@ -5,6 +5,7 @@ using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Services;
 using JailTalk.Shared;
 using JailTalk.Shared.Constants;
+using JailTalk.Shared.Extensions;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
 using MediatR;
@@ -33,20 +34,30 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Api
     readonly IDeviceRequestContext _requestContext;
     readonly ILogger<PrisonerTokenQueryHandler> _logger;
     readonly IAppFaceRecognition _faceRecognition;
+    readonly IApplicationSettingsProvider _applicationSettingsProvider;
 
     record PrisonerDto(Guid Id, bool IsBlocked, bool IsActive, string FullName, int PrisonId, List<string> FacePath);
 
-    public PrisonerTokenQueryHandler(IConfiguration configuration, IAppDbContext dbContext, IDeviceRequestContext requestContext, ILogger<PrisonerTokenQueryHandler> logger, IAppFaceRecognition faceRecognition)
+    public PrisonerTokenQueryHandler(
+        IConfiguration configuration,
+        IAppDbContext dbContext,
+        IDeviceRequestContext requestContext,
+        ILogger<PrisonerTokenQueryHandler> logger,
+        IAppFaceRecognition faceRecognition,
+        IApplicationSettingsProvider applicationSettingsProvider)
     {
         _configuration = configuration;
         _dbContext = dbContext;
         _requestContext = requestContext;
         _logger = logger;
         _faceRecognition = faceRecognition;
+        _applicationSettingsProvider = applicationSettingsProvider;
     }
 
     public async Task<ApiResponseDto<string>> Handle(PrisonerTokenQuery request, CancellationToken cancellationToken)
     {
+        // Check if the prisoners are allowed to make calls. If the request is made during offtime then throw error.
+        await ValidateTimeWindow();
         var prisoner = await _dbContext.Prisoners
             .Where(x => x.Pid == request.Pid && x.JailId.HasValue)
             .Select(x => new PrisonerDto(
@@ -81,6 +92,16 @@ public class PrisonerTokenQueryHandler : IRequestHandler<PrisonerTokenQuery, Api
 
         var token = CreateToken(prisoner);
         return new ApiResponseDto<string>(token);
+    }
+
+    private async Task ValidateTimeWindow()
+    {
+        var timeWindow = await _applicationSettingsProvider.GetDailyCallTimeWindow();
+        var currentTime = AppDateTime.LocalNow.TimeOfDay.TotalMinutes;
+        if (!(timeWindow.From <= currentTime && timeWindow.To >= currentTime))
+        {
+            throw new AppApiException(HttpStatusCode.Unauthorized, "PT-0005", $"System is shutdown. Available between {TimeSpan.FromMinutes(timeWindow.From).ToTimeString()} to {TimeSpan.FromMinutes(timeWindow.To).ToTimeString()} hours.");
+        }
     }
 
     private async Task AuthenticateByFaceId(PrisonerTokenQuery request, PrisonerDto prisoner)

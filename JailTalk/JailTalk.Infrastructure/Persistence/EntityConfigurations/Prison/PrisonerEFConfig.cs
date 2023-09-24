@@ -21,6 +21,8 @@ public class PrisonerEFConfig : IEntityTypeConfiguration<Prisoner>
         builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
         builder.Property(x => x.IsBlocked).IsRequired().HasDefaultValue(false);
         builder.Property(x => x.JailId).IsRequired(false);
+        builder.Property(x => x.PidNumber).IsRequired(true);
+        builder.HasIndex(x => x.PidNumber);
 
         builder.HasOne(x => x.Jail)
             .WithMany()

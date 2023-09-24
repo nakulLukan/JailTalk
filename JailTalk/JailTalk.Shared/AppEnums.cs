@@ -1,6 +1,4 @@
-﻿using System.Runtime.Serialization;
-
-namespace JailTalk.Shared;
+﻿namespace JailTalk.Shared;
 
 public enum ErrorType : short
 {
@@ -71,4 +69,5 @@ public enum ApplicationSettings : int
     CallPricePerMinute = 5,
     MaxAllowedCallTimeInRupeesPerMonth = 6,
     AllowAccessToCallRecording = 7,
+    DailyCallTimeWindow = 8
 }

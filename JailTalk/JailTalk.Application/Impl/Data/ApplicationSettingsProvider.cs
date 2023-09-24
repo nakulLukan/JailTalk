@@ -61,6 +61,19 @@ public class ApplicationSettingsProvider : IApplicationSettingsProvider
         return bool.Parse(await GetApplicationSettingValue(ApplicationSettings.AllowAccessToCallRecording));
     }
 
+    /// <summary>
+    /// Time window during which prisoners are allowed to make phone calls.
+    /// <para>Returns (Start time in minutes, End time in minutes)</para>
+    /// </summary>
+    /// <returns></returns>
+    public async Task<(int From, int To)> GetDailyCallTimeWindow()
+    {
+        string value = await GetApplicationSettingValue(ApplicationSettings.DailyCallTimeWindow);
+        var time = value.Split("-");
+
+        return ((int)TimeSpan.Parse(time[0]).TotalMinutes, (int)TimeSpan.Parse(time[1]).TotalMinutes);
+    }
+
     private async Task<string> GetApplicationSettingValue(ApplicationSettings applicationSetting)
     {
         if (_memoryCache.TryGetValue(applicationSetting, out string value))

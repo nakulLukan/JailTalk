@@ -82,6 +82,16 @@ public class ApplicationSettingsSeeder
                 IsReadonly = false,
                 LastUpdateBy = DefaultLastUpdatedByValue,
                 LastUpdatedOn = new DateTimeOffset(2023, 09, 02, 0,0,0, TimeSpan.Zero),
+            },
+            new()
+            {
+                Id = ApplicationSettings.DailyCallTimeWindow,
+                Value = ("09:00-20:00").ToString(),
+                Description = "Time window during which the prisoners can access the telephone device and make calls.",
+                RegexValidation = RegularExpressionPatternConstant.TelephoneAccessTimeWindow,
+                IsReadonly = false,
+                LastUpdateBy = DefaultLastUpdatedByValue,
+                LastUpdatedOn = new DateTimeOffset(2023, 09, 02, 0,0,0, TimeSpan.Zero),
             }
         };
 

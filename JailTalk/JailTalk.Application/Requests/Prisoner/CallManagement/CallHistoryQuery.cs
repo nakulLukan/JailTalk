@@ -32,7 +32,7 @@ public class CallHistoryQueryHandler : IRequestHandler<CallHistoryQuery, List<Ca
     public async Task<List<CallHistoryListDto>> Handle(CallHistoryQuery request, CancellationToken cancellationToken)
     {
         var callHistory = await _dbContext.CallHistory
-            .WhereInPrison(x => x.PhoneDirectory.Prisoner.JailId, _requestContext.GetAssociatedPrisonId())
+            .WhereInPrison(x => x.AssociatedPrisonId, _requestContext.GetAssociatedPrisonId())
             .Where(x => x.PhoneDirectory.PrisonerId == request.PrisonerId)
             .Where(x => x.CallStartedOn >= AppDateTime.UtcDateBeforeNDays(request.LastNDays))
             .OrderByDescending(x => x.CallStartedOn)

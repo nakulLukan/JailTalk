@@ -27,7 +27,6 @@ public class PrisonerBasicInfoQueryHandler : IRequestHandler<PrisonerBasicInfoQu
     public async Task<PrisonerBasicInfoDto> Handle(PrisonerBasicInfoQuery request, CancellationToken cancellationToken)
     {
         var basicInfo = await _dbContext.Prisoners
-            .WhereInPrison(x => x.JailId, _requestContext.GetAssociatedPrisonId())
             .Where(x => x.Id == request.PrisonerId)
             .Select(x => new PrisonerBasicInfoDto
             {

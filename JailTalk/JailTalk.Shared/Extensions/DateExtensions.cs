@@ -38,4 +38,9 @@ public static class DateExtensions
 
         return String.Empty;
     }
+
+    public static string ToTimeString(this TimeSpan timeSpan)
+    {
+        return DateTime.Today.Add(timeSpan).ToString("hh\\:mm tt");
+    }
 }

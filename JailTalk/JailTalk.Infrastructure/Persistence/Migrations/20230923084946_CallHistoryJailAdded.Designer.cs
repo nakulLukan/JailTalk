@@ -3,6 +3,7 @@ using System;
 using JailTalk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JailTalk.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230923084946_CallHistoryJailAdded")]
+    partial class CallHistoryJailAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -810,10 +813,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("pid");
 
-                    b.Property<long>("PidNumber")
-                        .HasColumnType("bigint")
-                        .HasColumnName("pid_number");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("text")
                         .HasColumnName("updated_by");
@@ -830,9 +829,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Pid")
                         .HasDatabaseName("ix_prisoners_pid");
-
-                    b.HasIndex("PidNumber")
-                        .HasDatabaseName("ix_prisoners_pid_number");
 
                     b.ToTable("prisoners", (string)null);
                 });

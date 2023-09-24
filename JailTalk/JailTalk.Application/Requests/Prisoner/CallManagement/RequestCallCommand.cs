@@ -38,7 +38,7 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
 
     public async Task<RequestCallResultDto> Handle(RequestCallCommand request, CancellationToken cancellationToken)
     {
-        Guid prisonerId = await ValidateAndGetPrisonerId(request);
+        (Guid prisonerId, int? prisonerJailId) = await ValidateAndGetPrisonerId(request);
 
         var phoneBalanceEntity = await _dbContext.PhoneBalances
             .Where(x => x.PrisonerId == prisonerId)
@@ -59,13 +59,14 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
             cancellationToken);
         RequestCallResultDto response = await AddCallHistoryEntryGetResponse(request,
                                                                              availableTalkTime,
+                                                                             prisonerJailId,
                                                                              cancellationToken);
 
         _logger.LogInformation("Call Allowed for prisoner: {prisoner}, Contact Id: {ct}, Duration: {dur}", prisonerId, request.ContactId, response.AvailableTalkTime / 60);
         return response;
     }
 
-    private async Task<Guid> ValidateAndGetPrisonerId(RequestCallCommand request)
+    private async Task<(Guid PrisonerId, int? jailId)> ValidateAndGetPrisonerId(RequestCallCommand request)
     {
         var prisonerId = _requestContext.GetPrisonerId();
         var contact = await _dbContext.PhoneDirectory
@@ -74,7 +75,8 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
             .Select(x => new
             {
                 x.IsActive,
-                x.IsBlocked
+                x.IsBlocked,
+                x.Prisoner.JailId
             })
             .FirstOrDefaultAsync();
         if (contact is null)
@@ -88,16 +90,21 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
             throw new AppApiException(HttpStatusCode.BadRequest, "RC-0002", "Invalid Contact Requested");
         }
 
-        return prisonerId;
+        if (!contact.JailId.HasValue)
+        {
+            throw new AppApiException(HttpStatusCode.BadRequest, "RC-0004", "Prisoner is not associated to any prison");
+        }
+        return (prisonerId, contact.JailId);
     }
 
-    private async Task<RequestCallResultDto> AddCallHistoryEntryGetResponse(RequestCallCommand request, int availableTalkTime, CancellationToken cancellationToken)
+    private async Task<RequestCallResultDto> AddCallHistoryEntryGetResponse(RequestCallCommand request, int availableTalkTime, int? prisonerJailId, CancellationToken cancellationToken)
     {
         var callHistory = new Domain.Prison.CallHistory
         {
             PhoneDirectoryId = request.ContactId,
             CallStartedOn = AppDateTime.UtcNow,
             EndedOn = null,
+            AssociatedPrisonId = prisonerJailId.Value
         };
         _dbContext.CallHistory.Add(callHistory);
         await _dbContext.SaveAsync(cancellationToken);

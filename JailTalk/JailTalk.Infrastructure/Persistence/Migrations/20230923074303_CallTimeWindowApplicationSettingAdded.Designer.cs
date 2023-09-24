@@ -3,6 +3,7 @@ using System;
 using JailTalk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JailTalk.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230923074303_CallTimeWindowApplicationSettingAdded")]
+    partial class CallTimeWindowApplicationSettingAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -406,10 +409,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<int>("AssociatedPrisonId")
-                        .HasColumnType("integer")
-                        .HasColumnName("associated_prison_id");
-
                     b.Property<int?>("CallRecordingAttachmentId")
                         .HasColumnType("integer")
                         .HasColumnName("call_recording_attachment_id");
@@ -432,9 +431,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_call_history");
-
-                    b.HasIndex("AssociatedPrisonId")
-                        .HasDatabaseName("ix_call_history_associated_prison_id");
 
                     b.HasIndex("CallRecordingAttachmentId")
                         .HasDatabaseName("ix_call_history_call_recording_attachment_id");
@@ -810,10 +806,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("pid");
 
-                    b.Property<long>("PidNumber")
-                        .HasColumnType("bigint")
-                        .HasColumnName("pid_number");
-
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("text")
                         .HasColumnName("updated_by");
@@ -830,9 +822,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Pid")
                         .HasDatabaseName("ix_prisoners_pid");
-
-                    b.HasIndex("PidNumber")
-                        .HasDatabaseName("ix_prisoners_pid_number");
 
                     b.ToTable("prisoners", (string)null);
                 });
@@ -1249,13 +1238,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JailTalk.Domain.Prison.CallHistory", b =>
                 {
-                    b.HasOne("JailTalk.Domain.Prison.Jail", "AssociatedPrison")
-                        .WithMany()
-                        .HasForeignKey("AssociatedPrisonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_call_history_jails_associated_prison_id");
-
                     b.HasOne("JailTalk.Domain.System.Attachment", "CallRecordingAttachment")
                         .WithMany()
                         .HasForeignKey("CallRecordingAttachmentId")
@@ -1267,8 +1249,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_call_history_phone_directory_phone_directory_id");
-
-                    b.Navigation("AssociatedPrison");
 
                     b.Navigation("CallRecordingAttachment");
 

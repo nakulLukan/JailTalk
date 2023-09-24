@@ -1,6 +1,5 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Dto.Prison;
-using JailTalk.Domain.Prison;
 using JailTalk.Shared;
 using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
@@ -37,6 +36,7 @@ public class RegisterPrisonerCommandHandler : IRequestHandler<RegisterPrisonerCo
             MiddleName = request.MiddleName.Trim(),
             FullName = string.Join(' ', new string[] { request.FirstName.Trim(), request.MiddleName.Trim(), request.LastName.Trim() }),
             Pid = request.Pid.Trim(),
+            PidNumber = long.Parse(request.Pid),
             CreatedOn = AppDateTime.UtcNow,
             UpdatedOn = AppDateTime.UtcNow,
             CreatedBy = string.Empty,
