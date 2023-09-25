@@ -1,0 +1,93 @@
+﻿@page "/prisons/{prisonId:int}"
+@using JailTalk.Application.Dto.Jail;
+@using JailTalk.Application.Requests.Jail;
+@using JailTalk.Shared.Extensions;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
+@using MediatR;
+@using Microsoft.AspNetCore.Components.Forms;
+@inject IAppMediator AppMediator;
+@inject IMediator Mediator;
+@inject NavigationManager NavigationManager;
+
+<HasPermissionComponent Roles="@Permissions.Admin"/>
+<MudContainer MaxWidth="MaxWidth.Small">
+    <EditForm Model="model" OnValidSubmit="@OnValidSubmit">
+        <DataAnnotationsValidator />
+        <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
+            <MudPaper Class="pa-16" Elevation="4">
+                <MudGrid>
+                    <MudItem sm="12">
+                        <MudText Typo="Typo.h5">Prison Code: <b>@prisonCode</b></MudText>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudTextField Label="Prison Name" @bind-Value="@model.PrisonName" For="@(()=> model.PrisonName)"></MudTextField>
+                    </MudItem><MudItem sm="12">
+                        <MudTextField Label="Contact Email Address" @bind-Value="@model.ContactEmailAddress" For="@(()=> model.ContactEmailAddress)"></MudTextField>
+                    </MudItem>
+                    <MudDivider DividerType="DividerType.Middle" />
+
+                    <MudItem sm="12">
+                        <MudTextField Label="Street" @bind-Value="@model.Address.Street" For="@(()=> model.Address.Street)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudTextField Label="City" @bind-Value="@model.Address.City" For="@(()=> model.Address.City)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudTextField Label="Pincode" @bind-Value="@model.Address.PinCode" For="@(()=> model.Address.PinCode)"></MudTextField>
+                    </MudItem>
+                    <MudItem sm="12">
+                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+                        <MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Surface" OnClick="(() => model = oldModelState.DeepClone())" >Reset</MudButton>
+                    </MudItem>
+                </MudGrid>
+            </MudPaper>
+        </MudStack>
+    </EditForm>
+</MudContainer>
+
+@code {
+
+    [Parameter]
+    public int PrisonId { get; set; }
+    string prisonCode { get; set; }
+    EditPrisonDto model = new();
+    EditPrisonDto oldModelState;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        var data = await Mediator.Send(new GetPrisonByIdQuery()
+            {
+                JailId = PrisonId
+            });
+        model.Address = data.Address;
+        model.JailId = data.JailId;
+        model.PrisonName = data.PrisonName;
+        model.ContactEmailAddress = data.ContactEmailAddress;
+        prisonCode = data.PrisonCode;
+
+        oldModelState = model;
+        StateHasChanged();
+    }
+
+    private async Task OnValidSubmit(EditContext context)
+    {
+        await AppMediator.Send(new EditPrisonCommand
+            {
+                PrisonName = model.PrisonName.Trim(),
+                Address = model.Address,
+                JailId = PrisonId,
+                ContactEmailAddress = model.ContactEmailAddress?.Trim(),
+            })
+            .OnSuccess(data =>
+            {
+                ToastService.Success("Prison details updated successfully");
+                NavigationManager.NavigateTo("/prisons");
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
+    }
+}

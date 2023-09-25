@@ -3,11 +3,11 @@
 @using JailTalk.Application.Requests.Jail;
 @using MediatR;
 @inject IMediator Mediator;
-
+@inject NavigationManager NavigationManager;
 <HasPermissionComponent Roles="@Permissions.Admin" />
 
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered="true" ShowMenuIcon="false" FixedHeader="true" Dense>
+    <MudDataGrid T="PrisonListDto" Items="@Elements" Virtualize="true" Groupable="false" Bordered="true" ShowMenuIcon="false" FixedHeader="true" Dense>
         <ToolBarContent>
             <MudText Typo="Typo.h6"><b>Prisons</b></MudText>
             <MudSpacer />
@@ -18,14 +18,23 @@
         <Columns>
             <PropertyColumn Property="x => x.Code" Title="Prison Code" />
             <PropertyColumn Property="x => x.Name" Title="Prison Name" />
+            <PropertyColumn Property="x => x.IsSystemTurnedOff" Title="Telephone Device Status" CellClassFunc="@((x) => GetClassForIsSystemTurnedOff(x.IsSystemTurnedOff))"/>
             <PropertyColumn Property="x => x.AddressAsText" Title="Address" />
-        </Columns>
-        <NoRecordsContent>
-            <JailTalk.Web.Components.Common.NoRecordsComponent />
-        </NoRecordsContent>
-    </MudDataGrid>
-</MudContainer>
-@code {
+            <TemplateColumn Title="Action">
+                <CellTemplate>
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert">
+                        <MudMenuItem OnClick="@(() => OnEditClicked(context.Item.Id))">Edit</MudMenuItem>
+                        <MudMenuItem Class="@(GetClassForIsSystemTurnedOff(!context.Item.IsSystemTurnedOff))">@(context.Item.IsSystemTurnedOff ? "Turn On System" : "Shutdown System")</MudMenuItem>
+                        </MudMenu>
+                    </CellTemplate>
+                </TemplateColumn>
+            </Columns>
+            <NoRecordsContent>
+                <JailTalk.Web.Components.Common.NoRecordsComponent />
+            </NoRecordsContent>
+        </MudDataGrid>
+    </MudContainer>
+    @code {
     List<PrisonListDto> Elements = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -33,5 +42,15 @@
         if (!firstRender) return;
         Elements = await Mediator.Send(new GetPrisonsQuery());
         StateHasChanged();
+    }
+
+    private string GetClassForIsSystemTurnedOff(bool value)
+    {
+        return value ? "red-text" : "black-text";
+    }
+
+    private void OnEditClicked(int jailId)
+    {
+        NavigationManager.NavigateTo($"prisons/{jailId}");
     }
 }

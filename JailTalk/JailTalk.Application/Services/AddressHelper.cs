@@ -5,7 +5,7 @@ namespace JailTalk.Application.Services;
 
 public class AddressHelper
 {
-    public static AddressBook ToNewAddress(NewAddressDto addressDto)
+    public static AddressBook FromNewAddress(NewAddressDto addressDto)
     {
         return new()
         {
@@ -15,6 +15,20 @@ public class AddressHelper
             PinCode = addressDto.PinCode,
             StateId = addressDto.StateId,
             Street = addressDto.Street,
+        };
+    }
+
+    public static NewAddressDto ToNewAddressDto(AddressBook address)
+    {
+        if(address == null) return new NewAddressDto();
+        return new()
+        {
+            City = address.City,
+            CountryId = address.CountryId,
+            HouseName = address.HouseName,
+            PinCode = address.PinCode,
+            StateId = address.StateId,
+            Street = address.Street,
         };
     }
 }

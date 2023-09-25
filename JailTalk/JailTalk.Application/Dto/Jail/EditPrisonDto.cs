@@ -4,11 +4,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Jail;
 
-public class AddPrisonDto
+public class EditPrisonDto
 {
-    [Required]
-    [RegularExpression(RegularExpressionPatternConstant.PrisonCode)]
-    public string PrisonCode { get; set; }
+    public int JailId { get; set; }
 
     [Required]
     [RegularExpression(RegularExpressionPatternConstant.PrisonName)]

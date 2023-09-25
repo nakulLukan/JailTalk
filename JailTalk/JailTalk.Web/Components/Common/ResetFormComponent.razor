@@ -1,0 +1,19 @@
+﻿@using JailTalk.Shared.Extensions;
+@typeparam T
+<MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface" OnClick="OnResetClicked">Reset</MudButton>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public T Model { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public T OldState { get => _oldState; set => _oldState = value.DeepClone(); }
+    private T _oldState;
+
+    private void OnResetClicked()
+    {
+        Model = OldState.DeepClone();
+    }
+}

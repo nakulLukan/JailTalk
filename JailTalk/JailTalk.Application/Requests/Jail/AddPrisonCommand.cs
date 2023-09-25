@@ -50,11 +50,13 @@ public class AddPrisonCommandHandler : IRequestHandler<AddPrisonCommand, Respons
         {
             Name = request.PrisonName,
             Code = request.PrisonCode,
-            Address = AddressHelper.ToNewAddress(request.Address),
+            Address = AddressHelper.FromNewAddress(request.Address),
             CreatedOn = AppDateTime.UtcNow,
             UpdatedOn = AppDateTime.UtcNow,
             CreatedBy = userId,
             UpdatedBy = userId,
+            ContactEmailAddress = request.ContactEmailAddress,
+            IsSystemTurnedOff = false
         };
 
         _dbContext.Jails.Add(prison);
