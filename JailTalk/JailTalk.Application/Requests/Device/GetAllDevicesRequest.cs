@@ -38,6 +38,7 @@ public class GetAllDevicesRequestHandler : IRequestHandler<GetAllDevicesRequest,
             DeviceSecret = x.DeviceSecretIdentifier.ToString().Mask(4, 4),
             IsActive = x.IsActive,
             Prison = x.Jail.Code,
+            IsDisabledAtJailLevel = x.Jail.IsSystemTurnedOff,
             Serial = index++,
         }).ToList());
     }

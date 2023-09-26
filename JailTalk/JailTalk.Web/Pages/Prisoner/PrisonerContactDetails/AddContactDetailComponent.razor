@@ -61,7 +61,7 @@
                 <MudTextField Label="Proof Number" @bind-Value="@model.ContactProofValue" For="@(()=> model.ContactProofValue)"></MudTextField>
             </MudItem>
             <MudItem>
-                <JailTalk.Web.Components.Common.FileSelectorComponent Label="Upload Proof" @bind-File="model.ContactProofAttachment" Accept=".png, .jpeg, .jpg, .pdf" />
+                <JailTalk.Web.Components.Common.FileSelectorComponent Label="Upload Proof" @bind-Files="model.ContactProofAttachment" Accept=".png, .jpeg, .jpg, .pdf" />
             </MudItem>
             <MudItem sm="12">
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>

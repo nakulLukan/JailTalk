@@ -7,5 +7,10 @@ public class DeviceListDto
     public string Code { get; set; }
     public string DeviceSecret { get; set; }
     public bool IsActive { get; set; }
+
+    /// <summary>
+    /// If all devices are disabled at the jail level.
+    /// </summary>
+    public bool IsDisabledAtJailLevel { get; set; }
     public string Prison { get; set; }
 }

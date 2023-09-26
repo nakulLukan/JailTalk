@@ -7,6 +7,7 @@ public class AddressHelper
 {
     public static AddressBook FromNewAddress(NewAddressDto addressDto)
     {
+        if (addressDto is null) return null;
         return new()
         {
             City = addressDto.City,
@@ -20,7 +21,7 @@ public class AddressHelper
 
     public static NewAddressDto ToNewAddressDto(AddressBook address)
     {
-        if(address == null) return new NewAddressDto();
+        if (address == null) return new NewAddressDto();
         return new()
         {
             City = address.City,

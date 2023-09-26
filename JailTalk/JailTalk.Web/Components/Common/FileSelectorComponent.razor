@@ -3,14 +3,13 @@
 @using MediatR;
 @using Microsoft.AspNetCore.Components.Forms;
 
-<MudFileUpload T="IBrowserFile" FilesChanged="UploadFile" Accept="@Accept">
+<MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="UploadFile" Accept="@Accept" MaximumFileCount="3">
     <ButtonTemplate>
         <MudButton HtmlTag="label"
                    Variant="Variant.Outlined"
                    Color="ButtonColor"
                    StartIcon="@Icons.Material.Filled.CloudUpload"
-                   for="@context"
-        >
+                   for="@context">
             @Label
         </MudButton>
     </ButtonTemplate>
@@ -22,39 +21,45 @@
     [Parameter] public string Label { get; set; } = "Upload File";
 
     #region File Parameter
-    BrowserFileDto _file;
+    List<BrowserFileDto> _files = new();
     [Parameter]
-    public BrowserFileDto File
+    public List<BrowserFileDto> Files
     {
-        get => _file; set
+        get => _files; set
         {
-            if (_file == value) return;
-            _file = value;
-            FileChanged.InvokeAsync(value);
+            if (_files == value) return;
+            _files = value ?? new List<BrowserFileDto>();
+            FilesChanged.InvokeAsync(_files);
         }
     }
-    [Parameter] public EventCallback<BrowserFileDto> FileChanged { get; set; }
+    [Parameter] public EventCallback<List<BrowserFileDto>> FilesChanged { get; set; }
     #endregion File Parameter
 
     [Parameter]
     public string Accept { get; set; } = "*";
 
     private string fileName;
-    private async Task UploadFile(IBrowserFile file)
+    private async Task UploadFile(IReadOnlyList<IBrowserFile> files)
     {
-        _file?.Dispose();
-        MemoryStream ms = new MemoryStream();
-        await file.OpenReadStream(10_00_00_000).CopyToAsync(ms);
-        fileName = file.Name;
-        _file = new BrowserFileDto
-            {
-                FileName = file.Name,
-                ContentType = file.ContentType,
-                Size = file.Size,
-                LastModified = file.LastModified,
-                DataStream = ms
-            };
+        _files.ForEach(x => x?.Dispose());
+        _files.Clear();
 
-        await FileChanged.InvokeAsync(_file);
+        foreach (var file in files)
+        {
+            MemoryStream ms = new MemoryStream();
+            await file.OpenReadStream(10_00_00_000).CopyToAsync(ms);
+            _files.Add(new BrowserFileDto
+                {
+                    FileName = file.Name,
+                    ContentType = file.ContentType,
+                    Size = file.Size,
+                    LastModified = file.LastModified,
+                    DataStream = ms
+                });
+
+        }
+        fileName = string.Join(", ", _files.Select(x => x.FileName));
+
+        await FilesChanged.InvokeAsync(_files);
     }
 }

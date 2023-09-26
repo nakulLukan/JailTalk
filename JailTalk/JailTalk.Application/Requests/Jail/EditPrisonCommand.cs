@@ -1,6 +1,7 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Contracts.Http;
 using JailTalk.Application.Dto.Jail;
+using JailTalk.Application.Services;
 using JailTalk.Shared;
 using JailTalk.Shared.Extensions;
 using JailTalk.Shared.Models;
@@ -38,12 +39,7 @@ public class EditPrisonCommandHandler : IRequestHandler<EditPrisonCommand, Respo
         jail.UpdatedBy = userId;
         jail.ContactEmailAddress = request.ContactEmailAddress;
         jail.Name = request.PrisonName;
-        //jail.Address.HouseName = request.Address?.HouseName;
-        //jail.Address.Street = request.Address?.Street;
-        //jail.Address.City = request.Address?.City;
-        //jail.Address.CountryId = request.Address?.CountryId;
-        //jail.Address.StateId = request.Address?.StateId;
-        //jail.Address.PinCode = request.Address?.PinCode;
+        jail.Address = AddressHelper.FromNewAddress(request.Address);
 
         await _dbContext.SaveAsync(cancellationToken);
         return new(request.JailId);

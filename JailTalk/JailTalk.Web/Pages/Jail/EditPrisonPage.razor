@@ -18,7 +18,7 @@
             <MudPaper Class="pa-16" Elevation="4">
                 <MudGrid>
                     <MudItem sm="12">
-                        <MudText Typo="Typo.h5">Prison Code: <b>@prisonCode</b></MudText>
+                        <MudText Typo="Typo.subtitle1">Prison Code:   <b>@prisonCode</b></MudText>
                     </MudItem>
                     <MudItem sm="12">
                         <MudTextField Label="Prison Name" @bind-Value="@model.PrisonName" For="@(()=> model.PrisonName)"></MudTextField>
@@ -30,10 +30,10 @@
                     <MudItem sm="12">
                         <MudTextField Label="Street" @bind-Value="@model.Address.Street" For="@(()=> model.Address.Street)"></MudTextField>
                     </MudItem>
-                    <MudItem sm="12">
+                    <MudItem sm="6">
                         <MudTextField Label="City" @bind-Value="@model.Address.City" For="@(()=> model.Address.City)"></MudTextField>
                     </MudItem>
-                    <MudItem sm="12">
+                    <MudItem sm="6">
                         <MudTextField Label="Pincode" @bind-Value="@model.Address.PinCode" For="@(()=> model.Address.PinCode)"></MudTextField>
                     </MudItem>
                     <MudItem sm="12">
@@ -67,7 +67,7 @@
         model.ContactEmailAddress = data.ContactEmailAddress;
         prisonCode = data.PrisonCode;
 
-        oldModelState = model;
+        oldModelState = model.DeepClone();
         StateHasChanged();
     }
 

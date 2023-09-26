@@ -11,7 +11,7 @@
 @inject NavigationManager NavigationManager;
 
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered ShowMenuIcon="false" FixedHeader Dense 
+    <MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered ShowMenuIcon="false" FixedHeader Dense
                   Hover RowClass="cursor-pointer">
             <ToolBarContent>
                 <MudText Typo="Typo.h6"><b>Device Manager </b></MudText>
@@ -24,12 +24,12 @@
                 <PropertyColumn Property="x => x.Serial" Title="S/L" />
                 <PropertyColumn Property="x => x.Code" Title="Device Code" />
                 <PropertyColumn Property="x => x.Prison" Title="Prison" />
-                <PropertyColumn Property="@(context=> context.IsActive ? "Enabled" : "Disabled")" Title="Status" />
+                <PropertyColumn Property="@(context=> GetDeviceStatus(context))" Title="Status" />
                 <PropertyColumn Property="x=> x.DeviceSecret" Title="Device Secret" />
                 <TemplateColumn Title="Action">
                     <CellTemplate>
                         <MudButton OnClick="@(()=> OnEditClicked(context.Item.DeviceId.ToString()))"
-                            Variant="Variant.Text" Size="Size.Small">Edit</MudButton>
+                                   Variant="Variant.Text" Size="Size.Small">Edit</MudButton>
                     </CellTemplate>
                 </TemplateColumn>
             </Columns>
@@ -67,5 +67,31 @@
     private void OnEditClicked(string deviceId)
     {
         NavigationManager.NavigateTo($"device-manager/edit/{deviceId}");
+    }
+
+    private string GetDeviceStatus(DeviceListDto item)
+    {
+        if (!item.IsDisabledAtJailLevel)
+        {
+            if (item.IsActive)
+            {
+                return "Running";
+            }
+            else
+            {
+                return "Stopped";
+            }
+        }
+        else
+        {
+            if (item.IsActive)
+            {
+                return "Enabled, System Turned Off";
+            }
+            else
+            {
+                return "Disabled, System Turned Off";
+            }
+        }
     }
 }

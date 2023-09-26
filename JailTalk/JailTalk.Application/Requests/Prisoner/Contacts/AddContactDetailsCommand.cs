@@ -90,14 +90,14 @@ public class AddContactDetailsCommandHandler : IRequestHandler<AddContactDetails
 
     private async Task CheckAndUploadProof(AddContactDetailsCommand request, PhoneDirectory entry, CancellationToken cancellationToken)
     {
-        if (request.ContactProofAttachment != null)
+        if (request.ContactProofAttachment != null && request.ContactProofAttachment.Any())
         {
             var attachmentPath = await PrisonerHelper.GetPrisonerAttachmentBasePath(request.PrisonerId, _dbContext) + "/contacts/proof";
             var attachmentId = await _mediator.Send(new UploadAttachmentCommand
             {
-                Data = request.ContactProofAttachment.DataStream.ToArray(),
-                FileContent = request.ContactProofAttachment.ContentType,
-                FileName = request.ContactProofAttachment.FileName,
+                Data = request.ContactProofAttachment[0].DataStream.ToArray(),
+                FileContent = request.ContactProofAttachment[0].ContentType,
+                FileName = request.ContactProofAttachment[0].FileName,
                 FileDestinationBasePath = attachmentPath,
                 SaveAsThumbnail = false
             });
@@ -129,7 +129,7 @@ public class AddContactDetailsCommandValidator : AbstractValidator<AddContactDet
         RuleFor(x => x.ContactProofAttachment)
             .NotNull()
                 .WithMessage("Please upload the proof.")
-            .Must(x => x is not null && x.DataStream is not null && x.DataStream.Length > 0)
+            .ForEach(y => y.Must(x => x is not null && x.DataStream is not null && x.DataStream.Length > 0))
                 .WithMessage("Please upload the proof.")
             .When(x => x.ContactProofTypeId.HasValue);
     }

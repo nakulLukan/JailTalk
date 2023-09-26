@@ -40,7 +40,7 @@ public class AddContactDetailsDto
     [MaxLength(50)]
     public string ContactProofValue { get; set; }
 
-    public BrowserFileDto ContactProofAttachment { get; set; }
+    public List<BrowserFileDto> ContactProofAttachment { get; set; }
 
     public bool IsCallRecordingAllowed { get; set; }
 }

@@ -30,7 +30,8 @@ public class GetPrisonsQueryHandler : IRequestHandler<GetPrisonsQuery, List<Pris
             Id = x.Id,
             Code = x.Code,
             Name = x.Name,
-            AddressAsText = x.Address.AddressAsText()
+            AddressAsText = x.Address.AddressAsText(),
+            IsSystemTurnedOff = x.IsSystemTurnedOff,
         }).ToList();
     }
 }

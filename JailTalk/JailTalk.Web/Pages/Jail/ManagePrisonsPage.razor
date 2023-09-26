@@ -1,8 +1,11 @@
 ﻿@page "/prisons"
 @using JailTalk.Application.Dto.Jail;
 @using JailTalk.Application.Requests.Jail;
+@using JailTalk.Web.Contracts.Events;
+@using JailTalk.Web.Extensions;
 @using MediatR;
 @inject IMediator Mediator;
+@inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
 <HasPermissionComponent Roles="@Permissions.Admin" />
 
@@ -18,13 +21,18 @@
         <Columns>
             <PropertyColumn Property="x => x.Code" Title="Prison Code" />
             <PropertyColumn Property="x => x.Name" Title="Prison Name" />
-            <PropertyColumn Property="x => x.IsSystemTurnedOff" Title="Telephone Device Status" CellClassFunc="@((x) => GetClassForIsSystemTurnedOff(x.IsSystemTurnedOff))"/>
+            <PropertyColumn Property="x => x.IsSystemTurnedOff" Title="Telephone Device Status">
+                <CellTemplate>
+                    <MudText Class="@GetClassForIsSystemTurnedOff(context.Item.IsSystemTurnedOff)">@(context.Item.IsSystemTurnedOff ? "Turned Off" : "Running")</MudText>
+                </CellTemplate>
+            </PropertyColumn>
             <PropertyColumn Property="x => x.AddressAsText" Title="Address" />
             <TemplateColumn Title="Action">
                 <CellTemplate>
                     <MudMenu Icon="@Icons.Material.Filled.MoreVert">
                         <MudMenuItem OnClick="@(() => OnEditClicked(context.Item.Id))">Edit</MudMenuItem>
-                        <MudMenuItem Class="@(GetClassForIsSystemTurnedOff(!context.Item.IsSystemTurnedOff))">@(context.Item.IsSystemTurnedOff ? "Turn On System" : "Shutdown System")</MudMenuItem>
+                        <MudMenuItem Class="@(GetClassForIsSystemTurnedOff(!context.Item.IsSystemTurnedOff))"
+                                     OnClick="@(async () => await OnTurnOnOffDeviceClicked(context.Item))">@(context.Item.IsSystemTurnedOff ? "Turn On System" : "Shutdown System")</MudMenuItem>
                         </MudMenu>
                     </CellTemplate>
                 </TemplateColumn>
@@ -46,11 +54,38 @@
 
     private string GetClassForIsSystemTurnedOff(bool value)
     {
-        return value ? "red-text" : "black-text";
+        return value ? "red-text" : "green-text";
     }
 
     private void OnEditClicked(int jailId)
     {
         NavigationManager.NavigateTo($"prisons/{jailId}");
+    }
+
+    private async Task OnTurnOnOffDeviceClicked(PrisonListDto item)
+    {
+        await AppMediator.Send(new TurnfOnOffJailDeviceCommand
+            {
+                JailId = item.Id,
+                TurnOffDevice = !item.IsSystemTurnedOff
+            })
+            .OnSuccess(async turnedOff =>
+            {
+                item.IsSystemTurnedOff = turnedOff;
+                if (turnedOff)
+                {
+                    ToastService.Success("All devices in this prison turned off.");
+                }
+                else
+                {
+                    ToastService.Success("All devices started.");
+                }
+
+                await InvokeAsync(StateHasChanged);
+            })
+            .OnError(err =>
+            {
+                ToastService.Error(err.Message);
+            });
     }
 }
