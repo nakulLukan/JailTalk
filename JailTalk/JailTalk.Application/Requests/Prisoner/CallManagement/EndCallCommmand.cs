@@ -25,6 +25,11 @@ public class EndCallCommmand : IRequest<EndCallResultDto>
     public int CallStartDiff { get; set; }
 
     /// <summary>
+    /// Total time for the whole call. Value in seconds
+    /// </summary>
+    public int TotalCallTime { get; set; }
+
+    /// <summary>
     /// Flag to indicate whether the callee as attended the call.
     /// </summary>
     public bool HasAttendedCall { get; set; }
@@ -36,6 +41,10 @@ public class EndCallCommmand : IRequest<EndCallResultDto>
     /// <para>3 - RecieverRegularCut</para>
     /// <para>4 - InsufficientBalance</para>
     /// <para>5 - NetworkError</para>
+    /// <para>6 - RecieverBusy</para>
+    /// <para>7 - CallTimeExpired</para>
+    /// <para>8 - MissedCall</para>
+    /// <para>9 - CallerSkippedCall</para>
     /// </summary>
     /// <completionlist cref="Shared.CallEndReason"/>
     public CallEndReason CallEndReason { get; set; }
@@ -87,13 +96,14 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
             .Where(x => x.PrisonerId == prisonerId)
             .FirstOrDefaultAsync(cancellationToken);
 
-        callHistory.EndedOn = AppDateTime.UtcNow;
-        callHistory.CallTerminationReason =request.CallEndReason;
-        var totalCallDuration = callHistory.EndedOn.Value - callHistory.CallStartedOn;
+        callHistory.EndedOn = callHistory.CallStartedOn.AddSeconds(request.TotalCallTime);
+        callHistory.CallTerminationReason = request.CallEndReason;
+        var totalCallDuration = TimeSpan.FromSeconds(request.TotalCallTime);
         var chargePerMinute = await _settingsProvider.GetCallPriceChargedPerMinute();
         var callCost = GetNetCallDurationInMinutes(totalCallDuration,
                                                    request.CallStartDiff,
-                                                   request.HasAttendedCall) * chargePerMinute;
+                                                   request.HasAttendedCall,
+                                                   getRoundedValue: true) * chargePerMinute;
 
         phoneBalance.Balance -= callCost;
         phoneBalance.LastUpdatedOn = AppDateTime.UtcNow;
@@ -115,15 +125,30 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
             CallDuration = ((float?)GetNetCallDurationInMinutes(
                 totalCallDuration,
                 request.CallStartDiff,
-                request.HasAttendedCall)).ToHoursMinutesSeconds()
+                request.HasAttendedCall,
+                getRoundedValue: false)).ToHoursMinutesSeconds()
         };
     }
 
-    private static float GetNetCallDurationInMinutes(TimeSpan totalCallDuration, int callStartDiff, bool hasAttendedCall)
+    private static float GetNetCallDurationInMinutes(TimeSpan totalCallDuration, int callStartDiff, bool hasAttendedCall, bool getRoundedValue)
     {
         if (hasAttendedCall)
         {
-            return ((float)totalCallDuration.TotalSeconds - callStartDiff) / 60F;
+            var netTalkTime = ((float)totalCallDuration.TotalSeconds - callStartDiff) / 60F;
+
+            // Round seconds part to higher minute value.
+            var roundValue = netTalkTime % 60;
+            if (roundValue > 0 && getRoundedValue)
+            {
+                return netTalkTime + 1 - roundValue;
+            }
+
+            return netTalkTime;
+        }
+
+        if (callStartDiff > totalCallDuration.TotalSeconds)
+        {
+            throw new AppApiException(HttpStatusCode.BadRequest, "EC-0005", "Invalid value in request.");
         }
 
         return 0;

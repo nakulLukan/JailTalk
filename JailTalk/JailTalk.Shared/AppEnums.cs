@@ -16,14 +16,14 @@ public enum PhoneBalanceReason : short
 public enum CallEndReason : short
 {
     CallerRegularCut = 1,
-
     CallConference = 2,
-
     RecieverRegularCut = 3,
-
     InsufficientBalance = 4,
-
-    NetworkError = 5
+    NetworkError = 5,
+    RecieverBusy = 6,
+    CallTimeExpired = 7,
+    MissedCall = 8,
+    CallerSkippedCall = 9,
 }
 
 public enum States : int

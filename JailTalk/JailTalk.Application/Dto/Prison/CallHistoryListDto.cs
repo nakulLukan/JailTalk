@@ -9,6 +9,7 @@ public class CallHistoryListDto
     public string CallStartedOn { get; set; }
     public string CallEndedOn { get; set; }
     public string CallDuration { get; set; }
+    public string CallEndReason { get; set; }
 
     /// <summary>
     /// True: Call recording clip is available for this call record.

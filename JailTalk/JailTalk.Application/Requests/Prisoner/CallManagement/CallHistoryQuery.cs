@@ -43,8 +43,9 @@ public class CallHistoryQueryHandler : IRequestHandler<CallHistoryQuery, List<Ca
                 x.EndedOn,
                 x.PhoneDirectory.PhoneNumber,
                 x.PhoneDirectory.CountryCode,
-                RelativeName = x.PhoneDirectory.RelativeType.Value,
-                x.CallRecordingAttachment.FileName
+                RelativeName = $"{x.PhoneDirectory.Name} ({x.PhoneDirectory.RelativeType.Value})",
+                x.CallRecordingAttachment.FileName,
+                x.CallTerminationReason
             })
             .ToListAsync(cancellationToken);
         int index = 1;
@@ -58,8 +59,25 @@ public class CallHistoryQueryHandler : IRequestHandler<CallHistoryQuery, List<Ca
             CallEndedOn = x.EndedOn.HasValue ? x.EndedOn.Value.ToLocalDateTimeString() : AppStringConstants.GridNoDataIndication,
             ContactNumber = $"{x.CountryCode} {x.PhoneNumber}",
             Callee = x.RelativeName,
+            CallEndReason = GetCallEndReasonAsText(x.CallTerminationReason),
             CallRecordingState = accessToCallRecordingAllowed ? !string.IsNullOrEmpty(x.FileName) : null
         }).ToList();
+    }
+
+    private string GetCallEndReasonAsText(CallEndReason value)
+    {
+        return value switch
+        {
+            CallEndReason.CallTimeExpired => "Maximum allowed time reached",
+            CallEndReason.CallerSkippedCall => "Call Skipped",
+            CallEndReason.CallConference => "Call Conference",
+            CallEndReason.MissedCall => "Reciever Missed Call",
+            CallEndReason.CallerRegularCut or CallEndReason.RecieverRegularCut => "Regular Call",
+            CallEndReason.InsufficientBalance => "Insufficient Balance",
+            CallEndReason.NetworkError => "Network Error",
+            CallEndReason.RecieverBusy => "Busy",
+            _ => "-",
+        };
     }
 }
 
