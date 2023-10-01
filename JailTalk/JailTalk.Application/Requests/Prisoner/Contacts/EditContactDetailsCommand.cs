@@ -37,6 +37,7 @@ public class EditContactDetailsCommandHandler : IRequestHandler<EditContactDetai
 
         var userId = await _requestContext.GetUserId();
         var contact = await _dbContext.PhoneDirectory.AsTracking()
+            .Include(x => x.RelativeAddress)
             .SingleOrDefaultAsync(x => x.Id == request.ContactId, cancellationToken) ?? throw new AppException("Contact record could not be found");
         contact.CountryCode = request.CountryCode;
         contact.PhoneNumber = request.PhoneNumber;
@@ -44,6 +45,13 @@ public class EditContactDetailsCommandHandler : IRequestHandler<EditContactDetai
         contact.RelativeTypeId = request.RelationshipId.Value;
         contact.UpdatedBy = userId;
         contact.UpdatedOn = AppDateTime.UtcNow;
+        contact.IsCallRecordingAllowed = request.IsCallRecordingAllowed;
+        contact.RelativeAddress.HouseName = request.RelativeAddress.HouseName;
+        contact.RelativeAddress.StateId = request.RelativeAddress.StateId;
+        contact.RelativeAddress.Street = request.RelativeAddress.Street;
+        contact.RelativeAddress.City = request.RelativeAddress.City;
+        contact.RelativeAddress.CountryId = request.RelativeAddress.CountryId;
+        contact.RelativeAddress.PinCode = request.RelativeAddress.PinCode;
 
         await _dbContext.SaveAsync(cancellationToken);
         return new(contact.Id);

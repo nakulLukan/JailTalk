@@ -1,4 +1,6 @@
-﻿using JailTalk.Shared.Constants;
+﻿using JailTalk.Application.Dto.Lookup;
+using JailTalk.Shared.Constants;
+using JailTalk.Shared.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace JailTalk.Application.Dto.Prison;
@@ -24,4 +26,6 @@ public class EditContactDetailsDto
 
     [Required]
     public int? RelationshipId { get; set; }
+    public NewAddressDto RelativeAddress { get; set; } = new();
+    public bool IsCallRecordingAllowed { get; set; }
 }

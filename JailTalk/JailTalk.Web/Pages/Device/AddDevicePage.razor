@@ -16,7 +16,9 @@
             <MudPaper Class="pa-16" Elevation="4">
                 <MudGrid>
                     <MudItem sm="12">
-                        <MudText Typo="Typo.h5">Register New Device</MudText>
+                        <JailTalk.Web.Components.Common.FormTitleComponent>
+                                Register New Device
+                        </JailTalk.Web.Components.Common.FormTitleComponent>
                     </MudItem>
                     <MudItem sm="12">
                         <MudTextField Label="Device Code" @bind-Value="@model.Code" For="@(()=> model.Code)"></MudTextField>
@@ -30,8 +32,8 @@
                     <MudItem sm="12">
                         <div class="d-flex flex-grow-1 gap-4">
                             <MudTextField Class="flex-grow-1" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
-                            <MudButton Class="flex-none" OnClick="OnGenerateDeviceSecret">Generate</MudButton>
-                            <MudButton Class="flex-none" Disabled="@(!model.DeviceSecret.Any())" Variant="Variant.Filled" Color="Color.Surface"
+                            <MudButton Class="flex-none" OnClick="OnGenerateDeviceSecret" Size="Size.Small">Generate</MudButton>
+                            <MudButton Class="flex-none" Disabled="@(!model.DeviceSecret.Any())" Size="Size.Small" Variant="Variant.Filled" Color="Color.Surface"
                                        OnClick="@ToggleQRCodeWindow">@QRCodePopupButtonName()</MudButton>
                             <MudPopover Open="@_isOpen" Fixed="false" Class="flex-none px-4 pt-4" AnchorOrigin="Origin.CenterRight"
                                         TransformOrigin="Origin.CenterLeft">

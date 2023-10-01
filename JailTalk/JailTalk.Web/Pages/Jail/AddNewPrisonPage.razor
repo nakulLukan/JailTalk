@@ -14,7 +14,9 @@
             <MudPaper Class="pa-16" Elevation="4">
                 <MudGrid>
                     <MudItem sm="12">
-                        <MudText Typo="Typo.h5">Enter Prisoner Details</MudText>
+                        <JailTalk.Web.Components.Common.FormTitleComponent>
+                            Enter Prison Details
+                        </JailTalk.Web.Components.Common.FormTitleComponent>
                     </MudItem>
                     <MudItem sm="12">
                         <MudTextField Label="Prison Code" @bind-Value="@model.PrisonCode" For="@(()=> model.PrisonCode)"></MudTextField>

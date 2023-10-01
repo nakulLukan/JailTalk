@@ -1,6 +1,7 @@
 ﻿@using JailTalk.Application.Dto.Prison;
 @using JailTalk.Application.Requests.Prisoner.Contacts;
 @using JailTalk.Shared;
+@using JailTalk.Shared.Extensions;
 @using JailTalk.Shared.Models;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
@@ -11,11 +12,14 @@
 
 <Microsoft.AspNetCore.Components.Forms.EditForm Model="model" OnValidSubmit="OnSubmit">
     <Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator />
-    <MudPaper Elevation="0">
+    <MudPaper Class="px-8 pb-8 pt-4" Elevation="0">
         <MudGrid>
             <MudItem sm="12">
-                <MudText Typo="Typo.h5">Update Contact Details</MudText>
+                <JailTalk.Web.Components.Common.FormTitleComponent>
+                    Update Contact Details
+                </JailTalk.Web.Components.Common.FormTitleComponent>
             </MudItem>
+
             <MudItem sm="12">
                 <MudTextField Label="Contact Name" @bind-Value="@model.Name" For="@(()=> model.Name)"></MudTextField>
             </MudItem>
@@ -30,9 +34,30 @@
                 <JailTalk.Web.Components.Lookup.LookupSelectComponent Label="Relationship" For="@(()=> model.RelationshipId)"
                 @bind-Value="@model.RelationshipId" LookupMaster="@LookupMasters.Relationship.ToString()" />
             </MudItem>
+            <MudItem sm="6">
+                <MudCheckBox T="bool" Label="Allow Call Recording" @bind-Checked="model.IsCallRecordingAllowed"></MudCheckBox>
+            </MudItem>
+
+            <MudItem sm="12">
+                <JailTalk.Web.Components.Common.AppDividerComponent Label="Address" />
+            </MudItem>
+            <MudItem sm="12">
+                <MudTextField Label="House/Flat Name" @bind-Value="@model.RelativeAddress.HouseName" For="@(()=> model.RelativeAddress.HouseName)"></MudTextField>
+            </MudItem>
+            <MudItem sm="4">
+                <MudTextField Label="Street" @bind-Value="@model.RelativeAddress.Street" For="@(()=> model.RelativeAddress.Street)"></MudTextField>
+            </MudItem>
+            <MudItem sm="4">
+                <MudTextField Label="City" @bind-Value="@model.RelativeAddress.City" For="@(()=> model.RelativeAddress.City)"></MudTextField>
+            </MudItem>
+            <MudItem sm="4">
+                <MudTextField Label="Pincode" @bind-Value="@model.RelativeAddress.PinCode" For="@(()=> model.RelativeAddress.PinCode)"></MudTextField>
+            </MudItem>
+            
             <MudItem sm="12">
                 <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
-                <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
+                <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface"
+                           OnClick="@(x=> model = oldStateModel.DeepClone())">Reset</MudButton>
             </MudItem>
         </MudGrid>
     </MudPaper>
@@ -52,6 +77,7 @@
     public EventCallback<ErrorDto> OnSubmitFailed { get; set; }
 
     EditContactDetailsDto model = new();
+    EditContactDetailsDto oldStateModel = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -60,12 +86,15 @@
             {
                 ContactId = ContactDetailId
             });
-        model.RelationshipId = response.RelativeTypeId;
+        model.RelationshipId = response.RelationshipId;
         model.PhoneNumber = response.PhoneNumber;
         model.PrisonerId = Guid.Parse(PrisonerId);
         model.ContactId = ContactDetailId;
         model.CountryCode = response.CountryCode;
         model.Name = response.Name;
+        model.RelativeAddress = response.RelativeAddress;
+        model.IsCallRecordingAllowed = response.IsCallRecordingAllowed;
+        oldStateModel = model.DeepClone();
         StateHasChanged();
     }
 
@@ -78,7 +107,9 @@
                 PrisonerId = Guid.Parse(PrisonerId),
                 RelationshipId = model.RelationshipId,
                 Name = model.Name,
-                ContactId = ContactDetailId
+                ContactId = ContactDetailId,
+RelativeAddress = model.RelativeAddress,
+IsCallRecordingAllowed = model.IsCallRecordingAllowed
             })
         .OnSuccess(async data =>
         {

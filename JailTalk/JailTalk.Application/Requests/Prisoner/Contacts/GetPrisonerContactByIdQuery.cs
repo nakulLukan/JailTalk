@@ -1,5 +1,6 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Dto.Prison;
+using JailTalk.Application.Services;
 using JailTalk.Shared.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +30,10 @@ public class GetPrisonerContactByIdQueryHandler : IRequestHandler<GetPrisonerCon
                 CountryCode = x.CountryCode.Replace("+", ""),
                 Name = x.Name,
                 PhoneNumber = x.PhoneNumber,
-                RelativeTypeId = x.RelativeTypeId
+                RelationshipId = x.RelativeTypeId,
+                IsCallRecordingAllowed = x.IsCallRecordingAllowed,
+                PrisonerId = x.PrisonerId,
+                RelativeAddress = AddressHelper.ToNewAddressDto(x.RelativeAddress)
             })
             .SingleOrDefaultAsync(cancellationToken) ?? throw new AppException("Contact not found");
 

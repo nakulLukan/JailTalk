@@ -1,4 +1,5 @@
 ﻿using JailTalk.Domain.Prison;
+using JailTalk.Domain.System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -26,12 +27,11 @@ public class PhoneDirectoryEFConfig : IEntityTypeConfiguration<PhoneDirectory>
             .WithMany()
             .HasForeignKey(x => x.IdProofTypeId);
 
-        builder.HasOne(x => x.IdProofAttachment)
-            .WithMany()
-            .HasForeignKey(x => x.IdProofAttachmentId);
-
         builder.HasMany(x => x.CallHistory)
             .WithOne(x => x.PhoneDirectory)
             .HasForeignKey(x => x.PhoneDirectoryId);
+
+        builder.HasMany(x => x.IdProofAttachments)
+            .WithMany();
     }
 }

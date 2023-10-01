@@ -3,6 +3,7 @@ using System;
 using JailTalk.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JailTalk.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231001105151_ContactMultipleAttachments")]
+    partial class ContactMultipleAttachments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -693,6 +696,10 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
+                    b.Property<int?>("IdProofAttachmentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("id_proof_attachment_id");
+
                     b.Property<int?>("IdProofTypeId")
                         .HasColumnType("integer")
                         .HasColumnName("id_proof_type_id");
@@ -751,6 +758,9 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_phone_directory");
+
+                    b.HasIndex("IdProofAttachmentId")
+                        .HasDatabaseName("ix_phone_directory_id_proof_attachment_id");
 
                     b.HasIndex("IdProofTypeId")
                         .HasDatabaseName("ix_phone_directory_id_proof_type_id");
@@ -1369,6 +1379,11 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JailTalk.Domain.Prison.PhoneDirectory", b =>
                 {
+                    b.HasOne("JailTalk.Domain.System.Attachment", "IdProofAttachment")
+                        .WithMany()
+                        .HasForeignKey("IdProofAttachmentId")
+                        .HasConstraintName("fk_phone_directory_attachments_id_proof_attachment_id");
+
                     b.HasOne("JailTalk.Domain.Lookup.LookupDetail", "IdProofType")
                         .WithMany()
                         .HasForeignKey("IdProofTypeId")
@@ -1394,6 +1409,8 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_phone_directory_lookup_details_relative_type_id");
+
+                    b.Navigation("IdProofAttachment");
 
                     b.Navigation("IdProofType");
 

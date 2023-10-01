@@ -9,10 +9,12 @@
 
 <Microsoft.AspNetCore.Components.Forms.EditForm Model="model" OnValidSubmit="OnSubmit">
     <Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator />
-    <MudPaper Elevation="0" Class="px-6 pb-6">
+    <MudPaper Class="px-8 pb-8 pt-4" Elevation="0">
         <MudGrid>
             <MudItem sm="12">
-                <MudText Typo="Typo.h5">Enter Contact Details</MudText>
+                <JailTalk.Web.Components.Common.FormTitleComponent>
+                    Enter Contact Details
+                </JailTalk.Web.Components.Common.FormTitleComponent>
             </MudItem>
 
             <MudItem sm="12">

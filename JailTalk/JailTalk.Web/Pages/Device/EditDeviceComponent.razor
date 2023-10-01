@@ -2,6 +2,7 @@
 @using JailTalk.Application.Dto.Device;
 @using JailTalk.Application.Dto.Prison;
 @using JailTalk.Application.Requests.Device;
+@using JailTalk.Shared.Extensions;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
 @using MediatR;
@@ -16,7 +17,9 @@
             <DataAnnotationsValidator />
             <MudGrid>
                 <MudItem sm="12">
-                    <MudText Typo="Typo.h4">Device Code: <b>@_deviceCode </b></MudText>
+                    <JailTalk.Web.Components.Common.FormTitleComponent>
+                        Device Code: <b>@_deviceCode </b>
+                    </JailTalk.Web.Components.Common.FormTitleComponent>
                 </MudItem>
                 <MudItem sm="12">
                     <MudTextField Label="Device ID" @bind-Value="@model.MacAddress" For="@(()=> model.MacAddress)"></MudTextField>
@@ -27,8 +30,8 @@
                 <MudItem sm="12">
                     <div class="d-flex flex-grow-1 gap-4">
                         <MudTextField Class="flex-grow-1" Label="Device Secret" @bind-Value="@model.DeviceSecret" For="@(()=> model.DeviceSecret)"></MudTextField>
-                        <MudButton Class="flex-none" OnClick="OnGenerateDeviceSecret">Generate</MudButton>
-                        <MudButton Class="flex-none" Disabled="@(!model.DeviceSecret.Any())" Variant="Variant.Filled" Color="Color.Surface"
+                        <MudButton Class="flex-none" OnClick="OnGenerateDeviceSecret" Size="Size.Small">Generate</MudButton>
+                        <MudButton Class="flex-none" Disabled="@(!model.DeviceSecret.Any())" Size="Size.Small" Variant="Variant.Filled" Color="Color.Surface"
                                    OnClick="@ToggleQRCodeWindow">@QRCodePopupButtonName()</MudButton>
                         <MudPopover Open="@_isOpen" Fixed="false" Class="flex-none px-4 pt-4" AnchorOrigin="Origin.CenterRight"
                                     TransformOrigin="Origin.CenterLeft">
@@ -39,9 +42,9 @@
                 <MudItem sm="12">
                     <MudSwitch @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
                 </MudItem>
-                <MudItem sm="4">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
-                    <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Reset</MudButton>
+                <MudItem sm="12">
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+                    <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface" OnClick="@(x=> model = oldStateModel.DeepClone())">Reset</MudButton>
                 </MudItem>
             </MudGrid>
         </EditForm>
@@ -51,6 +54,7 @@
     [Parameter]
     public string DeviceId { get; set; } = string.Empty;
     EditDeviceDto model = new();
+    EditDeviceDto oldStateModel = new();
     private string _deviceCode { get; set; }
     bool _isOpen = false;
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -68,6 +72,7 @@
                 MacAddress = response.MacAddress,
                 PrisonId = response.PrisonId
             };
+        oldStateModel = model.DeepClone();
         _deviceCode = response.Code;
         StateHasChanged();
     }

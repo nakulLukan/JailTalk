@@ -9,6 +9,7 @@ using JailTalk.Shared.Models;
 using JailTalk.Shared.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Concurrent;
 
 namespace JailTalk.Application.Requests.Prisoner.Contacts;
 
@@ -93,16 +94,24 @@ public class AddContactDetailsCommandHandler : IRequestHandler<AddContactDetails
         if (request.ContactProofAttachment != null && request.ContactProofAttachment.Any())
         {
             var attachmentPath = await PrisonerHelper.GetPrisonerAttachmentBasePath(request.PrisonerId, _dbContext) + "/contacts/proof";
-            var attachmentId = await _mediator.Send(new UploadAttachmentCommand
-            {
-                Data = request.ContactProofAttachment[0].DataStream.ToArray(),
-                FileContent = request.ContactProofAttachment[0].ContentType,
-                FileName = request.ContactProofAttachment[0].FileName,
-                FileDestinationBasePath = attachmentPath,
-                SaveAsThumbnail = false
-            });
 
-            entry.IdProofAttachmentId = attachmentId.Data;
+            var attachmentIds = new ConcurrentBag<int>();
+            await Task.WhenAll(request.ContactProofAttachment.Select(async file =>
+            {
+                var response = await _mediator.Send(new UploadAttachmentCommand
+                {
+                    Data = file.DataStream.ToArray(),
+                    FileContent = file.ContentType,
+                    FileName = file.FileName,
+                    FileDestinationBasePath = attachmentPath,
+                    SaveAsThumbnail = false
+                });
+                attachmentIds.Add(response.Data);
+            }));
+
+            entry.IdProofAttachments = await _dbContext.Attachments
+                .Where(x => attachmentIds.Contains(x.Id))
+                .ToListAsync(cancellationToken);
             await _dbContext.SaveAsync(cancellationToken);
         }
     }

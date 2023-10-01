@@ -49,10 +49,10 @@
         <MudTd DataLabel="Status">@context.Status</MudTd>
         <MudTd DataLabel="Call Recording">@(context.IsCallRecordingEnabled ? "Enabled" : "Disabled")</MudTd>
             <MudTd DataLabel="Address">@context.RelativeAddress</MudTd>
-        <MudTd DataLabel="Action">
-            <MudMenu Icon="@Icons.Material.Filled.MoreVert">
-                <MudMenuItem OnClick="@(()=> OnEditContactClicked(context.Id))">Edit</MudMenuItem>
-                <MudMenuItem OnClick="@(() => OnContactBlocked(context.Id, context.IsBlocked))">@(context.IsBlocked ? "Unblock Number" : "Block Number")</MudMenuItem>
+            <MudTd DataLabel="Action">
+                <MudMenu Icon="@Icons.Material.Filled.MoreVert">
+                    <MudMenuItem OnClick="@(()=> OnEditContactClicked(context.Id))">Edit</MudMenuItem>
+                    <MudMenuItem OnClick="@(() => OnContactBlocked(context.Id, context.IsBlocked))">@(context.IsBlocked ? "Unblock Number" : "Block Number")</MudMenuItem>
                     <MudMenuItem OnClick="@(() => OnContactDisabled(context.Id, context.IsActive))">@(context.IsActive ? "Disable Number" : "Enable Number")</MudMenuItem>
                 </MudMenu>
             </MudTd>
@@ -191,9 +191,9 @@
             {
                 ContactId = contactId
             })
-        .OnSuccess(async url =>
+        .OnSuccess(urls =>
         {
-            await JsRuntime.OpenDocumentInNewTab(url);
+            urls.ForEach(url => JsRuntime.OpenDocumentInNewTab(url));
         })
         .OnError(err =>
         {

@@ -5,12 +5,13 @@
 @using JailTalk.Application.Requests.Prisoner;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
+@using JailTalk.Web.Helpers;
 @using JailTalk.Web.Impl.Events;
 @using MediatR;
 @inject IMediator Mediator;
 @inject NavigationManager NavigationManager;
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudTable Items="@Prisoners"
+    <MudTable Items="@_prisoners"
               Dense="true" Hover="true" Bordered="true"
               FixedHeader="true" Loading="_loading" SelectOnRowClick="true"
               OnRowClick="OnRowClick" T="PrisonerListDto"
@@ -18,6 +19,10 @@
         <ToolBarContent>
             <MudText Typo="Typo.h6">Prisoners</MudText>
             <MudSpacer />
+            <MudTextField @bind-Value="_searchString" Placeholder="Enter PID" Adornment="Adornment.Start" Immediate
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          IconSize="Size.Medium" Class="mt-0 mx-4" OnKeyDown="@OnEnterPressed" Clearable
+                          OnClearButtonClick="OnClear" MaxLength="10"></MudTextField>
             <MudStack Row="true" AlignItems="AlignItems.End">
                 <MudLink Href="/prisoners/new">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary">Add Prisoner</MudButton>
@@ -25,16 +30,16 @@
             </MudStack>
         </ToolBarContent>
         <HeaderContent>
-            <MudTh>S/L</MudTh>
-            <MudTh>Full Name</MudTh>
             <MudTh>PID</MudTh>
+            <MudTh>Full Name</MudTh>
             <MudTh>Prison Code</MudTh>
+            <MudTh>Prison Name</MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd DataLabel="S/L">@context.Serial</MudTd>
-            <MudTd DataLabel="Full Name">@context.FullName</MudTd>
             <MudTd DataLabel="PID">@context.Pid</MudTd>
+            <MudTd DataLabel="Full Name">@context.FullName</MudTd>
             <MudTd DataLabel="Prison Code">@context.PrisonCode</MudTd>
+            <MudTd DataLabel="Prison Name">@context.PrisonName</MudTd>
         </RowTemplate>
         <PagerContent>
             <MudTablePager />
@@ -44,22 +49,76 @@
 
 @code {
     private bool _loading = true;
-    private string searchString1 = "";
 
-    private List<PrisonerListDto> Prisoners = new List<PrisonerListDto>();
+    private string _searchString = "";
+    private string _lastSearchString = "";
+
+    private int _prisonersCount;
+    private int _selectedPage = 1;
+    private const int _pageSize = 2;
+    private List<PrisonerListDto> _prisoners = new List<PrisonerListDto>();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            Prisoners = (await Mediator.Send(new GetPrisonersQuery()));
-            _loading = false;
-            StateHasChanged();
+            await LoadPrisoners();
         }
+    }
+
+    private async Task LoadPrisoners()
+    {
+        _loading = true;
+        StateHasChanged();
+
+        var response = (await Mediator.Send(new GetPrisonersQuery()
+            {
+                JailId = null,
+                Pid = _searchString,
+                Skip = UIHelper.GetPageSkipValue(_selectedPage, _pageSize),
+                Take = _pageSize
+            }));
+
+        _prisoners = response.Data;
+        _prisonersCount = UIHelper.GetNumberOfPages(response.TotalRecords, _pageSize);
+        _selectedPage = 1;
+        _loading = false;
+        StateHasChanged();
     }
 
     private void OnRowClick(TableRowClickEventArgs<PrisonerListDto> tableRowClickEventArgs)
     {
         NavigationManager.NavigateTo($"prisoners/{tableRowClickEventArgs.Item.Id}");
+    }
+
+    private async Task OnEnterPressed(KeyboardEventArgs eventArg)
+    {
+        if (eventArg.Code == "Enter")
+        {
+            await OnSearch();
+        }
+    }
+
+    private async Task OnSearch()
+    {
+        if (_lastSearchString == _searchString)
+        {
+            return;
+        }
+
+        await LoadPrisoners();
+        _lastSearchString = _searchString;
+    }
+
+    private async Task OnClear()
+    {
+        _searchString = _lastSearchString = string.Empty;
+        await LoadPrisoners();
+    }
+
+    private async Task OnPageSelected(int selectedPage)
+    {
+        _selectedPage = selectedPage;
+        await LoadPrisoners();
     }
 }

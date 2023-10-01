@@ -1,19 +1,20 @@
 ﻿using JailTalk.Application.Contracts.Data;
 using JailTalk.Application.Dto.ReleasedPrisoner;
 using JailTalk.Shared.Extensions;
+using JailTalk.Shared.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace JailTalk.Application.Requests.ReleasedPrisoner;
 
-public class GetAllReleasedPrisonersQuery : IRequest<List<ReleasedPrisonerListDto>>
+public class GetAllReleasedPrisonersQuery : IRequest<PaginatedResponse<ReleasedPrisonerListDto>>
 {
     public string Pid { get; set; }
     public int? Skip { get; set; }
     public int? Take { get; set; }
 }
 
-public class GetAllReleasedPrisonersQueryHandler : IRequestHandler<GetAllReleasedPrisonersQuery, List<ReleasedPrisonerListDto>>
+public class GetAllReleasedPrisonersQueryHandler : IRequestHandler<GetAllReleasedPrisonersQuery, PaginatedResponse<ReleasedPrisonerListDto>>
 {
     readonly IAppDbContext _dbContext;
 
@@ -22,7 +23,7 @@ public class GetAllReleasedPrisonersQueryHandler : IRequestHandler<GetAllRelease
         _dbContext = dbContext;
     }
 
-    public async Task<List<ReleasedPrisonerListDto>> Handle(GetAllReleasedPrisonersQuery request, CancellationToken cancellationToken)
+    public async Task<PaginatedResponse<ReleasedPrisonerListDto>> Handle(GetAllReleasedPrisonersQuery request, CancellationToken cancellationToken)
     {
         var prisonersQuery = _dbContext.Prisoners.Where(x => !x.JailId.HasValue)
             .OrderByDescending(x => x.PrisonerFunction.LastReleasedOn.Value)
@@ -39,6 +40,8 @@ public class GetAllReleasedPrisonersQueryHandler : IRequestHandler<GetAllRelease
             prisonersQuery = prisonersQuery.Where(x => x.Pid.Contains(request.Pid));
         }
 
+        var countQuery = prisonersQuery.AsQueryable();
+
         if (request.Skip.HasValue)
         {
             prisonersQuery = prisonersQuery.Skip(request.Skip.Value);
@@ -50,6 +53,7 @@ public class GetAllReleasedPrisonersQueryHandler : IRequestHandler<GetAllRelease
         }
 
         var prisoners = await prisonersQuery.ToListAsync(cancellationToken);
-        return prisoners;
+        var count = await countQuery.CountAsync(cancellationToken);
+        return new(prisoners, count);
     }
 }

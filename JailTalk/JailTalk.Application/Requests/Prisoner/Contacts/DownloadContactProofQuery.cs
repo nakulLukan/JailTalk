@@ -10,12 +10,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JailTalk.Application.Requests.Prisoner.Contacts;
 
-public class DownloadContactProofQuery : IRequest<string>
+public class DownloadContactProofQuery : IRequest<List<string>>
 {
     public long ContactId { get; set; }
 }
 
-public class DownloadContactProofQueryHandler : IRequestHandler<DownloadContactProofQuery, string>
+public class DownloadContactProofQueryHandler : IRequestHandler<DownloadContactProofQuery, List<string>>
 {
     readonly IAppDbContext _dbContext;
     readonly IAppRequestContext _requestContext;
@@ -28,20 +28,23 @@ public class DownloadContactProofQueryHandler : IRequestHandler<DownloadContactP
         _fileStorage = fileStorage;
     }
 
-    public async Task<string> Handle(DownloadContactProofQuery request, CancellationToken cancellationToken)
+    public async Task<List<string>> Handle(DownloadContactProofQuery request, CancellationToken cancellationToken)
     {
         var jailId = _requestContext.GetAssociatedPrisonId();
-        var attachment = await _dbContext.PhoneDirectory
+        var attachments = await _dbContext.PhoneDirectory
             .WhereInPrison(x => x.Prisoner.JailId, jailId)
-            .Select(x => new
+            .Where(x => x.Id == request.ContactId)
+            .SelectMany(x => x.IdProofAttachments)
+            .Select(x=> new
             {
                 x.Id,
-                x.IdProofAttachment.FileName,
-                x.IdProofAttachment.RelativeFilePath
+                x.FileName,
+                x.RelativeFilePath
             })
-            .FirstOrDefaultAsync(x => x.Id == request.ContactId, cancellationToken) ?? throw new AppException(CommonExceptionMessages.PermissionDenied);
+            .ToListAsync(cancellationToken) ?? throw new AppException(CommonExceptionMessages.PermissionDenied);
 
-        return _fileStorage.GetPresignedUrl(AttachmentHelper.GenerateFullPath(attachment.RelativeFilePath, attachment.FileName));
+        return attachments.Select(attachment => _fileStorage.GetPresignedUrl(AttachmentHelper.GenerateFullPath(attachment.RelativeFilePath, attachment.FileName)))
+            .ToList();
     }
 }
 

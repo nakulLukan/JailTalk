@@ -16,13 +16,12 @@ public class PhoneDirectory : DomainBase
     public long RelativeAddressId { get; set; }
     public int? IdProofTypeId { get; set; }
     public string IdProofValue { get; set; }
-    public int? IdProofAttachmentId { get; set; }
     public bool IsCallRecordingAllowed { get; set; }
 
     public Prisoner Prisoner { get; set; }
     public LookupDetail RelativeType { get; set; }
     public LookupDetail IdProofType { get; set; }
     public AddressBook RelativeAddress { get; set; }
-    public Attachment IdProofAttachment { get; set; }
     public List<CallHistory> CallHistory { get; set; }
+    public List<Attachment> IdProofAttachments { get; set; }
 }
