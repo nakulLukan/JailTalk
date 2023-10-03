@@ -15,8 +15,7 @@ public class NewAddressDto
     public string City { get; set; }
 
     [MaxLength(10)]
-    [Required]
-    [RegularExpression(RegularExpressionPatternConstant.Pincode, ErrorMessage = "Wrong format. Enter value in the following format 'xxxxxx'")]
+    [RegularExpression(RegularExpressionPatternConstant.Pincode, ErrorMessage = "Wrong format. Enter 6 digit numerical value.")]
     public string PinCode { get; set; }
 
     public int? StateId { get; set; }

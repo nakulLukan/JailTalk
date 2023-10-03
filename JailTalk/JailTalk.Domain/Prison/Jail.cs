@@ -15,4 +15,5 @@ public class Jail : DomainBase
     public bool IsSystemTurnedOff { get; set; }
 
     public AddressBook Address { get; set; }
+    public JailAccountBalance AccountBalance { get; set; }
 }

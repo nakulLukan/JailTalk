@@ -27,6 +27,8 @@ public interface IAppDbContext
     public DbSet<AppUser> Users { get; set; }
     public DbSet<AppRole> Roles { get; set; }
     public DbSet<IdentityUserRole<string>> UserRoles { get; set; }
+    public DbSet<JailAccountRechargeRequest> JailAccountRechargeRequests { get; set; }
+    public DbSet<JailAccountBalance> JailAccountBalance { get; set; }
 
     public void ClearChanges();
 

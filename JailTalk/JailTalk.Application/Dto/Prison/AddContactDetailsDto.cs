@@ -11,7 +11,7 @@ public class AddContactDetailsDto
     [Required]
     [MaxLength(5)]
     [RegularExpression(RegularExpressionPatternConstant.CountryCode)]
-    public string CountryCode { get; set; }
+    public string CountryCode { get; set; } = "91";
 
     [MaxLength(15)]
     [RegularExpression(RegularExpressionPatternConstant.PhoneNumber, ErrorMessage = "Phone number should have 10 numbers")]

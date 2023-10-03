@@ -71,3 +71,12 @@ public enum ApplicationSettings : int
     AllowAccessToCallRecording = 7,
     DailyCallTimeWindow = 8
 }
+
+public enum JailAccountRechargeRequestStatus : short
+{
+    Pending = 1,
+    Completed = 2,
+    Declined = 3,
+    Expired = 4,
+    FailAttemptExceeded = 5
+}

@@ -38,7 +38,7 @@ public class EmailService : IEmailService
     /// <param name="body">Body of the email</param>
     /// <param name="isBodyHtml">To indicate that the body is a valid HTML content.</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    public void SendEmail(string to, string subject, string body, bool isBodyHtml = true, CancellationToken cancellationToken = default)
+    public async Task SendEmailAsync(string to, string subject, string body, bool isBodyHtml = true, CancellationToken cancellationToken = default)
     {
         try
         {
@@ -51,7 +51,7 @@ public class EmailService : IEmailService
 
             var bodyBuilder = new BodyBuilder
             {
-                HtmlBody = body,
+                HtmlBody = body
             };
 
             message.Body = bodyBuilder.ToMessageBody();
@@ -59,7 +59,7 @@ public class EmailService : IEmailService
             using var client = new SmtpClient();
             client.Connect(_smtpServer, _smtpPort, useSsl: false, cancellationToken);
             client.Authenticate(_smtpUsername, _smtpPassword);
-            client.Send(message);
+            await client.SendAsync(message);
             client.Disconnect(true);
             _logger.LogInformation("Email sent successfully.");
         }
