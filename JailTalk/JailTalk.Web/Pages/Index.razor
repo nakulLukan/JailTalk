@@ -1,17 +1,14 @@
 ﻿@page "/"
-@using JailTalk.Web.Pages.Dashboard
 
 <MudContainer MaxWidth="MaxWidth.Medium">
-
-    <MudPaper Class="d-flex flex-wrap justify-start gap-12 mt-12 default-bg" Elevation="0" >
-        <DashboardItemComponent Name="Prisons" Route="/prisons"/>
-        <DashboardItemComponent Name="Prison Inmates" Route="/prisoners" />
-        <DashboardItemComponent Name="Prison Inmates (Released)" Route="/prisoners/released" />
-        <DashboardItemComponent Name="Telephone Devices" Route="/device-manager" />
-        <DashboardItemComponent Name="User & Role Management" Route="/identity-management" />
-        <DashboardItemComponent Name="Application Settings" Route="/application-settings" />
-    </MudPaper>
-
+    <JailTalk.Web.Components.Common.Dashboard.DashboardComponent>
+        <JailTalk.Web.Components.Common.Dashboard.DashboardItemComponent Name="Prisons" Route="/prisons" IconPath="/assets/images/home-menu-items/jail.png" />
+        <JailTalk.Web.Components.Common.Dashboard.DashboardItemComponent Name="Prison Inmates" Route="/prisoners" IconPath="/assets/images/home-menu-items/prisoners.png" />
+        <JailTalk.Web.Components.Common.Dashboard.DashboardItemComponent Name="Prison Inmates (Released)" Route="/prisoners/released" IconPath="/assets/images/home-menu-items/prisoners-released.png" />
+        <JailTalk.Web.Components.Common.Dashboard.DashboardItemComponent Name="Telephone Devices" Route="/device-manager" IconPath="/assets/images/home-menu-items/telephone-devices.png" />
+        <JailTalk.Web.Components.Common.Dashboard.DashboardItemComponent Name="User & Role Management" Route="/identity-management" IconPath="/assets/images/home-menu-items/user-role-management.png" />
+        <JailTalk.Web.Components.Common.Dashboard.DashboardItemComponent Name="Application Settings" Route="/application-settings" IconPath="/assets/images/home-menu-items/application-settings.png" />
+    </JailTalk.Web.Components.Common.Dashboard.DashboardComponent>
 </MudContainer>
 @code {
 

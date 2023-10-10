@@ -1,12 +1,11 @@
 ﻿@page "/identity-management"
-@using JailTalk.Web.Pages.Dashboard
-<HasPermissionComponent Roles="@Permissions.Admin"/>
+<HasPermissionComponent Roles="@Permissions.Admin" />
 
 <MudContainer MaxWidth="MaxWidth.Medium">
-    <MudPaper Class="d-flex flex-wrap justify-start gap-12 mt-12 default-bg" Elevation="0">
-        <DashboardItemComponent Name="Users Accounts" Route="/identity-management/user-accounts" />
-        <DashboardItemComponent Name="Roles" Route="/identity-management/roles" />
-    </MudPaper>
+    <JailTalk.Web.Components.Common.Dashboard.DashboardComponent>
+        <JailTalk.Web.Components.Common.Dashboard.DashboardItemComponent Name="Users Accounts" Route="/identity-management/user-accounts" />
+        <JailTalk.Web.Components.Common.Dashboard.DashboardItemComponent Name="Roles" Route="/identity-management/roles" />
+    </JailTalk.Web.Components.Common.Dashboard.DashboardComponent>
 </MudContainer>
 @code {
 

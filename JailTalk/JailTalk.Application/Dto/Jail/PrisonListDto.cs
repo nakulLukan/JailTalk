@@ -7,4 +7,5 @@ public class PrisonListDto
     public string Code { get; set; }
     public bool IsSystemTurnedOff { get; set; }
     public string AddressAsText { get; set; }
+    public float AccountBalance { get; set; }
 }

@@ -1,0 +1,11 @@
+﻿@using JailTalk.Shared.Utilities;
+@inject NavigationManager NavigationManager
+<MudPaper Class="d-flex flex-row flex-wrap justify-center align-content-center gap-12 mt-12 default-bg" Elevation="0">
+    @ChildContent
+</MudPaper>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public RenderFragment ChildContent { get; set; }
+}

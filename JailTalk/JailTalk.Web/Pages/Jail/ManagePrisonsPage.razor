@@ -1,6 +1,7 @@
 ﻿@page "/prisons"
 @using JailTalk.Application.Dto.Jail;
 @using JailTalk.Application.Requests.Jail;
+@using JailTalk.Shared.Extensions;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
 @using MediatR;
@@ -21,18 +22,26 @@
         <Columns>
             <PropertyColumn Property="x => x.Code" Title="Prison Code" />
             <PropertyColumn Property="x => x.Name" Title="Prison Name" />
-            <PropertyColumn Property="x => x.IsSystemTurnedOff" Title="Telephone Device Status">
+            <PropertyColumn Property="x => x.AccountBalance" Title="Balance Amount">
                 <CellTemplate>
-                    <MudText Class="@GetClassForIsSystemTurnedOff(context.Item.IsSystemTurnedOff)">@(context.Item.IsSystemTurnedOff ? "Turned Off" : "Running")</MudText>
+                    <MudText Class="@GetClassForAccountBalance(context.Item.AccountBalance)" Typo="Typo.body2">
+                        @context.Item.AccountBalance.ToCurrency()
+                    </MudText>
                 </CellTemplate>
             </PropertyColumn>
-            <PropertyColumn Property="x => x.AddressAsText" Title="Address" />
-            <TemplateColumn Title="Action">
+            <PropertyColumn Property="x => x.IsSystemTurnedOff" Title="Telephone Device Status">
                 <CellTemplate>
-                    <MudMenu Icon="@Icons.Material.Filled.MoreVert">
-                        <MudMenuItem OnClick="@(() => OnEditClicked(context.Item.Id))">Edit</MudMenuItem>
-                        <MudMenuItem Class="@(GetClassForIsSystemTurnedOff(!context.Item.IsSystemTurnedOff))"
-                                     OnClick="@(async () => await OnTurnOnOffDeviceClicked(context.Item))">@(context.Item.IsSystemTurnedOff ? "Turn On System" : "Shutdown System")</MudMenuItem>
+                    <MudText Class="@GetClassForIsSystemTurnedOff(context.Item.IsSystemTurnedOff)" Typo="Typo.body2">@(context.Item.IsSystemTurnedOff ? "Turned Off" : "Running")</MudText>
+                    </CellTemplate>
+                </PropertyColumn>
+                <PropertyColumn Property="x => x.AddressAsText" Title="Address" />
+                <TemplateColumn Title="Action">
+                    <CellTemplate>
+                        <MudMenu Icon="@Icons.Material.Filled.MoreVert" Dense>
+                            <MudMenuItem OnClick="@(() => OnEditClicked(context.Item.Id))">Edit</MudMenuItem>
+                            <MudMenuItem Class="@(GetClassForIsSystemTurnedOff(!context.Item.IsSystemTurnedOff))"
+                                         OnClick="@(async () => await OnTurnOnOffDeviceClicked(context.Item))">@(context.Item.IsSystemTurnedOff ? "Turn On System" : "Shutdown System")</MudMenuItem>
+                            <MudMenuItem OnClick="@(() => OnRechargeClicked(context.Item.Id))">Recharge Account</MudMenuItem>
                         </MudMenu>
                     </CellTemplate>
                 </TemplateColumn>
@@ -57,9 +66,18 @@
         return value ? "red-text" : "green-text";
     }
 
+    private string GetClassForAccountBalance(float accountBalance)
+    {
+        return accountBalance < 50 ? "red-text" : "green-text";
+    }
+
     private void OnEditClicked(int jailId)
     {
         NavigationManager.NavigateTo($"prisons/{jailId}");
+    }
+
+    private void OnRechargeClicked(int jailId)
+    {
     }
 
     private async Task OnTurnOnOffDeviceClicked(PrisonListDto item)

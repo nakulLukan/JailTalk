@@ -24,6 +24,7 @@ public class GetPrisonsQueryHandler : IRequestHandler<GetPrisonsQuery, List<Pris
     public async Task<List<PrisonListDto>> Handle(GetPrisonsQuery request, CancellationToken cancellationToken)
     {
         var prisons = await _dbContext.Jails.Include(x => x.Address)
+                .Include(x => x.AccountBalance)
             .ToListAsync(cancellationToken);
         return prisons.Select(x => new PrisonListDto
         {
@@ -32,6 +33,7 @@ public class GetPrisonsQueryHandler : IRequestHandler<GetPrisonsQuery, List<Pris
             Name = x.Name,
             AddressAsText = x.Address.AddressAsText(),
             IsSystemTurnedOff = x.IsSystemTurnedOff,
+            AccountBalance = x.AccountBalance?.BalanceAmount ?? 0
         }).ToList();
     }
 }
