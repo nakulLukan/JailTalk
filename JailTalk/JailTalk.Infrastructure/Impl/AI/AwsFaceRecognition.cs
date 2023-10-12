@@ -3,6 +3,7 @@ using Amazon.Rekognition.Model;
 using JailTalk.Application.Contracts.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Image = Amazon.Rekognition.Model.Image;
 
 namespace JailTalk.Infrastructure.Impl.AI;
 

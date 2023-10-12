@@ -11,4 +11,7 @@ public class AttachmentHelper
 
         return $"{basePath}/{fileName}";
     }
+
+    public static string TempFolder => "temp";
+    public static string RechargeRequestTempPath => TempFolder + "/rechage-requests";
 }

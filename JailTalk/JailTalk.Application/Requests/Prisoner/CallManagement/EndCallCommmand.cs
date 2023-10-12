@@ -137,13 +137,10 @@ public class EndCallCommmandHandler : IRequestHandler<EndCallCommmand, EndCallRe
             var netTalkTime = ((float)totalCallDuration.TotalSeconds - callStartDiff) / 60F;
 
             // Round seconds part to higher minute value.
-            var roundValue = netTalkTime % 60;
-            if (roundValue > 0 && getRoundedValue)
-            {
-                return netTalkTime + 1 - roundValue;
-            }
+            var roundValue = MathF.Ceiling(netTalkTime);
 
-            return netTalkTime;
+            // If net talktime minutes is to calculate the total amount then return rounded value.
+            return getRoundedValue ? roundValue : netTalkTime;
         }
 
         if (callStartDiff > totalCallDuration.TotalSeconds)

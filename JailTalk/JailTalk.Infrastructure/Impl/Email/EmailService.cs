@@ -4,6 +4,7 @@ using MailKit.Net.Smtp;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MimeKit;
+using System.Text;
 
 namespace JailTalk.Infrastructure.Impl.Email;
 
@@ -28,6 +29,37 @@ public class EmailService : IEmailService
         _smtpUsername = configuration[$"{pathToSettings}:UserName"];
         _smtpPassword = configuration[$"{pathToSettings}:Password"];
         _logger = logger;
+    }
+
+    /// <summary>
+    /// Function to generate body of the email from a given html template and its body params.
+    /// Body params will get replaced in the template with actual value supplied.
+    /// </summary>
+    /// <param name="templateName"></param>
+    /// <param name="bodyParams"></param>
+    /// <returns></returns>
+    public async Task<string> GenerateBody(string templateName, IDictionary<string, string> bodyParams)
+    {
+        var emailTemplateDirectory = AppContext.BaseDirectory + "/Resources/EmailTemplates";
+        _logger.LogInformation("Email Template Root Directory: {RootDirectory}", emailTemplateDirectory);
+
+        var fileLocation = Path.Combine(emailTemplateDirectory, $"{templateName}.htm");
+        if (!File.Exists(fileLocation))
+        {
+            throw new AppException("Email template not found.");
+        }
+
+        StringBuilder emailBodyBuilder = new(await File.ReadAllTextAsync(fileLocation));
+
+        if (bodyParams != null)
+        {
+            foreach (var bodyParam in bodyParams)
+            {
+                emailBodyBuilder.Replace(bodyParam.Key, bodyParam.Value);
+            }
+        }
+
+        return emailBodyBuilder.ToString();
     }
 
     /// <summary>

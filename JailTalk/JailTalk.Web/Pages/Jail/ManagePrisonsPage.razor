@@ -38,10 +38,10 @@
                 <TemplateColumn Title="Action">
                     <CellTemplate>
                         <MudMenu Icon="@Icons.Material.Filled.MoreVert" Dense>
-                            <MudMenuItem OnClick="@(() => OnEditClicked(context.Item.Id))">Edit</MudMenuItem>
-                            <MudMenuItem Class="@(GetClassForIsSystemTurnedOff(!context.Item.IsSystemTurnedOff))"
-                                         OnClick="@(async () => await OnTurnOnOffDeviceClicked(context.Item))">@(context.Item.IsSystemTurnedOff ? "Turn On System" : "Shutdown System")</MudMenuItem>
-                            <MudMenuItem OnClick="@(() => OnRechargeClicked(context.Item.Id))">Recharge Account</MudMenuItem>
+                        <MudMenuItem OnClick="@(() => OnEditClicked(context.Item.Id))">Edit</MudMenuItem>
+                        <MudMenuItem Class="@(GetClassForIsSystemTurnedOff(!context.Item.IsSystemTurnedOff))"
+                                     OnClick="@(async () => await OnTurnOnOffDeviceClicked(context.Item))">@(context.Item.IsSystemTurnedOff ? "Turn On System" : "Shutdown System")</MudMenuItem>
+                            <MudMenuItem OnClick="@(async () => await OnRechargeClicked(context.Item.Id))">Recharge Account</MudMenuItem>
                         </MudMenu>
                     </CellTemplate>
                 </TemplateColumn>
@@ -76,8 +76,21 @@
         NavigationManager.NavigateTo($"prisons/{jailId}");
     }
 
-    private void OnRechargeClicked(int jailId)
+    private async Task OnRechargeClicked(int jailId)
     {
+        await AppMediator.Send(new RequestJailAccountRechargeCommand()
+            {
+                JailId = jailId,
+                RechargeAmount = 1000
+            })
+        .OnSuccess(data =>
+        {
+            ToastService.Success("Account recharge request sent successfully.");
+        })
+        .OnError(err =>
+        {
+            ToastService.Error(err.Message);
+        });
     }
 
     private async Task OnTurnOnOffDeviceClicked(PrisonListDto item)

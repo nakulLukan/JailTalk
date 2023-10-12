@@ -3,6 +3,15 @@
 public interface IEmailService
 {
     /// <summary>
+    /// Function to generate body of the email from a given html template and its body params.
+    /// Body params will get replaced in the template with actual value supplied.
+    /// </summary>
+    /// <param name="templateName"></param>
+    /// <param name="bodyParams"></param>
+    /// <returns></returns>
+    public Task<string> GenerateBody(string templateName, IDictionary<string, string> bodyParams);
+
+    /// <summary>
     /// Sends an email to the given email address.
     /// </summary>
     /// <param name="to">Recievers email address</param>

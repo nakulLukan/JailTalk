@@ -33,5 +33,6 @@ public static class ServiceRegistry
         services.AddTransient<IEmailService, EmailService>();
         services.AddTransient<IFileStorage, AwsStorage>();
         services.AddTransient<IAudioService, AudioService>();
+        services.AddTransient<IAppQRCodeGenerator, AppQRCodeGenerator>();
     }
 }
