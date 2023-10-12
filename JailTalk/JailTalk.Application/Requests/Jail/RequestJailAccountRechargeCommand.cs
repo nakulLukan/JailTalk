@@ -94,7 +94,7 @@ public class RequestJailAccountRechargeCommandHandler : IRequestHandler<RequestJ
         var init = EmailContentInitialiser.RechargeRequestBuilder(qrCodeFile.SignedUrl);
         var emailBody = await _emailService.GenerateBody(init.TemplateName, init.BodyParams);
 
-        string requestRecieverEmail = _configuration["Jail:RechargeRequestRecieverEmailAddress"];
+        string requestRecieverEmail = _configuration["AccountManager:RechargeRequestRecieverEmailAddress"];
         await _emailService.SendEmailAsync(requestRecieverEmail, $"Recharge Request #{rechargeRequest.Id}", emailBody);
         return rechargeRequest.Id;
     }
