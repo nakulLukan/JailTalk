@@ -28,6 +28,20 @@ public class RechargeAccountCommandHandler : IRequestHandler<RechargeAccountComm
     public async Task<ResponseDto<float>> Handle(RechargeAccountCommand request, CancellationToken cancellationToken)
     {
         float initialAmount = 0;
+        var jail = await _dbContext.Prisoners
+            .Where(x => x.Id == request.PrisonerId)
+            .Select(x => new
+            {
+                AccountBalance = x.Jail.AccountBalance,
+                x.JailId
+            })
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (jail.AccountBalance == null || (jail.AccountBalance.BalanceAmount < request.RechargeAmount))
+        {
+            throw new AppException("Jail account has insufficient balance. Please recharge the prison account balance.");
+        }
+
         var accountBalanceInfo = await _dbContext.PhoneBalances.AsTracking()
             .Where(x => x.PrisonerId == request.PrisonerId)
             .FirstOrDefaultAsync(cancellationToken);
@@ -60,6 +74,9 @@ public class RechargeAccountCommandHandler : IRequestHandler<RechargeAccountComm
         };
 
         _dbContext.PhoneBalanceHistory.Add(balanceHistoryEntity);
+        await _dbContext.JailAccountBalance.ExecuteUpdateAsync((x) => x.SetProperty(
+            x => x.BalanceAmount,
+            x => x.BalanceAmount - request.RechargeAmount));
         await _dbContext.SaveAsync(cancellationToken);
         return new ResponseDto<float>(accountBalanceInfo.Balance);
     }

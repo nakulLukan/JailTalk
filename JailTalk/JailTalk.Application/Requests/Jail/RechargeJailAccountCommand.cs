@@ -45,6 +45,10 @@ public class RechargeJailAccountCommandHandler : IRequestHandler<RechargeJailAcc
 
     private async Task ValidateRequest(RechargeJailAccountCommand request, JailAccountRechargeRequest rechargeRequest, CancellationToken cancellationToken)
     {
+        if (rechargeRequest.RequestStatus != Shared.JailAccountRechargeRequestStatus.Pending)
+        {
+            throw new AppApiException(HttpStatusCode.BadRequest, "ERR-6", "Request already processed.");
+        }
         if (rechargeRequest.RetryCount >= _maxFailAttempt)
         {
             // Update the status only if the status is pending. This is to track the status of previous request.

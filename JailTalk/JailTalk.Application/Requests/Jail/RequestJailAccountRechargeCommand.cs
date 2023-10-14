@@ -88,11 +88,11 @@ public class RequestJailAccountRechargeCommandHandler : IRequestHandler<RequestJ
             $"RequestedUserFullName={HttpUtility.UrlEncode(requestedBy.FullName)}&" +
             $"RequestedUserEmail={HttpUtility.UrlEncode(requestedBy.Email)}";
 
-        var qrCode = _appQrCodeGenerator.GenerateQrCode(secretMessage);
-        var qrCodeFile = await _fileStorage.UploadFile(qrCode, rechargeRequest.Id.ToString(), AttachmentHelper.RechargeRequestTempPath, cancellationToken);
+        //var qrCode = _appQrCodeGenerator.GenerateQrCode(secretMessage);
+        //var qrCodeFile = await _fileStorage.UploadFile(qrCode, rechargeRequest.Id.ToString(), AttachmentHelper.RechargeRequestTempPath, cancellationToken);
 
         // Get email template and its body parameters
-        var init = EmailContentInitialiser.RechargeRequestBuilder(qrCodeFile.SignedUrl);
+        var init = EmailContentInitialiser.RechargeRequestBuilder(secretMessage);
         var emailBody = await _emailService.GenerateBody(init.TemplateName, init.BodyParams);
 
         string requestRecieverEmail = _configuration["AccountManager:RechargeRequestRecieverEmailAddress"];
