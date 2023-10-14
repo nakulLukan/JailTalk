@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
+@inherits AppBaseComponent;
 
 <MudContainer MaxWidth="MaxWidth.Medium">
 
@@ -45,7 +46,8 @@
                         <MudSwitch @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
                     </MudItem>
                     <MudItem sm="4">
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                        <JailTalk.Web.Components.Common.AppProgressButton IsProgressing=_isSaving
+                            ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</JailTalk.Web.Components.Common.AppProgressButton>
                         <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
                     </MudItem>
                 </MudGrid>
@@ -56,9 +58,11 @@
 @code {
     NewDeviceDto model = new();
     bool _isOpen = false;
+    bool _isSaving;
 
     private async Task OnValidSubmit(EditContext context)
     {
+        ChangeToLoadingState(ref _isSaving);
         await AppMediator.Send(new RegisterDeviceCommand
             {
                 Code = model.Code.Trim(),
@@ -71,10 +75,12 @@
         {
             ToastService.Success("Device Registered Successfully.");
             NavigationManager.NavigateTo("device-manager");
+            ChangeToLoadedState(ref _isSaving);
         })
         .OnError(err =>
         {
             ToastService.Error(err.Message);
+            ChangeToLoadedState(ref _isSaving);
         });
     }
 

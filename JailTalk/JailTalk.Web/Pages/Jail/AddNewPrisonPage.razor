@@ -6,6 +6,7 @@
 @using Microsoft.AspNetCore.Components.Forms;
 @inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
+@inherits AppBaseComponent;
 
 <MudContainer MaxWidth="MaxWidth.Small">
     <EditForm Model="model" OnValidSubmit="@OnValidSubmit">
@@ -36,7 +37,7 @@
                         <MudTextField Label="Pincode" @bind-Value="@model.Address.PinCode" For="@(()=> model.Address.PinCode)"></MudTextField>
                     </MudItem>
                     <MudItem sm="12">
-                        <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                        <AppProgressButton IsProgressing=_isSaving ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</AppProgressButton>
                         <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
                     </MudItem>
                 </MudGrid>
@@ -47,8 +48,11 @@
 
 @code {
     AddPrisonDto model = new();
+    bool _isSaving;
+
     private async Task OnValidSubmit(EditContext context)
     {
+        ChangeToLoadingState(ref _isSaving);
         await AppMediator.Send(new AddPrisonCommand
             {
                 PrisonName = model.PrisonName.Trim(),
@@ -59,10 +63,12 @@
             {
                 ToastService.Success("New prison created successfully");
                 NavigationManager.NavigateTo("/prisons");
+                ChangeToLoadedState(ref _isSaving);
             })
             .OnError(err =>
             {
                 ToastService.Error(err.Message);
+                ChangeToLoadedState(ref _isSaving);
             });
     }
 }

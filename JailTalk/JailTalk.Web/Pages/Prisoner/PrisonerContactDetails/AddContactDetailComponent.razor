@@ -6,6 +6,7 @@
 @using JailTalk.Web.Extensions;
 @using Microsoft.AspNetCore.Components.Forms;
 @inject IAppMediator AppMediator;
+@inherits AppBaseComponent;
 
 <Microsoft.AspNetCore.Components.Forms.EditForm Model="model" OnValidSubmit="OnSubmit">
     <Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator />
@@ -32,9 +33,9 @@
                 @bind-Value="@model.RelationshipId" LookupMaster="@LookupMasters.Relationship.ToString()" />
             </MudItem>
             <MudItem sm="12">
-                    <MudCheckBox T="bool" Label="Set as Active?" @bind-Checked="model.IsEnabled"></MudCheckBox>
+                <MudCheckBox T="bool" Label="Set as Active?" @bind-Checked="model.IsEnabled"></MudCheckBox>
                 <MudCheckBox T="bool" Label="Allow Call Recording" @bind-Checked="model.IsCallRecordingAllowed"></MudCheckBox>
-               
+
             </MudItem>
 
             <MudItem sm="12">
@@ -66,7 +67,7 @@
                 <JailTalk.Web.Components.Common.FileSelectorComponent Label="Upload Proof" @bind-Files="model.ContactProofAttachment" Accept=".png, .jpeg, .jpg, .pdf" />
             </MudItem>
             <MudItem sm="12">
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</MudButton>
+                <AppProgressButton IsProgressing=_isSaving ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Submit</AppProgressButton>
                 <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
             </MudItem>
         </MudGrid>
@@ -82,9 +83,11 @@
     public EventCallback<ErrorDto> OnSubmitFailed { get; set; }
 
     AddContactDetailsDto model = new();
+    bool _isSaving;
 
     private async Task OnSubmit(EditContext context)
     {
+        ChangeToLoadingState(ref _isSaving);
         await AppMediator.Send(new AddContactDetailsCommand
             {
                 CountryCode = "+" + model.CountryCode.Trim(),
@@ -102,6 +105,7 @@
         .OnSuccess(async data =>
         {
             await InvokeAsync(() => OnSubmitSuccess.InvokeAsync(data));
+            ChangeToLoadedState(ref _isSaving);
         })
         .OnFormError(async err =>
         {
@@ -109,10 +113,12 @@
             {
                 await InvokeAsync(() => OnSubmitFailed.InvokeAsync(new ErrorDto(e.Value.FirstOrDefault(), ErrorType.Error)));
             }
+            ChangeToLoadedState(ref _isSaving);
         })
         .OnError(async err =>
         {
             await InvokeAsync(() => OnSubmitFailed.InvokeAsync(err));
+            ChangeToLoadedState(ref _isSaving);
         });
     }
 }

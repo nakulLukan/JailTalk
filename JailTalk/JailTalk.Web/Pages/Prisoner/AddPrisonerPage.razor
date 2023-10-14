@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Components.Forms;
 @inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
+@inherits AppBaseComponent
 
 <MudContainer MaxWidth="MaxWidth.Medium">
     <EditForm Model="model" OnValidSubmit="@OnValidSubmit">
@@ -45,7 +46,7 @@
                 </MudItem>
 
                 <MudItem sm="4">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                    <AppProgressButton IsProgressing=_isSaving ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</AppProgressButton>
                     <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
                 </MudItem>
             </MudGrid>
@@ -54,9 +55,11 @@
 </MudContainer>
 @code {
     NewPrisonerDto model = new();
+    bool _isSaving;
 
     private async Task OnValidSubmit(EditContext context)
     {
+        ChangeToLoadingState(ref _isSaving);
         await AppMediator.Send(new RegisterPrisonerCommand
             {
                 Pid = model.Pid,
@@ -70,10 +73,12 @@
         {
             ToastService.Success("Prisoner details added successfully.");
             NavigationManager.NavigateTo($"prisoners/{data.ToString()}");
+            ChangeToLoadedState(ref _isSaving);
         })
         .OnError(err =>
         {
             ToastService.Error(err.Message);
+            ChangeToLoadedState(ref _isSaving);
         });
     }
 }

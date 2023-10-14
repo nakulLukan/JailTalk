@@ -9,7 +9,6 @@
 @inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
 <HasPermissionComponent Roles="@Permissions.Admin" />
-
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudDataGrid T="PrisonListDto" Items="@Elements" Virtualize="true" Groupable="false" Bordered="true" ShowMenuIcon="false" FixedHeader="true" Dense>
         <ToolBarContent>
@@ -41,7 +40,7 @@
                         <MudMenuItem OnClick="@(() => OnEditClicked(context.Item.Id))">Edit</MudMenuItem>
                         <MudMenuItem Class="@(GetClassForIsSystemTurnedOff(!context.Item.IsSystemTurnedOff))"
                                      OnClick="@(async () => await OnTurnOnOffDeviceClicked(context.Item))">@(context.Item.IsSystemTurnedOff ? "Turn On System" : "Shutdown System")</MudMenuItem>
-                            <MudMenuItem OnClick="@(async () => await OnRechargeClicked(context.Item.Id))">Recharge Account</MudMenuItem>
+                            <MudMenuItem OnClick="@(() => OnRechargeClicked(context.Item))">Recharge Account</MudMenuItem>
                         </MudMenu>
                     </CellTemplate>
                 </TemplateColumn>
@@ -51,8 +50,17 @@
             </NoRecordsContent>
         </MudDataGrid>
     </MudContainer>
+    <MudDialog @bind-IsVisible="_rechargeIsOpen">
+        <DialogContent>
+            <RechargeRequestPrisonAccountBalanceComponent JailId="@_selectedItem.Id" JailNameWithCode="@($"{_selectedItem.Name} ({_selectedItem.Code})")"
+                                                          OnRequestSent="OnRechargeRequestSent" OnClose="OnRechargeRequestClosed" />
+        </DialogContent>
+    </MudDialog>
+
     @code {
     List<PrisonListDto> Elements = new();
+    bool _rechargeIsOpen = false;
+    PrisonListDto _selectedItem = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -76,21 +84,11 @@
         NavigationManager.NavigateTo($"prisons/{jailId}");
     }
 
-    private async Task OnRechargeClicked(int jailId)
+    private void OnRechargeClicked(PrisonListDto selectedItem)
     {
-        await AppMediator.Send(new RequestJailAccountRechargeCommand()
-            {
-                JailId = jailId,
-                RechargeAmount = 1000
-            })
-        .OnSuccess(data =>
-        {
-            ToastService.Success("Account recharge request sent successfully.");
-        })
-        .OnError(err =>
-        {
-            ToastService.Error(err.Message);
-        });
+        _selectedItem = selectedItem;
+        _rechargeIsOpen = true;
+        StateHasChanged();
     }
 
     private async Task OnTurnOnOffDeviceClicked(PrisonListDto item)
@@ -118,5 +116,18 @@
             {
                 ToastService.Error(err.Message);
             });
+    }
+
+    private void OnRechargeRequestClosed(bool isClosed)
+    {
+        _rechargeIsOpen = false;
+        StateHasChanged();
+    }
+
+    private void OnRechargeRequestSent(long requestId)
+    {
+        _rechargeIsOpen = false;
+        ToastService.Success("Account recharge requested successfully.");
+        StateHasChanged();
     }
 }

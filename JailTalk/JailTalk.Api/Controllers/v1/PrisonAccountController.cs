@@ -11,24 +11,14 @@ public class PrisonAccountController : AppBaseController
     {
     }
 
-    [HttpGet("prison-account/recharge")]
+    [HttpPost("prison-account/recharge")]
     [ProducesResponseType(typeof(ApiResponseDto<string>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.Unauthorized)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> AuthenticatePrisoner(
-        [FromQuery] long requestId,
-        [FromQuery] Guid secret,
-        [FromQuery] string sharedSecret,
-        bool isCompleteCommand)
+    public async Task<IActionResult> RechargeAccountAction(RechargeJailAccountCommand request)
     {
-        var response = await Mediator.Send(new RechargeJailAccountCommand
-        {
-            RequestId = requestId,
-            Secret = secret,
-            IsCompleteCommand = isCompleteCommand,
-            SharedSecret = sharedSecret
-        });
+        var response = await Mediator.Send(request);
 
         return Ok(response);
     }

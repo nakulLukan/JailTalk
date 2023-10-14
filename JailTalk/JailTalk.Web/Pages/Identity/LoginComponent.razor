@@ -8,7 +8,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
-
+@inherits AppBaseComponent;
 <EditForm Model="model" OnValidSubmit="OnValidSubmit">
     <DataAnnotationsValidator />
     <MudStack Row=true Justify="Justify.Center" AlignItems="AlignItems.Center">
@@ -27,7 +27,7 @@
                     <MudTextField Label="Password" @bind-Value="@model.Password" For="@(()=> model.Password)" InputType="InputType.Password"></MudTextField>
                 </MudItem>
                 <MudItem sm="12" Class="d-flex justify-space-between">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Login</MudButton>
+                    <AppProgressButton IsProgressing="_isSaving" ProcessingText="Signing In" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Login</AppProgressButton>
                     <MudLink Href="/forgot-password"><MudButton ButtonType="ButtonType.Button" Variant="Variant.Outlined" Color="Color.Surface">Forgot Password</MudButton></MudLink>
                 </MudItem>
             </MudGrid>
@@ -36,9 +36,11 @@
 </EditForm>
 @code {
     SignInDto model = new();
+    bool _isSaving;
 
     private async Task OnValidSubmit(EditContext context)
     {
+        ChangeToLoadingState(ref _isSaving);
         await AppMediator.Send(new ValidateUserCommand()
             {
                 Email = model.Email,
@@ -49,10 +51,12 @@
             Guid key = Guid.NewGuid();
             AuthenticationService.Logins[key] = new LoginInfo { UserName = data.UserName, Password = model.Password };
             NavigationManager.NavigateTo($"/login?key={key}", true);
+            ChangeToLoadedState(ref _isSaving);
         })
         .OnError(error =>
         {
             ToastService.Error(error.Message);
+            ChangeToLoadedState(ref _isSaving);
         });
         StateHasChanged();
     }

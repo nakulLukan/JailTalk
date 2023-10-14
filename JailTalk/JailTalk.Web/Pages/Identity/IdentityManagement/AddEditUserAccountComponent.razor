@@ -41,7 +41,7 @@
                 </MudItem>
 
                 <MudItem sm="12">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</MudButton>
+                    <AppProgressButton IsProgressing=_isSaving ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Register</AppProgressButton>
                     <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface">Clear</MudButton>
                 </MudItem>
             </MudGrid>
@@ -51,9 +51,11 @@
 
 @code {
     AddUserAccountDto model = new();
-
+    bool _isSaving;
     private async Task OnSubmit()
     {
+        _isSaving = true;
+        StateHasChanged();
         await AppMediator.Send(new AddUserAccountCommand
             {
                 Email = model.Email.Trim(),
@@ -67,10 +69,14 @@
         {
             ToastService.Success("User account created successfully.");
             NavigationManager.NavigateTo("identity-management/user-accounts");
+            _isSaving = false;
+            InvokeAsync(StateHasChanged);
         })
         .OnError(err =>
         {
             ToastService.Error(err.Message);
+            _isSaving = false;
+            InvokeAsync(StateHasChanged);
         });
     }
 }

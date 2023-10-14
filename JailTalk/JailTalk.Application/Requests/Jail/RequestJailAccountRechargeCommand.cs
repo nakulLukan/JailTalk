@@ -20,6 +20,7 @@ public class RequestJailAccountRechargeCommand : IRequest<long>
     public float RechargeAmount { get; set; }
     public int JailId { get; set; }
 }
+
 public class RequestJailAccountRechargeCommandHandler : IRequestHandler<RequestJailAccountRechargeCommand, long>
 {
     readonly IAppDbContext _dbContext;

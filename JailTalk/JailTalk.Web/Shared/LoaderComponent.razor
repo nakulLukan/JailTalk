@@ -1,0 +1,18 @@
+﻿@using Fluxor;
+@using JailTalk.Web.Store.Http;
+@inject IState<HttpCallRequestState> HttpCallRequestState;
+
+@if(HttpCallRequestState.Value.NumberOfSubscribers != 0)
+{
+    <h1>Loading</h1>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        HttpCallRequestState.StateChanged += (x, y) =>
+        {
+            StateHasChanged();
+        };
+    }
+}

@@ -43,7 +43,7 @@
                     <MudSwitch @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
                 </MudItem>
                 <MudItem sm="12">
-                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+                    <AppProgressButton IsProgressing="_isSaving" ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update</AppProgressButton>
                     <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface" OnClick="@(x=> model = oldStateModel.DeepClone())">Reset</MudButton>
                 </MudItem>
             </MudGrid>
@@ -57,6 +57,7 @@
     EditDeviceDto oldStateModel = new();
     private string _deviceCode { get; set; }
     bool _isOpen = false;
+    bool _isSaving;
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
@@ -78,6 +79,8 @@
     }
     private async Task OnValidSubmit(EditContext context)
     {
+        _isSaving = true;
+        StateHasChanged();
         await AppMediator.Send(new EditDeviceCommand
             {
                 DeviceId = model.DeviceId,
@@ -90,10 +93,14 @@
         {
             ToastService.Success("Device details updated successfully.");
             NavigationManager.NavigateTo("device-manager");
+            _isSaving = false;
+            InvokeAsync(StateHasChanged);
         })
         .OnError(err =>
         {
             ToastService.Error(err.Message);
+            _isSaving = false;
+            InvokeAsync(StateHasChanged);
         });
     }
 

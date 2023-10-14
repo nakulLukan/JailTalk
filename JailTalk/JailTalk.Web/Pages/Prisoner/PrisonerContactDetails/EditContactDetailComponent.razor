@@ -9,6 +9,7 @@
 @using Microsoft.AspNetCore.Components.Forms;
 @inject IAppMediator AppMediator;
 @inject IMediator Mediator;
+@inherits AppBaseComponent;
 
 <Microsoft.AspNetCore.Components.Forms.EditForm Model="model" OnValidSubmit="OnSubmit">
     <Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator />
@@ -53,9 +54,9 @@
             <MudItem sm="4">
                 <MudTextField Label="Pincode" @bind-Value="@model.RelativeAddress.PinCode" For="@(()=> model.RelativeAddress.PinCode)"></MudTextField>
             </MudItem>
-            
+
             <MudItem sm="12">
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update</MudButton>
+                <AppProgressButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary">Update</AppProgressButton>
                 <MudButton ButtonType="ButtonType.Reset" Variant="Variant.Outlined" Color="Color.Surface"
                            OnClick="@(x=> model = oldStateModel.DeepClone())">Reset</MudButton>
             </MudItem>
@@ -79,6 +80,8 @@
     EditContactDetailsDto model = new();
     EditContactDetailsDto oldStateModel = new();
 
+    bool _isSaving;
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
@@ -100,6 +103,7 @@
 
     private async Task OnSubmit(EditContext context)
     {
+        ChangeToLoadingState(ref _isSaving);
         await AppMediator.Send(new EditContactDetailsCommand
             {
                 CountryCode = "+" + model.CountryCode.Trim(),
@@ -108,16 +112,18 @@
                 RelationshipId = model.RelationshipId,
                 Name = model.Name,
                 ContactId = ContactDetailId,
-RelativeAddress = model.RelativeAddress,
-IsCallRecordingAllowed = model.IsCallRecordingAllowed
+                RelativeAddress = model.RelativeAddress,
+                IsCallRecordingAllowed = model.IsCallRecordingAllowed
             })
         .OnSuccess(async data =>
         {
             await InvokeAsync(() => OnSubmitSuccess.InvokeAsync(data));
+            ChangeToLoadedState(ref _isSaving);
         })
         .OnError(async err =>
         {
             await InvokeAsync(() => OnSubmitFailed.InvokeAsync(err));
+            ChangeToLoadedState(ref _isSaving);
         });
     }
 }

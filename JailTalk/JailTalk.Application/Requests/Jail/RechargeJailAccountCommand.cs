@@ -14,9 +14,8 @@ namespace JailTalk.Application.Requests.Jail;
 public class RechargeJailAccountCommand : IRequest<ResponseDto<string>>
 {
     public long RequestId { get; set; }
-    public Guid Secret { get; set; }
+    public byte[] RechargeSecret { get; set; }
     public bool IsCompleteCommand { get; set; }
-    public string SharedSecret { get; set; }
 }
 
 public class RechargeJailAccountCommandHandler : IRequestHandler<RechargeJailAccountCommand, ResponseDto<string>>
@@ -68,14 +67,30 @@ public class RechargeJailAccountCommandHandler : IRequestHandler<RechargeJailAcc
             throw new AppApiException(HttpStatusCode.BadRequest, "ERR-4", "The request has expired.");
         }
 
-        if (rechargeRequest.RequestStatus != Shared.JailAccountRechargeRequestStatus.Pending)
+        await ValidateRechargeSecretHash(rechargeRequest, request.RechargeSecret, cancellationToken);
+    }
+
+    private async Task ValidateRechargeSecretHash(JailAccountRechargeRequest rechargeRequest, byte[] sharedSecret, CancellationToken cancellationToken)
+    {
+        var secret = _configuration["AccountManager:RechargeSecret"];
+        int sharedSecretDynamicComponent = (int)(AppDateTime.UtcNow - DateTime.UnixEpoch).TotalMinutes;
+        string[] possibleSharedSecret = new string[]
         {
-            rechargeRequest.RetryCount += 1;
-            await _dbContext.SaveAsync(cancellationToken);
-            throw new AppApiException(HttpStatusCode.BadRequest, "ERR-3", "This request has already been processed.");
+            $"{secret}:{sharedSecretDynamicComponent}",
+            $"{secret}:{sharedSecretDynamicComponent + 1}",
+            $"{secret}:{sharedSecretDynamicComponent - 1}",
+        };
+
+        bool secretMatched = false;
+        foreach (var possibleSecret in possibleSharedSecret)
+        {
+            if (Guid.TryParse(CryptoEngine.DecryptText(sharedSecret, possibleSecret), out Guid guid) && rechargeRequest.RechargeSecretHash == guid.ToHash())
+            {
+                secretMatched = true;
+            }
         }
 
-        if (rechargeRequest.RechargeSecretHash != request.Secret.ToHash())
+        if (!secretMatched)
         {
             rechargeRequest.RetryCount += 1;
             await _dbContext.SaveAsync(cancellationToken);
@@ -85,16 +100,16 @@ public class RechargeJailAccountCommandHandler : IRequestHandler<RechargeJailAcc
 
     private void ValidateSharedSecret(RechargeJailAccountCommand request)
     {
-        var secret = _configuration["Accounting:RechargeSecret"];
+        var secret = _configuration["AccountManager:RechargeSecret"];
         int sharedSecretDynamicComponent = (int)(AppDateTime.UtcNow - DateTime.UnixEpoch).TotalMinutes;
         string[] possibleSharedSecret = new string[]
         {
-            $"{secret}:{sharedSecretDynamicComponent - 1}",
             $"{secret}:{sharedSecretDynamicComponent}",
-            $"{secret}:{sharedSecretDynamicComponent + 1}"
+            $"{secret}:{sharedSecretDynamicComponent + 1}",
+            $"{secret}:{sharedSecretDynamicComponent - 1}",
         };
 
-        if (!possibleSharedSecret.Contains(request.SharedSecret))
+        if (!possibleSharedSecret.Any(x => Guid.TryParse(request.RechargeSecret.DecryptText(x), out Guid _)))
         {
             throw new AppApiException(HttpStatusCode.Unauthorized, "ERR-1", "Shared key is not accepted.");
         }
@@ -134,11 +149,9 @@ public class RechargeJailAccountCommandValidator : AbstractValidator<RechargeJai
 {
     public RechargeJailAccountCommandValidator()
     {
-        RuleFor(x => x.SharedSecret)
+        RuleFor(x => x.RechargeSecret)
             .NotNull()
             .NotEmpty()
-            .MaximumLength(50)
-            .Matches("^[A-Za-z0-9:]+$")
                 .WithMessage("Invalid shared secret.");
     }
 }

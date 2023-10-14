@@ -12,7 +12,7 @@ public static class StringExtensions
     {
         char[] maskedValue = value.ToCharArray();
         unmaskLast = value.Length - unmaskLast;
-        for(int i = 0; i < value.Length; i++)
+        for (int i = 0; i < value.Length; i++)
         {
             if (i < unmaskFirst || i >= unmaskLast)
             {
