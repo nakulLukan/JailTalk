@@ -7,4 +7,5 @@ public class AccountBalanceDto
     public string TalkTimeLeft { get; set; }
     public string PrisonerName { get; set; }
     public string Pid { get; set; }
+    public float CallChargePerMinute { get; set; }
 }

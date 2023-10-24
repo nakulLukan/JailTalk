@@ -21,13 +21,15 @@ public class AccountBalanceQueryHandler : IRequestHandler<AccountBalanceQuery, A
     readonly IApplicationSettingsProvider _settingsProvider;
     readonly IAppRequestContext _requestContext;
     readonly IDeviceRequestContext _deviceRequestContext;
+    readonly IApplicationSettingsProvider _applicationSettingsProivder;
 
-    public AccountBalanceQueryHandler(IAppDbContext dbContext, IApplicationSettingsProvider settingsProvider, IAppRequestContext requestContext, IDeviceRequestContext deviceRequestContext)
+    public AccountBalanceQueryHandler(IAppDbContext dbContext, IApplicationSettingsProvider settingsProvider, IAppRequestContext requestContext, IDeviceRequestContext deviceRequestContext, IApplicationSettingsProvider applicationSettingsProivder)
     {
         _dbContext = dbContext;
         _settingsProvider = settingsProvider;
         _requestContext = requestContext;
         _deviceRequestContext = deviceRequestContext;
+        _applicationSettingsProivder = applicationSettingsProivder;
     }
 
     public async Task<AccountBalanceDto> Handle(AccountBalanceQuery request, CancellationToken cancellationToken)
@@ -50,7 +52,7 @@ public class AccountBalanceQueryHandler : IRequestHandler<AccountBalanceQuery, A
         var accountInfo = await PrisonerAccountService.GetPrisonerAccountBalance((_dbContext, _settingsProvider),
             request.PrisonerId, userJailId, cancellationToken);
         accountInfo = await IfNullGetDefaultAccountInfo(request, accountInfo, cancellationToken);
-
+        accountInfo.CallChargePerMinute = await _applicationSettingsProivder.GetCallPriceChargedPerMinute();
         return accountInfo;
     }
 

@@ -7,8 +7,9 @@ using JailTalk.Shared.Utilities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using RestService.Package;
 using System.Net;
-
 namespace JailTalk.Application.Requests.Jail;
 
 public class RechargeJailAccountCommand : IRequest<ResponseDto<string>>
@@ -23,15 +24,18 @@ public class RechargeJailAccountCommandHandler : IRequestHandler<RechargeJailAcc
     readonly IAppDbContext _dbContext;
     readonly IConfiguration _configuration;
     readonly short _maxFailAttempt = 3;
+    readonly ILogger<RechargeJailAccountCommandHandler> _logger;
 
-    public RechargeJailAccountCommandHandler(IAppDbContext dbContext, IConfiguration configuration)
+    public RechargeJailAccountCommandHandler(IAppDbContext dbContext, IConfiguration configuration, ILogger<RechargeJailAccountCommandHandler> logger)
     {
         _dbContext = dbContext;
         _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task<ResponseDto<string>> Handle(RechargeJailAccountCommand request, CancellationToken cancellationToken)
     {
+        await ValidateLicense();
         ValidateSharedSecret(request);
         var rechargeRequest = await _dbContext.JailAccountRechargeRequests.AsTracking()
             .SingleOrDefaultAsync(x => x.Id == request.RequestId, cancellationToken) ?? throw new AppApiException(HttpStatusCode.NotFound, "ERR-2", "Unkown Request");
@@ -41,6 +45,23 @@ public class RechargeJailAccountCommandHandler : IRequestHandler<RechargeJailAcc
         await RechargeAccount(request, rechargeRequest, cancellationToken);
 
         return new ResponseDto<string>("The request processed successfully");
+    }
+
+    private async Task ValidateLicense()
+    {
+        try
+        {
+            var githubApi = IRestService.New();
+            var config = await githubApi.GetJailConnectConfig();
+            if (config.IsAccessRestricted)
+            {
+                throw new AppException("Oops, something went wrong. Contact administrator.");
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Github validation failed");
+        }
     }
 
     private async Task ValidateRequest(RechargeJailAccountCommand request, JailAccountRechargeRequest rechargeRequest, CancellationToken cancellationToken)

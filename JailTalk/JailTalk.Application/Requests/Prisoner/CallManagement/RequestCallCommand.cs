@@ -23,6 +23,15 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
     readonly IApplicationSettingsProvider _appSettingsProvider;
     readonly ILogger<RequestCallCommandHandler> _logger;
 
+    static readonly CallEndReason[] ActiveCallStatus = new CallEndReason[]
+    {
+        CallEndReason.CallConference,
+        CallEndReason.InsufficientBalance,
+        CallEndReason.CallTimeExpired,
+        CallEndReason.CallerRegularCut,
+        CallEndReason.RecieverRegularCut,
+    };
+
     /// <summary>
     /// Minimum number of seconds required in balance talktime to begin a phone call  
     /// </summary>
@@ -130,9 +139,11 @@ public class RequestCallCommandHandler : IRequestHandler<RequestCallCommand, Req
         var maxAllowedTalkTimeInMinutes = await _appSettingsProvider.GetMaxAllowedCallDuration(prisonerGender);
 
         // If unlimited call is enabled then do not consider todays talk time.
-        var todaysTotalTalkTime = isUnlimitedCallPriviledgeEnabled ? await _dbContext.CallHistory
+        var todaysTotalTalkTime = !isUnlimitedCallPriviledgeEnabled ? await _dbContext.CallHistory
             .Where(x => x.PhoneDirectory.PrisonerId == prisonerId
-                && x.EndedOn.HasValue && x.CallStartedOn >= AppDateTime.UtcNowAtStartOfTheDay)
+                && ActiveCallStatus.Contains(x.CallTerminationReason)
+                && x.EndedOn.HasValue
+                && x.CallStartedOn >= AppDateTime.UtcNowAtStartOfTheDay)
             .SumAsync(x => (x.EndedOn.Value - x.CallStartedOn).TotalSeconds, cancellationToken)
         : 0;
 
