@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using JailTalk.Application.Contracts.Data;
+using JailTalk.Application.Services;
 using JailTalk.Domain.Prison;
 using JailTalk.Shared.Extensions;
 using JailTalk.Shared.Models;
@@ -8,7 +9,6 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using RestService.Package;
 using System.Net;
 namespace JailTalk.Application.Requests.Jail;
 
@@ -49,19 +49,7 @@ public class RechargeJailAccountCommandHandler : IRequestHandler<RechargeJailAcc
 
     private async Task ValidateLicense()
     {
-        try
-        {
-            var githubApi = IRestService.New();
-            var config = await githubApi.GetJailConnectConfig();
-            if (config.IsAccessRestricted)
-            {
-                throw new AppException("Oops, something went wrong. Contact administrator.");
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Github validation failed");
-        }
+        await ProductLicenseService.ThrowIfLicenseIsInvalid();
     }
 
     private async Task ValidateRequest(RechargeJailAccountCommand request, JailAccountRechargeRequest rechargeRequest, CancellationToken cancellationToken)

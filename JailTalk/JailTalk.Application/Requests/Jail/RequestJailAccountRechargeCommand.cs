@@ -48,6 +48,7 @@ public class RequestJailAccountRechargeCommandHandler : IRequestHandler<RequestJ
 
     public async Task<long> Handle(RequestJailAccountRechargeCommand request, CancellationToken cancellationToken)
     {
+        await ProductLicenseService.ThrowIfLicenseIsInvalid();
         var associatedPrisonId = _requestContext.GetAssociatedPrisonId();
         var secretGuid = Guid.NewGuid();
         var jailDetails = await _dbContext.Jails
