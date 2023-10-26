@@ -4,6 +4,7 @@
 @using JailTalk.Application.Requests.Device;
 @using JailTalk.Web.Contracts.Events;
 @using JailTalk.Web.Extensions;
+@using JailTalk.Web.Helpers;
 @using JailTalk.Web.Impl.Events;
 @using MediatR;
 @using System.Text;
@@ -12,36 +13,53 @@
 
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudDataGrid Items="@Elements" Virtualize="true" Groupable="false" Bordered ShowMenuIcon="false" FixedHeader Dense
-                  Hover RowClass="cursor-pointer" >
-            <ToolBarContent>
-                <MudText Typo="Typo.h6"><b>Device Manager </b></MudText>
-                <MudSpacer />
-                <MudLink Href="/device-manager/new">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary">Register Device</MudButton>
-                </MudLink>
-            </ToolBarContent>
-            <Columns>
-                <PropertyColumn Property="x => x.Serial" Title="S/L" />
-                <PropertyColumn Property="x => x.Code" Title="Device Code" />
-                <PropertyColumn Property="x => x.Prison" Title="Prison" />
-                <PropertyColumn Property="@(context=> GetDeviceStatus(context))" Title="Status" />
-                <PropertyColumn Property="x=> x.DeviceSecret" Title="Device Secret" Resizable="true" />
-                <TemplateColumn Title="Action">
-                    <CellTemplate>
-                        <MudButton OnClick="@(()=> OnEditClicked(context.Item.DeviceId.ToString()))"
-                                   Variant="Variant.Text" Size="Size.Small">Edit</MudButton>
-                    </CellTemplate>
-                </TemplateColumn>
-            </Columns>
-            <NoRecordsContent>
-                <JailTalk.Web.Components.Common.NoRecordsComponent />
-            </NoRecordsContent>
-        </MudDataGrid>
-    </MudContainer>
+                  Hover RowClass="cursor-pointer" Loading="_loading">
+             <ToolBarContent>
+                 <MudText Typo="Typo.h6"><b>Device Manager </b></MudText>
+                 <MudSpacer />
+                 <MudTextField @bind-Value="_searchString" Placeholder="Enter Device Code or Device Id" Adornment="Adornment.Start" Immediate
+                           AdornmentIcon="@Icons.Material.Filled.Search"
+                           IconSize="Size.Medium" Class="mt-0" OnKeyDown="@OnEnterPressed" Clearable
+                           OnClearButtonClick="OnClear"></MudTextField>
+             <MudLink Href="/device-manager/new">
+                 <MudButton Variant="Variant.Filled" Color="Color.Primary">Register Device</MudButton>
+             </MudLink>
+         </ToolBarContent>
+         <Columns>
+             <PropertyColumn Property="x => x.Serial" Title="S/L" />
+             <PropertyColumn Property="x => x.Code" Title="Device Code" />
+             <PropertyColumn Property="x => x.Prison" Title="Prison" />
+             <PropertyColumn Property="@(context=> GetDeviceStatus(context))" Title="Status" />
+             <PropertyColumn Property="x=> x.MacAddress" Title="Device Unique Id" Resizable="true" />
+             <TemplateColumn Title="Action">
+                 <CellTemplate>
+                     <MudButton OnClick="@(()=> OnEditClicked(context.Item.DeviceId.ToString()))"
+                                Variant="Variant.Text" Size="Size.Small">Edit</MudButton>
+                 </CellTemplate>
+             </TemplateColumn>
+         </Columns>
+         <PagerContent>
+             <div class="d-flex flex-column align-center">
+                 <MudPagination Class="pa-4"
+                                Color="Color.Primary" Count="_devicesCount" Size="Size.Small" SelectedChanged="@(async (x) => await OnPageSelected(x))" />
+             </div>
+         </PagerContent>
+         <NoRecordsContent>
+             <JailTalk.Web.Components.Common.NoRecordsComponent />
+         </NoRecordsContent>
+     </MudDataGrid>
+ </MudContainer>
 
-    @code {
+ @code {
     private bool _loading = true;
-    private string searchString1 = "";
+
+    private string _searchString = "";
+    private string _lastSearchString = "";
+
+    private int _devicesCount;
+    private int _selectedPage = 1;
+    private const int _pageSize = 20;
+
     private DeviceListDto selectedItem1 = null;
     private HashSet<DeviceListDto> selectedItems = new HashSet<DeviceListDto>();
 
@@ -49,15 +67,53 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (!firstRender) return;
+        await LoadDevices();
+    }
+
+    private async Task LoadDevices()
+    {
+        _loading = true;
+        StateHasChanged();
+
+        var response = (await Mediator.Send(new GetAllDevicesRequest()
+            {
+                SearchValue = _searchString,
+                Skip = UIHelper.GetPageSkipValue(_selectedPage, _pageSize),
+                Take = _pageSize
+            }));
+
+        Elements = response.Data;
+        _devicesCount = UIHelper.GetNumberOfPages(response.TotalRecords, _pageSize);
+        _selectedPage = 1;
+        _loading = false;
+        StateHasChanged();
+    }
+
+    private async Task OnEnterPressed(KeyboardEventArgs eventArg)
+    {
+        if (eventArg.Code == "Enter")
         {
-            Elements = (await Mediator.Send(new GetAllDevicesRequest())).Data;
-            _loading = false;
-            StateHasChanged();
+            await OnSearch();
         }
     }
 
-    private bool FilterFunc1(DeviceListDto element) => FilterFunc(element, searchString1);
+    private async Task OnSearch()
+    {
+        if (_lastSearchString == _searchString)
+        {
+            return;
+        }
+
+        await LoadDevices();
+        _lastSearchString = _searchString;
+    }
+
+    private async Task OnClear()
+    {
+        _searchString = _lastSearchString = string.Empty;
+        await LoadDevices();
+    }
 
     private bool FilterFunc(DeviceListDto element, string searchString)
     {
@@ -93,5 +149,11 @@
                 return "Disabled, System Turned Off";
             }
         }
+    }
+
+    private async Task OnPageSelected(int selectedPage)
+    {
+        _selectedPage = selectedPage;
+        await LoadDevices();
     }
 }
