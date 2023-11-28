@@ -56,8 +56,8 @@ public class ApplicationSettingsSeeder
             new()
             {
                 Id = ApplicationSettings.CallPricePerMinute,
-                Value = (0.5).ToString(),
-                Description = "Amount charged for 1 minute call in rupees.",
+                Value = (1.5).ToString(),
+                Description = "Amount charged for 1 minute call in rupees. Minimum charge will be given 'Value' and after 1 minute projected 'Value' per second is charged for each second.",
                 RegexValidation = RegularExpressionPatternConstant.FloatOnly,
                 IsReadonly = true,
                 LastUpdateBy = DefaultLastUpdatedByValue,

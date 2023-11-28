@@ -12,6 +12,9 @@ builder.Configuration.AddConfiguration(new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddJsonFile("appconfig.json", optional: false, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables()
+                .AddUserSecrets<Program>()
+                .AddCommandLine(args)
                 .Build());
 
 Log.Logger = new LoggerConfiguration()

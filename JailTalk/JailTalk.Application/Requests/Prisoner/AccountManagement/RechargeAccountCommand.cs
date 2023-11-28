@@ -74,7 +74,9 @@ public class RechargeAccountCommandHandler : IRequestHandler<RechargeAccountComm
         };
 
         _dbContext.PhoneBalanceHistory.Add(balanceHistoryEntity);
-        await _dbContext.JailAccountBalance.ExecuteUpdateAsync((x) => x.SetProperty(
+        await _dbContext.JailAccountBalance
+            .Where(x=>x.JailId == jail.JailId)
+            .ExecuteUpdateAsync((x) => x.SetProperty(
             x => x.BalanceAmount,
             x => x.BalanceAmount - request.RechargeAmount));
         await _dbContext.SaveAsync(cancellationToken);
