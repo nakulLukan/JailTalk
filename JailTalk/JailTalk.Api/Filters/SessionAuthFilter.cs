@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Text;
 
 namespace JailTalk.Api.Filters;
@@ -48,6 +49,11 @@ public class SessionAuthFilter : Attribute, IAuthorizationFilter
 
     private UnauthorizedObjectResult GetUnauthorizedObjectResult()
     {
-        return new UnauthorizedObjectResult("Session Token is Invalid");
+        return new UnauthorizedObjectResult(new ProblemDetails
+        {
+            Title = "Unauthorized",
+            Status = (int)HttpStatusCode.Unauthorized,
+            Detail = "Session Token is Invalid"
+        });
     }
 }

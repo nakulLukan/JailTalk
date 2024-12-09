@@ -23,6 +23,11 @@ public class AppApiGlobalExceptionHandlerMiddleware
         try
         {
             await next(context);
+
+            if (!context.Response.HasStarted && context.Response.StatusCode == (int)HttpStatusCode.Unauthorized)
+            {
+                throw new UnauthorizedAccessException();
+            }
         }
         catch (AppApiException ex)
         {
@@ -35,6 +40,16 @@ public class AppApiGlobalExceptionHandlerMiddleware
                 Detail = ex.Message,
             };
             await WriteErrorResponse(context, ex.StatusCode, problemDetails);
+        }
+        catch (UnauthorizedAccessException uae)
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Title = "Unauthorized",
+                Status = (int)HttpStatusCode.Unauthorized,
+                Detail = uae.Message
+            };
+            await WriteErrorResponse(context, HttpStatusCode.Unauthorized, problemDetails);
         }
         catch (Exception ex)
         {

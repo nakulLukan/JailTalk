@@ -10,6 +10,8 @@ public class ToastService : IToastService
     public ToastService(ISnackbar snackbar)
     {
         this.snackbar = snackbar;
+        snackbar.Configuration.SnackbarVariant = Variant.Filled;
+        snackbar.Configuration.MaxDisplayedSnackbars = 10;
     }
 
     public void Success(string content, int duration = 3)
