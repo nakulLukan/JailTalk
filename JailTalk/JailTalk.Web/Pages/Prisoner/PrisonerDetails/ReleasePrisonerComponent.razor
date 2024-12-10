@@ -32,7 +32,7 @@
 
     private async Task OnReleasePrisonerClicked(MouseEventArgs @event)
     {
-        var isPressed = await _confirmationPopup.Show();
+        var isPressed = await _confirmationPopup.ShowAsync();
         if (isPressed.HasValue && isPressed.Value)
         {
             await AppMediator.Send(new ReleasePrisonerFromJailCommand()

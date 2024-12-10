@@ -6,7 +6,7 @@
                        Class="flex-shrink-1 " InputClass="absolute mud-width-full mud-height-full overflow-hidden z-20"
                        InputStyle="opacity:0" Accept="@allowedExtensionsAsCsv"
         @ondragenter="@SetDragClass" @ondragleave="@ClearDragClass" @ondragend="@ClearDragClass" MaximumFileCount="3">
-            <ButtonTemplate>
+            <ActivatorContent>
                 <MudPaper Height="300px" Width="200px" Outlined="true" Class="@DragClass">
                     @if (files.Count == 0)
                     {
@@ -15,10 +15,10 @@
                     }
                     @foreach (var file in files)
                     {
-                        <MudChip Color="Color.Dark" Text="@file.Name" />
+                        <MudChip T="string" Color="Color.Dark" Text="@file.Name" />
                     }
                 </MudPaper>
-            </ButtonTemplate>
+            </ActivatorContent>
         </MudFileUpload>
         <MudToolBar DisableGutters="true" Class="gap-4">
             <MudButton OnClick="Upload" Disabled="@(!files.Any())" Color="Color.Primary" Variant="Variant.Filled">Upload</MudButton>
@@ -142,7 +142,7 @@
 
     private async Task OnPhotoDeletedClicked(int imageId)
     {
-        bool? result = await _imageDeleteConfirmation.Show();
+        bool? result = await _imageDeleteConfirmation.ShowAsync();
 
         if (result.HasValue && result.Value)
         {

@@ -28,7 +28,7 @@
         <MessageContent>
             <MudNumericField HideSpinButtons="true" @bind-Value="NoOfDays" Label="For how many days the prisoner should be blocked" Variant="Variant.Text" Min="1" Max="1000" />
             <MudSpacer></MudSpacer>
-            <MudCheckBox @bind-Checked="@BlockPermenantly" Label="Block prisoner permenantly" LabelPosition="LabelPosition.Start" Color="Color.Error"></MudCheckBox>
+            <MudCheckBox T="bool" @bind-Checked="@BlockPermenantly" Label="Block prisoner permenantly" LabelPosition="LabelPosition.Start" Color="Color.Error"></MudCheckBox>
         </MessageContent>
         <YesButton>
             <MudButton Variant="Variant.Filled" Color="Color.Error" Class="ml-3">Block</MudButton>
@@ -83,7 +83,7 @@ else
 
     private async Task OnBlockOrUnBlockPrisoner(MouseEventArgs @event)
     {
-        var buttonPressed = await _blockUserPopup.Show();
+        var buttonPressed = await _blockUserPopup.ShowAsync();
         var blockPressed = buttonPressed.HasValue && buttonPressed.Value && !IsPrisonerBlocked;
         if (!buttonPressed.HasValue) return;
         await AppMediator.Send(new BlockOrUnblockPrisonerCommand()

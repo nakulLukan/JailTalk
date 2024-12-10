@@ -86,6 +86,6 @@
         _fileSize = data.FileSizeAsText;
         _callDuration = data.CallDurationAsText;
         StateHasChanged();
-        _ = await audioPlayerPopup.Show();
+        _ = await audioPlayerPopup.ShowAsync();
     }
 }

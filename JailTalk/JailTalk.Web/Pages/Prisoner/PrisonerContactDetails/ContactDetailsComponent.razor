@@ -11,13 +11,14 @@
 @inject IAppMediator AppMediator;
 @inject IAppJSInterop JsRuntime;
 @inject IAppAuthenticator AppAuthenticator;
+@inject IDialogService DialogService
 
 <MudTable Items="@contacts" Dense="true" Hover="true" Bordered="true" Striped="true"
           Class="no-border" Elevation="4" Outlined>
     <ToolBarContent>
         <MudText Typo="Typo.h6">Contacts</MudText>
         <MudSpacer />
-        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="(x => _addIsOpen = !_addIsOpen)">Add Contact</MudButton>
+        <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="OpenAddContactDialog">Add Contact</MudButton>
     </ToolBarContent>
     <HeaderContent>
         <MudTh>S/L</MudTh>
@@ -48,32 +49,21 @@
         </MudTd>
         <MudTd DataLabel="Status">@context.Status</MudTd>
         <MudTd DataLabel="Call Recording">@(context.IsCallRecordingEnabled ? "Enabled" : "Disabled")</MudTd>
-            <MudTd DataLabel="Address">@context.RelativeAddress</MudTd>
-            <MudTd DataLabel="Action">
-                <MudMenu Icon="@Icons.Material.Filled.MoreVert">
-                    <MudMenuItem OnClick="@(()=> OnEditContactClicked(context.Id))">Edit</MudMenuItem>
-                    <MudMenuItem OnClick="@(() => OnContactBlocked(context.Id, context.IsBlocked))">@(context.IsBlocked ? "Unblock Number" : "Block Number")</MudMenuItem>
-                    <MudMenuItem OnClick="@(() => OnContactDisabled(context.Id, context.IsActive))">@(context.IsActive ? "Disable Number" : "Enable Number")</MudMenuItem>
-                </MudMenu>
-            </MudTd>
-        </RowTemplate>
-        <NoRecordsContent>
-            <JailTalk.Web.Components.Common.NoRecordsComponent />
-        </NoRecordsContent>
-    </MudTable>
+        <MudTd DataLabel="Address">@context.RelativeAddress</MudTd>
+        <MudTd DataLabel="Action">
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert">
+                <MudMenuItem OnClick="@(()=> OnEditContactClicked(context.Id))">Edit</MudMenuItem>
+                <MudMenuItem OnClick="@(() => OnContactBlocked(context.Id, context.IsBlocked))">@(context.IsBlocked ? "Unblock Number" : "Block Number")</MudMenuItem>
+                <MudMenuItem OnClick="@(() => OnContactDisabled(context.Id, context.IsActive))">@(context.IsActive ? "Disable Number" : "Enable Number")</MudMenuItem>
+            </MudMenu>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <JailTalk.Web.Components.Common.NoRecordsComponent />
+    </NoRecordsContent>
+</MudTable>
 
-    <MudDialog @bind-IsVisible="_addIsOpen" Options="options">
-        <DialogContent>
-            <AddContactDetailComponent PrisonerId="@PrisonerId" OnSubmitSuccess="OnAddContactSuccess" OnSubmitFailed="OnAddEditContactFailed" />
-        </DialogContent>
-    </MudDialog>
-
-    <MudDialog @bind-IsVisible="_editIsOpen" Options="options">
-        <DialogContent>
-            <EditContactDetailComponent PrisonerId="@PrisonerId" ContactDetailId="@_editContactId" OnSubmitSuccess="OnEditContactSuccess" OnSubmitFailed="OnAddEditContactFailed" />
-        </DialogContent>
-    </MudDialog>
-    @code {
+@code {
     [Parameter]
     public string PrisonerId { get; set; }
     List<PrisonerContactDetailListDto> contacts = new();
@@ -82,38 +72,11 @@
     bool _editIsOpen = false;
     long _editContactId = 0;
 
-    DialogOptions options = new DialogOptions
-        {
-            CloseButton = true,
-            DisableBackdropClick = true
-        };
-
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (!firstRender) return;
         await UpdateContacts();
         StateHasChanged();
-    }
-
-    private async Task OnAddContactSuccess(long id)
-    {
-        ToastService.Success("Contact details added successfully");
-        _addIsOpen = false;
-        await UpdateContacts();
-        StateHasChanged();
-    }
-
-    private async Task OnEditContactSuccess(long id)
-    {
-        ToastService.Success("Contact details updated successfully");
-        _editIsOpen = false;
-        await UpdateContacts();
-        StateHasChanged();
-    }
-
-    private void OnAddEditContactFailed(ErrorDto err)
-    {
-        ToastService.Error(err.Message);
     }
 
     private async Task UpdateContacts()
@@ -172,11 +135,27 @@
         InvokeAsync(StateHasChanged);
     }
 
-    private void OnEditContactClicked(long contactId)
+    private async void OnEditContactClicked(long contactId)
     {
+        DialogOptions options = new DialogOptions
+            {
+                CloseButton = true,
+                BackdropClick = false
+            };
         _editContactId = contactId;
-        _editIsOpen = true;
-        _addIsOpen = false;
+        DialogParameters param = new DialogParameters()
+        {
+            {nameof(EditContactDetailComponent.PrisonerId), PrisonerId },
+            {nameof(EditContactDetailComponent.ContactDetailId), contactId }
+        };
+        var result = await DialogService.ShowAsync<EditContactDetailComponent>("", param, options);
+        var dialogResult = await result.Result;
+        if (dialogResult.Data is bool accepted && accepted)
+        {
+            ToastService.Success("Contact details updated successfully");
+            await UpdateContacts();
+            StateHasChanged();
+        }
     }
 
     private async Task OpenProofInNewTab(long contactId)
@@ -199,5 +178,26 @@
         {
             ToastService.Error(err.Message);
         });
+    }
+
+    private async Task OpenAddContactDialog()
+    {
+        DialogOptions options = new DialogOptions
+            {
+                CloseButton = true,
+                BackdropClick = false
+            };
+        DialogParameters param = new DialogParameters()
+        {
+            { nameof(AddContactDetailComponent.PrisonerId), PrisonerId },
+        };
+        var result = await DialogService.ShowAsync<AddContactDetailComponent>("", param, options);
+        var dialogResult = await result.Result;
+        if (dialogResult.Data is bool accepted && accepted)
+        {
+            ToastService.Success("Contact details added successfully");
+            await UpdateContacts();
+            StateHasChanged();
+        }
     }
 }

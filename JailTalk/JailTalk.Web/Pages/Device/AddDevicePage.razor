@@ -43,7 +43,7 @@
                         </div>
                     </MudItem>
                     <MudItem sm="12">
-                        <MudSwitch @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
+                        <MudSwitch T="bool" @bind-Checked="@model.IsActive" Label="Enable" Color="Color.Primary" />
                     </MudItem>
                     <MudItem sm="4">
                         <JailTalk.Web.Components.Common.AppProgressButton IsProgressing=_isSaving

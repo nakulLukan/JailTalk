@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace JailTalk.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231001105151_ContactMultipleAttachments")]
-    partial class ContactMultipleAttachments
+    [Migration("20241209171222_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -198,7 +198,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasColumnName("house_name");
 
                     b.Property<string>("PinCode")
-                        .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("character varying(10)")
                         .HasColumnName("pin_code");
@@ -592,6 +591,90 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("JailTalk.Domain.Prison.JailAccountBalance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<float>("BalanceAmount")
+                        .HasColumnType("real")
+                        .HasColumnName("balance_amount");
+
+                    b.Property<int>("JailId")
+                        .HasColumnType("integer")
+                        .HasColumnName("jail_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_jail_account_balance");
+
+                    b.HasIndex("JailId")
+                        .IsUnique()
+                        .HasDatabaseName("ix_jail_account_balance_jail_id");
+
+                    b.ToTable("jail_account_balance", (string)null);
+                });
+
+            modelBuilder.Entity("JailTalk.Domain.Prison.JailAccountRechargeRequest", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTimeOffset?>("ExpiresOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_on");
+
+                    b.Property<int>("JailId")
+                        .HasColumnType("integer")
+                        .HasColumnName("jail_id");
+
+                    b.Property<float>("RechargeAmount")
+                        .HasColumnType("real")
+                        .HasColumnName("recharge_amount");
+
+                    b.Property<string>("RechargeSecretHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("recharge_secret_hash");
+
+                    b.Property<DateTimeOffset?>("RequestCompletedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("request_completed_on");
+
+                    b.Property<short>("RequestStatus")
+                        .HasColumnType("smallint")
+                        .HasColumnName("request_status");
+
+                    b.Property<string>("RequestedBy")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("requested_by");
+
+                    b.Property<DateTimeOffset>("RequestedOn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("requested_on");
+
+                    b.Property<short>("RetryCount")
+                        .HasColumnType("smallint")
+                        .HasColumnName("retry_count");
+
+                    b.HasKey("Id")
+                        .HasName("pk_jail_account_recharge_requests");
+
+                    b.HasIndex("JailId")
+                        .HasDatabaseName("ix_jail_account_recharge_requests_jail_id");
+
+                    b.ToTable("jail_account_recharge_requests", (string)null);
+                });
+
             modelBuilder.Entity("JailTalk.Domain.Prison.PhoneBalance", b =>
                 {
                     b.Property<int>("Id")
@@ -696,10 +779,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
-                    b.Property<int?>("IdProofAttachmentId")
-                        .HasColumnType("integer")
-                        .HasColumnName("id_proof_attachment_id");
-
                     b.Property<int?>("IdProofTypeId")
                         .HasColumnType("integer")
                         .HasColumnName("id_proof_type_id");
@@ -758,9 +837,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id")
                         .HasName("pk_phone_directory");
-
-                    b.HasIndex("IdProofAttachmentId")
-                        .HasDatabaseName("ix_phone_directory_id_proof_attachment_id");
 
                     b.HasIndex("IdProofTypeId")
                         .HasDatabaseName("ix_phone_directory_id_proof_type_id");
@@ -1030,12 +1106,12 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         new
                         {
                             Id = 5,
-                            Description = "Amount charged for 1 minute call in rupees.",
+                            Description = "Amount charged for 1 minute call in rupees. Minimum charge will be given 'Value' and after 1 minute projected 'Value' per second is charged for each second.",
                             IsReadonly = true,
                             LastUpdateBy = "System",
                             LastUpdatedOn = new DateTimeOffset(new DateTime(2023, 5, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             RegexValidation = "^[-+]?[0-9]*\\.?[0-9]+$",
-                            Value = "0.5"
+                            Value = "1.5"
                         },
                         new
                         {
@@ -1346,6 +1422,30 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                     b.Navigation("Address");
                 });
 
+            modelBuilder.Entity("JailTalk.Domain.Prison.JailAccountBalance", b =>
+                {
+                    b.HasOne("JailTalk.Domain.Prison.Jail", "Jail")
+                        .WithOne("AccountBalance")
+                        .HasForeignKey("JailTalk.Domain.Prison.JailAccountBalance", "JailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_jail_account_balance_jails_jail_id");
+
+                    b.Navigation("Jail");
+                });
+
+            modelBuilder.Entity("JailTalk.Domain.Prison.JailAccountRechargeRequest", b =>
+                {
+                    b.HasOne("JailTalk.Domain.Prison.Jail", "Jail")
+                        .WithMany()
+                        .HasForeignKey("JailId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_jail_account_recharge_requests_jails_jail_id");
+
+                    b.Navigation("Jail");
+                });
+
             modelBuilder.Entity("JailTalk.Domain.Prison.PhoneBalance", b =>
                 {
                     b.HasOne("JailTalk.Domain.Prison.Prisoner", "Prisoner")
@@ -1379,11 +1479,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("JailTalk.Domain.Prison.PhoneDirectory", b =>
                 {
-                    b.HasOne("JailTalk.Domain.System.Attachment", "IdProofAttachment")
-                        .WithMany()
-                        .HasForeignKey("IdProofAttachmentId")
-                        .HasConstraintName("fk_phone_directory_attachments_id_proof_attachment_id");
-
                     b.HasOne("JailTalk.Domain.Lookup.LookupDetail", "IdProofType")
                         .WithMany()
                         .HasForeignKey("IdProofTypeId")
@@ -1409,8 +1504,6 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_phone_directory_lookup_details_relative_type_id");
-
-                    b.Navigation("IdProofAttachment");
 
                     b.Navigation("IdProofType");
 
@@ -1438,7 +1531,7 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasForeignKey("JailTalk.Domain.Prison.PrisonerFaceEncodingMapping", "ImageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_prisoner_face_encoding_mappings_attachments_attachment_id");
+                        .HasConstraintName("fk_prisoner_face_encoding_mappings_attachments_image_id");
 
                     b.HasOne("JailTalk.Domain.Prison.Prisoner", "Prisoner")
                         .WithMany("FaceEncodings")
@@ -1538,6 +1631,11 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("JailTalk.Domain.Lookup.LookupMaster", b =>
                 {
                     b.Navigation("LookupDetails");
+                });
+
+            modelBuilder.Entity("JailTalk.Domain.Prison.Jail", b =>
+                {
+                    b.Navigation("AccountBalance");
                 });
 
             modelBuilder.Entity("JailTalk.Domain.Prison.PhoneDirectory", b =>

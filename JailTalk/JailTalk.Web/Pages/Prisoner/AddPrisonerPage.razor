@@ -35,9 +35,9 @@
                 <MudItem sm="12">
                     <MudText>Gender</MudText>
                     <MudRadioGroup @bind-SelectedOption="@model.Gender" For="@(() => model.Gender)" Name="Gender">
-                        <MudRadio Option="@(Gender.Male)" Color="Color.Primary">Male</MudRadio>
-                        <MudRadio Option="@(Gender.Female)" Color="Color.Secondary">Female</MudRadio>
-                        <MudRadio Option="@(Gender.Transgender)" Color="Color.Tertiary">Transgender</MudRadio>
+                        <MudRadio T="Gender" Option="@(Gender.Male)" Color="Color.Primary">Male</MudRadio>
+                        <MudRadio T="Gender" Option="@(Gender.Female)" Color="Color.Secondary">Female</MudRadio>
+                        <MudRadio T="Gender" Option="@(Gender.Transgender)" Color="Color.Tertiary">Transgender</MudRadio>
                     </MudRadioGroup>
                 </MudItem>
 

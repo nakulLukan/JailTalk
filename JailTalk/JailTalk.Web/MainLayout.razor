@@ -4,13 +4,13 @@
 <MudThemeProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
-
+<MudPopoverProvider />
 <MudLayout>
     <MudAppBar Dense>
         @*<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />*@
         <MudLink Href="/" Typo="Typo.button" Underline="Underline.None" Color="Color.Inherit">Jail Connect </MudLink>
         <MudSpacer />
-        <MudLink Href="/sign-out" Typo="Typo.subtitle1" Underline="Underline.None" Color="Color.Inherit" >Log out </MudLink>
+        <MudLink Href="/sign-out" Typo="Typo.subtitle1" Underline="Underline.None" Color="Color.Inherit">Log out </MudLink>
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
         <MudDrawerHeader>
@@ -41,13 +41,26 @@
 
     [CascadingParameter]
     protected Task<AuthenticationState> AuthStat { get; set; }
+
+    bool isNavigateToLogin;
     protected async override Task OnInitializedAsync()
     {
         base.OnInitialized();
         var user = (await AuthStat).User;
         if (!user.Identity.IsAuthenticated)
         {
-            NavigationManager.NavigateTo("login");
+            isNavigateToLogin = true;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender) return;
+
+        if (isNavigateToLogin)
+        {
+            NavigationManager.NavigateTo("/login");
+
         }
     }
 }

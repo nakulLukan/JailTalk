@@ -69,7 +69,7 @@
 
     private async Task OnRechargeSubmit()
     {
-        var rechargePressed = await _rechargePopup.Show();
+        var rechargePressed = await _rechargePopup.ShowAsync();
         if (rechargePressed.HasValue && rechargePressed.Value)
         {
             await AppMediator.Send(new RechargeAccountCommand

@@ -15,7 +15,11 @@ public class PrisonAccountController : AppBaseController
     [ProducesResponseType(typeof(ApiResponseDto<string>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), (int)HttpStatusCode.Unauthorized)]
+#if DEBUG
+    [ApiExplorerSettings(IgnoreApi = false)]
+#else
     [ApiExplorerSettings(IgnoreApi = true)]
+#endif
     public async Task<IActionResult> RechargeAccountAction(RechargeJailAccountCommand request)
     {
         var response = await Mediator.Send(request);

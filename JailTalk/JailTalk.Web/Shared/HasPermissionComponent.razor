@@ -7,9 +7,19 @@
     [Parameter]
     public string Roles { get; set; } = "none";
 
+    private bool hasPermission = true;
     protected override void OnInitialized()
     {
         if (!AuthenticationStateProvider.CheckHasPermission(Roles))
+        {
+            hasPermission = false;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (!firstRender) return;
+        if (!hasPermission)
         {
             NavigationManager.NavigateTo("/unauthorized");
         }

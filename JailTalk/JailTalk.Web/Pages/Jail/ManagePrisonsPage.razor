@@ -8,6 +8,8 @@
 @inject IMediator Mediator;
 @inject IAppMediator AppMediator;
 @inject NavigationManager NavigationManager;
+@inject IDialogService DialogService
+
 <HasPermissionComponent Roles="@Permissions.Admin" />
 <MudContainer MaxWidth="MaxWidth.Medium">
     <MudDataGrid T="PrisonListDto" Items="@Elements" Virtualize="true" Groupable="false" Bordered="true" ShowMenuIcon="false" FixedHeader="true" Dense>
@@ -31,35 +33,28 @@
             <PropertyColumn Property="x => x.IsSystemTurnedOff" Title="Telephone Device Status">
                 <CellTemplate>
                     <MudText Class="@GetClassForIsSystemTurnedOff(context.Item.IsSystemTurnedOff)" Typo="Typo.body2">@(context.Item.IsSystemTurnedOff ? "Turned Off" : "Running")</MudText>
-                    </CellTemplate>
-                </PropertyColumn>
-                <PropertyColumn Property="x => x.AddressAsText" Title="Address" />
-                <TemplateColumn Title="Action">
-                    <CellTemplate>
-                        <MudMenu Icon="@Icons.Material.Filled.MoreVert" Dense>
+                </CellTemplate>
+            </PropertyColumn>
+            <PropertyColumn Property="x => x.AddressAsText" Title="Address" />
+            <TemplateColumn Title="Action">
+                <CellTemplate>
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert" Dense>
                         <MudMenuItem OnClick="@(() => OnEditClicked(context.Item.Id))">Edit</MudMenuItem>
                         <MudMenuItem Class="@(GetClassForIsSystemTurnedOff(!context.Item.IsSystemTurnedOff))"
                                      OnClick="@(async () => await OnTurnOnOffDeviceClicked(context.Item))">@(context.Item.IsSystemTurnedOff ? "Turn On System" : "Shutdown System")</MudMenuItem>
-                            <MudMenuItem OnClick="@(() => OnRechargeClicked(context.Item))">Recharge Account</MudMenuItem>
-                        </MudMenu>
-                    </CellTemplate>
-                </TemplateColumn>
-            </Columns>
-            <NoRecordsContent>
-                <JailTalk.Web.Components.Common.NoRecordsComponent />
-            </NoRecordsContent>
-        </MudDataGrid>
-    </MudContainer>
-    <MudDialog @bind-IsVisible="_rechargeIsOpen">
-        <DialogContent>
-            <RechargeRequestPrisonAccountBalanceComponent JailId="@_selectedItem.Id" JailNameWithCode="@($"{_selectedItem.Name} ({_selectedItem.Code})")"
-                                                          OnRequestSent="OnRechargeRequestSent" OnClose="OnRechargeRequestClosed" />
-        </DialogContent>
-    </MudDialog>
+                        <MudMenuItem OnClick="@(() => OnRechargeClicked(context.Item))">Recharge Account</MudMenuItem>
+                    </MudMenu>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <NoRecordsContent>
+            <JailTalk.Web.Components.Common.NoRecordsComponent />
+        </NoRecordsContent>
+    </MudDataGrid>
+</MudContainer>
 
-    @code {
+@code {
     List<PrisonListDto> Elements = new();
-    bool _rechargeIsOpen = false;
     PrisonListDto _selectedItem = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -84,11 +79,16 @@
         NavigationManager.NavigateTo($"prisons/{jailId}");
     }
 
-    private void OnRechargeClicked(PrisonListDto selectedItem)
+    private async void OnRechargeClicked(PrisonListDto selectedItem)
     {
         _selectedItem = selectedItem;
-        _rechargeIsOpen = true;
-        StateHasChanged();
+        var parameter = new DialogParameters()
+        {
+            {nameof(RechargeRequestPrisonAccountBalanceComponent.JailId), selectedItem.Id},
+            {nameof(RechargeRequestPrisonAccountBalanceComponent.JailNameWithCode), $"{_selectedItem.Name} ({_selectedItem.Code})"}
+        };
+
+        var result = await DialogService.ShowAsync<RechargeRequestPrisonAccountBalanceComponent>("", parameter);
     }
 
     private async Task OnTurnOnOffDeviceClicked(PrisonListDto item)
@@ -116,18 +116,5 @@
             {
                 ToastService.Error(err.Message);
             });
-    }
-
-    private void OnRechargeRequestClosed(bool isClosed)
-    {
-        _rechargeIsOpen = false;
-        StateHasChanged();
-    }
-
-    private void OnRechargeRequestSent(long requestId)
-    {
-        _rechargeIsOpen = false;
-        ToastService.Success("Account recharge requested successfully.");
-        StateHasChanged();
     }
 }

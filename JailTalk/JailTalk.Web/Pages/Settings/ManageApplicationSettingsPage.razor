@@ -57,7 +57,7 @@
     private async Task OnEditClicked(ApplicationSettingsListDto item)
     {
         NewValue = item.Value;
-        bool? result = await _valueUpdatePopup.Show();
+        bool? result = await _valueUpdatePopup.ShowAsync();
         if (result.HasValue && result.Value)
         {
             await AppMediator.Send(new ApplicationSettingsUpdateCommand()

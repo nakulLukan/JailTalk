@@ -60,7 +60,7 @@
 
     private async Task OnAssociateClicked()
     {
-        var confirm = await _associatePrisonerPopup.Show();
+        var confirm = await _associatePrisonerPopup.ShowAsync();
         if (!confirm.HasValue || !confirm.Value)
         {
             return;

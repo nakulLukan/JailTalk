@@ -62,7 +62,7 @@
     [Parameter]
     public string PrisonerId { get; set; }
 
-    private string dpSrc => string.IsNullOrEmpty(personalDetails.DpSrc) ? Assets.DefaultProfilePlaceholder : personalDetails.DpSrc;
+    private string dpSrc => string.IsNullOrEmpty(personalDetails.DpSrc) ? Constants.Assets.DefaultProfilePlaceholder : personalDetails.DpSrc;
     PrisonerDetailDto personalDetails = new();
 
     protected override async void OnAfterRender(bool firstRender)

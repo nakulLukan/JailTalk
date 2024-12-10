@@ -17,7 +17,7 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -1528,7 +1528,7 @@ namespace JailTalk.Infrastructure.Persistence.Migrations
                         .HasForeignKey("JailTalk.Domain.Prison.PrisonerFaceEncodingMapping", "ImageId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
-                        .HasConstraintName("fk_prisoner_face_encoding_mappings_attachments_attachment_id");
+                        .HasConstraintName("fk_prisoner_face_encoding_mappings_attachments_image_id");
 
                     b.HasOne("JailTalk.Domain.Prison.Prisoner", "Prisoner")
                         .WithMany("FaceEncodings")
