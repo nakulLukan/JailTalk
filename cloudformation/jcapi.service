@@ -1,0 +1,47 @@
+[Unit]
+Description=JC API
+
+[Service]
+WorkingDirectory=/var/www/release/api
+ExecStart=/home/ec2-user/.dotnet/dotnet /var/www/release/api/JailTalk.Api.dll
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=jc-api
+User=ec2-user
+
+StandardOutput=journal
+StandardError=journal
+
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_NOLOGO=true
+Environment=ASPNETCORE_URLS=http://0.0.0.0:6000
+
+# Connection string
+Environment=ConnectionStrings__Default="Host=;Username=postgres;Database=jailtalk;Port=5432;Password=;"
+
+# Rekognition
+Environment=Aws__Rekognition__AccessKey=accesskey
+Environment=Aws__Rekognition__SecretKey=secretkey
+Environment=Aws__Rekognition__Region=ap-south-1
+
+# S3
+Environment=Aws__S3__AccessKey=accesskey
+Environment=Aws__S3__SecretKey=secretkey
+Environment=Aws__S3__Region=ap-south-1
+Environment=Aws__S3__UseBasicCredentialAuthentication=false
+Environment=Aws__S3__BucketName=jail-connect
+
+# JWT Settings
+Environment=JwtSettings__Issuer="https://jailtalk.sil.com"
+Environment=JwtSettings__Audience="https://client-jailtalk.sil.com"
+Environment=JwtSettings__Key="KeyUsedInDEV***************8"
+Environment=JwtSettings__SessionVerificationKey="This is a **&(@#$%sd*()"
+Environment=JwtSettings__ValidateFaceImage=false
+
+# Account Manager
+Environment=AccountManager__RechargeSecret="secret@221"
+
+[Install]
+WantedBy=multi-user.target

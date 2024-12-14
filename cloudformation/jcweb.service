@@ -1,0 +1,49 @@
+[Unit]
+Description=JC Web APP
+
+[Service]
+WorkingDirectory=/var/www/release/web
+ExecStart=/home/ec2-user/.dotnet/dotnet /var/www/release/web/JailTalk.Web.dll
+Restart=always
+# Restart service after 10 seconds if the dotnet service crashes:
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=jc-webapp
+User=ec2-user
+
+StandardOutput=journal
+StandardError=journal
+
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_NOLOGO=true
+Environment=ASPNETCORE_URLS=http://0.0.0.0:5000
+
+# Connection string
+Environment=ConnectionStrings__Default="Host=;Username=postgres;Database=jailtalk;Port=5432;Password="
+
+# Rekognition
+Environment=Aws__Rekognition__AccessKey=accesskey
+Environment=Aws__Rekognition__SecretKey=secretkey
+Environment=Aws__Rekognition__Region=region
+
+# S3
+Environment=Aws__S3__AccessKey=accesskey
+Environment=Aws__S3__SecretKey=secretkey
+Environment=Aws__S3__Region=ap-south-1
+Environment=Aws__S3__UseBasicCredentialAuthentication=false
+Environment=Aws__S3__BucketName=jail-connect
+
+# Email Service
+Environment=Email__EnableEmailService=true
+Environment=Email__SmtpSettings__Server="smtp.gmail.com"
+Environment=Email__SmtpSettings__Port=587
+Environment=Email__SmtpSettings__UserName="***@gmail.com"
+Environment=Email__SmtpSettings__Password="*** *** *** jsgv"
+Environment=Email__SmtpSettings__Name="J"
+
+# Email Recharge Service
+Environment=AccountManager__RechargeRequestRecieverEmailAddress="***@gmail.com"
+
+
+[Install]
+WantedBy=multi-user.target

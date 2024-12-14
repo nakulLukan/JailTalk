@@ -1,0 +1,30 @@
+sudo yum update
+
+#install dotnet
+wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+chmod +x ./dotnet-install.sh
+./dotnet-install.sh --channel 9.0 --runtime aspnetcore
+
+# Set System Globalization
+export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=0
+sudo yum install -y libicu
+
+# Install nginx
+sudo yum install -y nginx
+
+sudo mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
+
+# Create certificate
+sudo openssl genrsa -out /etc/ssl/jc-selfsigned.key 2048
+sudo openssl req -new -x509 -key /etc/ssl/jc-selfsigned.key -out /etc/ssl/certs/jc-selfsigned.crt -days 10000
+
+# Enable nginx
+sudo systemctl enable nginx
+
+sudo nginx -t
+
+sudo systemctl start nginx
+
+
+
+
