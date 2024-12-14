@@ -1,0 +1,75 @@
+﻿@page "/"
+@using System.Web;
+@using JailConnect.Management.UI
+@using Management.Contracts
+@using Management.Data
+@using Management.Models
+@using Management.Utility
+@using Microsoft.Extensions.Configuration;
+@using System.Collections.Specialized;
+@using MudBlazor
+@using Refit;
+@using System.Text
+@using System.Net.Http.Json
+@inject IConfiguration Configuration;
+@inject ISnackbar snackbar;
+@inject IHttpClientFactory HttpClientFactory;
+@inject IDialogService DialogService
+<MudStack AlignItems="AlignItems.Center" Style="height: 100%;" Spacing="5">
+    <MudItem>
+        <MudTextField Lines="10" @bind-Value="@EncryptedText" FullWidth Variant="Variant.Outlined"
+        AdornmentColor="Color.Transparent" HelperText="Paste the shared recharge request link here." />
+    </MudItem>
+    <MudItem>
+        <MudButton OnClick="OnShowDetailsClicked" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary">Load Request</MudButton>
+    </MudItem>
+</MudStack>
+@code {
+    public string EncryptedText { get; set; }
+    bool _showRechargeDetailsPopup;
+    RechargeRequestData model = new RechargeRequestData()
+        {
+            Amount = null,
+            PrisonCode = null,
+            PrisonName = null,
+            RequestedUserEmail = null,
+            RequestedUserFullName = null,
+        };
+
+    private async Task OnShowDetailsClicked()
+    {
+        try
+        {
+            NameValueCollection queryParameters = HttpUtility.ParseQueryString(EncryptedText);
+            model = new RechargeRequestData
+                {
+                    RequestedUserEmail = queryParameters[nameof(RechargeRequestData.RequestedUserEmail)],
+                    RequestedUserFullName = queryParameters[nameof(RechargeRequestData.RequestedUserFullName)],
+                    Amount = queryParameters[nameof(RechargeRequestData.Amount)],
+                    PrisonCode = queryParameters[nameof(RechargeRequestData.PrisonCode)],
+                    PrisonName = queryParameters[nameof(RechargeRequestData.PrisonName)],
+                    RechargeSecret = Guid.Parse(queryParameters[nameof(RechargeRequestData.RechargeSecret)]),
+                    RequestId = long.Parse(queryParameters[nameof(RechargeRequestData.RequestId)]),
+                };
+
+            var parameters = new DialogParameters
+            {
+                { nameof(RechargeDetailsDialog.Model), model}
+            };
+            await DialogService.ShowAsync<RechargeDetailsDialog>("", parameters);
+        }
+        catch (Exception ex)
+        {
+            snackbar.Add("Failed to parse request", Severity.Error);
+        }
+        StateHasChanged();
+    }
+
+    private IPrisonAccountManagementApiService GetApiInterface()
+    {
+        var client = HttpClientFactory.CreateClient();
+        client.BaseAddress = new Uri(Configuration["RemoteServices:JailConnectApi"]);
+        return RestService.For<IPrisonAccountManagementApiService>(client);
+    }
+
+}

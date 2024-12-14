@@ -1,0 +1,120 @@
+﻿@using JailConnect.Management.UI
+@using Management.Data
+@using Management.Models
+@using Management.Utility
+@using Microsoft.Extensions.Configuration
+@using MudBlazor
+@using System.Text
+@inject IConfiguration Configuration;
+@inject ISnackbar Snackbar;
+
+<MudDialog >
+    <DialogContent>
+        <MudGrid>
+
+            <MudItem xs="6">
+                <MudText>Request Id</MudText>
+            </MudItem>
+            <MudItem xs="6">
+                <MudText><b>#@Model.RequestId</b> </MudText>
+            </MudItem>
+
+            <MudItem xs="6">
+                <MudText>Requested By</MudText>
+            </MudItem>
+            <MudItem xs="6">
+                <MudText><b>@Model.RequestedUserFullName</b> </MudText>
+            </MudItem>
+
+            <MudItem xs="6">
+                <MudText>Amount</MudText>
+            </MudItem>
+            <MudItem xs="6">
+                <MudText><b>@Model.Amount</b> </MudText>
+            </MudItem>
+
+            <MudItem xs="6">
+                <MudText>Prison Code</MudText>
+            </MudItem>
+            <MudItem xs="6">
+                <MudText><b>@Model.PrisonCode</b> </MudText>
+            </MudItem>
+
+            <MudItem xs="6">
+                <MudText>Prison Name</MudText>
+            </MudItem>
+            <MudItem xs="6">
+                <MudText><b>@Model.PrisonName</b> </MudText>
+            </MudItem>
+
+            <MudItem xs="12">
+                <MudButton Variant="Variant.Filled" Color="Color.Success" OnClick="(async x=> await OnRecharge(true))">Approve</MudButton>
+                <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="(async x=> await OnRecharge(false))">Reject</MudButton>
+            </MudItem>
+        </MudGrid>
+    </DialogContent>
+</MudDialog>
+
+@code {
+    [Parameter]
+    public required RechargeRequestData Model { get; set; }
+
+    private async Task OnRecharge(bool isApproved)
+    {
+        try
+        {
+            var secret = Configuration["AccountManager:RechargeSecret"];
+            int sharedSecretDynamicComponent = (int)(DateTimeOffset.UtcNow - DateTime.UnixEpoch).TotalMinutes;
+
+            var cipherSecret = $"{secret}:{sharedSecretDynamicComponent}";
+            var requestParam = new RechargeJailAccountRequest()
+                {
+                    IsCompleteCommand = isApproved,
+                    RechargeSecret = CryptoEngine.EncryptText(Model.RechargeSecret.ToString(), cipherSecret),
+                    RequestId = Model.RequestId,
+                };
+            HttpsClientHandlerService handler = new HttpsClientHandlerService();
+            var httpClient = new HttpClient(handler.GetPlatformMessageHandler());
+            var json = System.Text.Json.JsonSerializer.Serialize(requestParam);
+            var request = new HttpRequestMessage(HttpMethod.Post, Configuration["RemoteServices:JailConnectApi"] + "/prison-account/recharge");
+            request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            // Send the request and get the response
+            HttpResponseMessage response = await httpClient.SendAsync(request);
+            var temp = await response.Content.ReadAsStringAsync();
+            var curl = PrintRequestAsCurl(request);
+            response.EnsureSuccessStatusCode();
+            StateHasChanged();
+            Snackbar.Add($"Request processed successfully. {(isApproved ? "APPROVED" : "REJECTED")}", Severity.Success);
+        }
+        catch (HttpRequestException e)
+        {
+            Snackbar.Add(e.Message, Severity.Error);
+        }
+        catch
+        {
+        }
+    }
+
+    static string PrintRequestAsCurl(HttpRequestMessage request)
+    {
+        // Method
+        string method = request.Method.Method;
+
+        // URL
+        string url = request.RequestUri.ToString();
+
+        // Headers
+        string headers = "";
+        foreach (var header in request.Headers)
+        {
+            headers += $" -H \"{header.Key}: {string.Join(", ", header.Value)}\"";
+        }
+
+        // Body (if applicable)
+        string body = request.Content != null ? $" -d '{request.Content.ReadAsStringAsync().Result}'" : "";
+
+        // Print the cURL command
+        return $"curl -X {method}{headers}{body} \"{url}\" --insercure";
+    }
+}

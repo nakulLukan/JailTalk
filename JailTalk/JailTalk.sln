@@ -15,6 +15,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JailTalk.Shared", "JailTalk
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JailTalk.Api", "JailTalk.Api\JailTalk.Api.csproj", "{5DF1EC86-F83F-49D0-96E4-64FEC30FDCF1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "mobile", "mobile", "{BD5147D5-3C7C-476F-B556-3ED3911B463E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagementApp", "mobile\ManagementApp\ManagementApp.csproj", "{772FB75F-8087-4698-A9F1-F3A375B2513F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,9 +49,18 @@ Global
 		{5DF1EC86-F83F-49D0-96E4-64FEC30FDCF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DF1EC86-F83F-49D0-96E4-64FEC30FDCF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DF1EC86-F83F-49D0-96E4-64FEC30FDCF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{772FB75F-8087-4698-A9F1-F3A375B2513F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{772FB75F-8087-4698-A9F1-F3A375B2513F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{772FB75F-8087-4698-A9F1-F3A375B2513F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{772FB75F-8087-4698-A9F1-F3A375B2513F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{772FB75F-8087-4698-A9F1-F3A375B2513F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{772FB75F-8087-4698-A9F1-F3A375B2513F}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{772FB75F-8087-4698-A9F1-F3A375B2513F} = {BD5147D5-3C7C-476F-B556-3ED3911B463E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C653DC52-ACE7-4B85-80B5-24B17071B55B}

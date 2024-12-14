@@ -1,0 +1,36 @@
+﻿@using MudBlazor
+@inherits LayoutComponentBase
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+<main class="h-100">
+    <MudLayout>
+        <MudAppBar Elevation="1" Color="Color.Transparent">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+            <MudSpacer />
+        </MudAppBar>
+        <MudDrawer @bind-Open="@open" Elevation="1">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h6">Jail Connect</MudText>
+            </MudDrawerHeader>
+            <MudNavMenu>
+                <MudNavLink Href="/">Home</MudNavLink>
+                <MudNavLink Href="/settings">Settings</MudNavLink>
+
+            </MudNavMenu>
+        </MudDrawer>
+        <MudMainContent Class="pt-16 px-16">
+            <MudContainer Class="mt-6" MaxWidth="MaxWidth.ExtraExtraLarge">
+                @Body
+            </MudContainer>
+        </MudMainContent>
+    </MudLayout>
+</main>
+@code {
+    bool open = false;
+
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
+}

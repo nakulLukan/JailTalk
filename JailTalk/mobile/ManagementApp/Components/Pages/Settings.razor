@@ -1,0 +1,36 @@
+﻿@page "/settings"
+@using Microsoft.Extensions.Configuration
+@using MudBlazor
+@inject IConfiguration Configuration;
+@inject ISnackbar snackbar;
+
+<MudStack AlignItems="AlignItems.Center" Style="height: 100%;" Spacing="5">
+    <MudItem>
+        <MudTextField @bind-Value="@ApiUrl" FullWidth Variant="Variant.Outlined" Label="API Address"
+                       AdornmentColor="Color.Transparent" HelperText="Enter the API address to which the approval request has to be sent" />
+     </MudItem>
+     <MudItem>
+         <MudTextField @bind-Value="@ApiSecret" FullWidth Variant="Variant.Outlined" Label="API Secret"
+                       AdornmentColor="Color.Transparent" HelperText="Enter the API secret." />
+     </MudItem>
+     <MudItem>
+         <MudButton OnClick="Save" Variant="Variant.Filled" Size="Size.Large" Color="Color.Primary">Save Settings</MudButton>
+     </MudItem>
+ </MudStack>
+@code {
+    public string ApiUrl { get; set; }
+    public string ApiSecret { get; set; }
+
+    protected override void OnInitialized()
+    {
+        ApiUrl = Configuration["RemoteServices:JailConnectApi"];
+        ApiSecret = Configuration["AccountManager:RechargeSecret"];
+    }
+    private Task Save(MouseEventArgs e)
+    {
+        Configuration["RemoteServices:JailConnectApi"] = ApiUrl;
+        Configuration["AccountManager:RechargeSecret"] = ApiSecret;
+        snackbar.Add("Settings Updated", Severity.Info);
+        return Task.CompletedTask;
+    }
+}
